@@ -2593,7 +2593,7 @@ public static class Utils
                 lyricItem.Romaji =
                     await Common.KawazuConv.Convert(lyricItem.LyricLine.CurrentLyric, To.Romaji, Mode.Separated);
                 if (lyricItem.LyricLine is not KaraokeLyricsLine klyric) continue;
-                var list = await Common.KawazuConv.GetDivisions(lyricItem.LyricLine.CurrentLyric, To.Romaji, Mode.Separated);
+                var list = await Common.KawazuConv.GetDivisions(lyricItem.LyricLine.CurrentLyric, To.Romaji, Mode.Separated, RomajiSystem.Hepburn, "", "");
                 SetRomajiKaraoke(list, klyric.WordInfos.ToList());
             }
         }
@@ -2623,7 +2623,12 @@ parseOneChar:
             {
                 wordInfo[i + delta].Transliteration = Utilities.ToRawRomaji(curHiraNotation, RomajiSystem.Hepburn, true);
                 if (!string.IsNullOrWhiteSpace(wordInfo[i + delta].CurrentWords))
-                    curElement = curElement.Replace(wordInfo[i + delta].CurrentWords.Trim(), string.Empty);
+                {
+                    var trimmedWord = wordInfo[i + delta].CurrentWords.Trim();
+                    var idx = curElement.IndexOf(trimmedWord, StringComparison.Ordinal);
+                    if (idx >= 0)
+                        curElement = curElement.Remove(idx, trimmedWord.Length);
+                }
                 
                 if (curElement.Trim().Length > 0)
                 {

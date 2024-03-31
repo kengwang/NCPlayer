@@ -216,15 +216,21 @@ namespace HyPlayer.LyricRenderer.LyricLineRenderers
 
             var gap = Id - context.CurrentLyricLineIndex;
 
-            if (_isFocusing && context.Effects.ScaleWhenFocusing)
+            if (context.Effects.ScaleWhenFocusing)
             {
                 // 计算 Progress
-                var progress = 1.0f;
-                if (context.CurrentLyricTime - _lastNoneGapTime <= ScaleAnimationDuration)
+                var progress = 0f;
+                if (context.CurrentLyricTime - EndTime >= 0 && context.CurrentLyricTime - EndTime <= ScaleAnimationDuration)
+                {
+                    progress = 1 - ((float)EaseFunction.Ease(Math.Clamp(
+                        (context.CurrentLyricTime - EndTime) * 1.0f / ScaleAnimationDuration, 0, 1)));
+                }
+                else if (_isFocusing && context.CurrentLyricTime - StartTime >= 0)
                 {
                     progress = (float)EaseFunction.Ease(Math.Clamp(
-                        (context.CurrentLyricTime - _lastNoneGapTime) * 1.0f / ScaleAnimationDuration, 0, 1));
+                        (context.CurrentLyricTime - StartTime) * 1.0f / ScaleAnimationDuration, 0, 1));
                 }
+
 
                 var scaling = 0.8F + progress * 0.2F;
                 var transformEffect = new Transform2DEffect
@@ -245,7 +251,6 @@ namespace HyPlayer.LyricRenderer.LyricLineRenderers
                 ICanvasImage finalEffect = totalCommand;
                 if (context.Effects.ScaleWhenFocusing)
                 {
-                    _lastNoneGapTime = context.CurrentLyricTime;
                     finalEffect = new Transform2DEffect
                     {
                         Source = totalCommand,
@@ -278,7 +283,6 @@ namespace HyPlayer.LyricRenderer.LyricLineRenderers
             return true;
         }
 
-        private long _lastNoneGapTime;
 
         /// <summary>
         /// 根据中心点放大
@@ -461,7 +465,8 @@ namespace HyPlayer.LyricRenderer.LyricLineRenderers
             };
             if (!_isInitialized)
                 _isRomajiSyllable = Syllables?.Any(t => t.Transliteration is not null) ?? false;
-            if (!string.IsNullOrWhiteSpace(Transliteration) || !string.IsNullOrWhiteSpace(Translation) || _isRomajiSyllable)
+            if (!string.IsNullOrWhiteSpace(Transliteration) || !string.IsNullOrWhiteSpace(Translation) ||
+                _isRomajiSyllable)
             {
                 if (!string.IsNullOrWhiteSpace(Transliteration))
                 {

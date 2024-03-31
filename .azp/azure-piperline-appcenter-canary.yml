@@ -23,12 +23,13 @@ steps:
   - checkout: self
     submodules: true
 
-  - task: NuGetToolInstaller@0
-    displayName: 'Use NuGet 4.4.1'
+  - task: UseDotNet@2
+    displayName: 'Use .NET 6'
     inputs:
-      versionSpec: 4.4.1
-      checkLatest: true
+      version: 6.0.x
 
+  - task: NuGetToolInstaller@1
+  
   - task: NuGetCommand@2
     inputs:
       command: 'restore'
@@ -36,10 +37,6 @@ steps:
       feedsToUse: 'config'
       nugetConfigPath: 'nuget.config'
 
-  - task: UseDotNet@2
-    displayName: 'Use .NET 6'
-    inputs:
-      version: 6.0.x
 
   - powershell: |
       $MANIFEST = [xml](Get-Content **\Package.appxmanifest)

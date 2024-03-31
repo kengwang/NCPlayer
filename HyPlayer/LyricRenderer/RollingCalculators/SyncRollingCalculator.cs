@@ -12,7 +12,7 @@ public class SyncRollingCalculator : LineRollingCalculator
     public override float CalculateCurrentY(float fromY, float targetY, RenderingLyricLine currentLine, RenderContext context)
     {
         var gap = currentLine.Id - context.CurrentLyricLineIndex;
-        if (gap < -3)
+        if (false)
         {
             return targetY;
         }

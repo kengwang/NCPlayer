@@ -237,7 +237,10 @@ namespace HyPlayer.LyricRenderer
                             renderedBeforeStartPosition = Context.LineRollingEaseCalculator.CalculateCurrentY(
                                 Context.SnapshotRenderOffsets[currentLine.Id].Y, theoryRenderBeforePosition,
                                 currentLine, Context);
-
+                            if (Context.Debug)
+                            {
+                                session.DrawText(renderedBeforeStartPosition.ToString(), 0, renderedBeforeStartPosition, Colors.Green);
+                            }
                             _needRecalculate = true; // 滚动中, 下一帧继续渲染
                         }
                         if (renderedBeforeStartPosition + currentLine.RenderingHeight > 0) Context.RenderingLyricLines.Add(currentLine);

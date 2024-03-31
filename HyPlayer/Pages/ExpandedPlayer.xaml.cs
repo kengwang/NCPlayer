@@ -114,7 +114,7 @@ public sealed partial class ExpandedPlayer : Page, IDisposable
         LyricBox.OnBeforeRender += LyricBox_OnBeforeRender;
         LyricBox.OnRequestSeek += LyricBoxOnOnRequestSeek;
         LyricBox.Context.LyricWidthRatio = 1;
-        LyricBox.Context.LyricPaddingTopRatio = 0.1f;
+        LyricBox.Context.LyricPaddingTopRatio = Common.Setting.lyricPaddingTopRatio / 100f;
         LyricBox.Context.CurrentLyricTime = 0;
         LyricBox.Context.Debug = Common.Setting.LyricRendererDebugMode;
         LyricBox.Context.Effects.Blur = Common.Setting.lyricRenderBlur;
@@ -122,6 +122,7 @@ public sealed partial class ExpandedPlayer : Page, IDisposable
         {
             1 => new SinRollingCalculator(),
             2 => new LyricifyRollingCalculator(),
+            3 => new SyncRollingCalculator(),
             _ => new ElasticEaseRollingCalculator()
         };
         LyricBox.Context.Effects.ScaleWhenFocusing = Common.Setting.lyricRenderScaleWhenFocusing;

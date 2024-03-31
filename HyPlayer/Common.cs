@@ -350,6 +350,17 @@ namespace HyPlayer
 
     internal class Setting : INotifyPropertyChanged
     {
+        
+        public int lyricPaddingTopRatio
+        {
+            get => GetSettings(nameof(lyricPaddingTopRatio), 10);
+            set
+            {
+                ApplicationData.Current.LocalSettings.Values[nameof(lyricPaddingTopRatio)] = value;
+                OnPropertyChanged();
+            }
+        }
+        
         public int lyricSize
         {
             get => GetSettings(nameof(lyricSize), 0);

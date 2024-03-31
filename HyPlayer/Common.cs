@@ -350,12 +350,33 @@ namespace HyPlayer
 
     internal class Setting : INotifyPropertyChanged
     {
+        
+        public int lyricPaddingTopRatio
+        {
+            get => GetSettings(nameof(lyricPaddingTopRatio), 10);
+            set
+            {
+                ApplicationData.Current.LocalSettings.Values[nameof(lyricPaddingTopRatio)] = value;
+                OnPropertyChanged();
+            }
+        }
+        
         public int lyricSize
         {
             get => GetSettings(nameof(lyricSize), 0);
             set
             {
                 ApplicationData.Current.LocalSettings.Values[nameof(lyricSize)] = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public int translationSize
+        {
+            get => GetSettings(nameof(translationSize), 0);
+            set
+            {
+                ApplicationData.Current.LocalSettings.Values[nameof(translationSize)] = value;
                 OnPropertyChanged();
             }
         }
@@ -757,9 +778,9 @@ namespace HyPlayer
             set => ApplicationData.Current.LocalSettings.Values[nameof(noImage)] = value;
         }
 
-        public bool lyricAlignment
+        public int lyricAlignment
         {
-            get => GetSettings(nameof(lyricAlignment), false);
+            get => GetSettings(nameof(lyricAlignment), 0);
             set
             {
                 ApplicationData.Current.LocalSettings.Values[nameof(lyricAlignment)] = value;
@@ -776,6 +797,57 @@ namespace HyPlayer
                 OnPropertyChanged();
             }
         }
+        
+        public bool lyricRenderFocusHighlighting
+        {
+            get => GetSettings(nameof(lyricRenderFocusHighlighting), true);
+            set
+            {
+                ApplicationData.Current.LocalSettings.Values[nameof(lyricRenderFocusHighlighting)] = value;
+                OnPropertyChanged();
+            }
+        }
+        
+        public bool lyricRenderTransliterationScanning
+        {
+            get => GetSettings(nameof(lyricRenderTransliterationScanning), true);
+            set
+            {
+                ApplicationData.Current.LocalSettings.Values[nameof(lyricRenderTransliterationScanning)] = value;
+                OnPropertyChanged();
+            }
+        }
+        
+        public bool lyricRenderSimpleLineScanning
+        {
+            get => GetSettings(nameof(lyricRenderSimpleLineScanning), true);
+            set
+            {
+                ApplicationData.Current.LocalSettings.Values[nameof(lyricRenderSimpleLineScanning)] = value;
+                OnPropertyChanged();
+            }
+        }
+        
+        public bool lyricRenderScaleWhenFocusing
+        {
+            get => GetSettings(nameof(lyricRenderScaleWhenFocusing), true);
+            set
+            {
+                ApplicationData.Current.LocalSettings.Values[nameof(lyricRenderScaleWhenFocusing)] = value;
+                OnPropertyChanged();
+            }
+        }
+        
+        public bool lyricRenderBlur
+        {
+            get => GetSettings(nameof(lyricRenderBlur), true);
+            set
+            {
+                ApplicationData.Current.LocalSettings.Values[nameof(lyricRenderBlur)] = value;
+                OnPropertyChanged();
+            }
+        }
+        
 #nullable enable
         public Color? pureLyricIdleColor
         {
@@ -1508,6 +1580,17 @@ namespace HyPlayer
                 OnPropertyChanged();
             }
         }
+        
+        public int LineRollingCalculator
+        {
+            //  0 - 不进行转换  1 - 自动选择  2 - 网易云优先  3 - Kawazu 转换优先
+            get => GetSettings(nameof(LineRollingCalculator), 0);
+            set
+            {
+                ApplicationData.Current.LocalSettings.Values[nameof(LineRollingCalculator)] = value;
+                OnPropertyChanged();
+            }
+        }
 
         public bool UseHttp
         {
@@ -1569,6 +1652,17 @@ namespace HyPlayer
                 OnPropertyChanged();
             }
         }
+
+        public bool LyricRendererDebugMode
+        {
+            get => GetSettings(nameof(LyricRendererDebugMode), false);
+            set
+            {
+                ApplicationData.Current.LocalSettings.Values[nameof(LyricRendererDebugMode)] = value;
+                OnPropertyChanged();
+            }
+        }
+
         public bool LastFMLogined => LastFMManager.LastfmLogined;
         public bool SaveCookies()
         {

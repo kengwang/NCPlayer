@@ -349,6 +349,15 @@
                                             HorizontalAlignment="Right"
                                             IsOn="{x:Bind hyplayer:Common.Setting.lyricRenderBlur, Mode=TwoWay}" />
                                     </controls3:SettingsCard>
+                                    <controls3:SettingsCard Description="切歌后生效" Header="罗马字源">
+                                        <ComboBox
+                                            HorizontalAlignment="Right"
+                                            SelectedIndex="{x:Bind hyplayer:Common.Setting.LineRollingCalculator, Mode=TwoWay}">
+                                            <ComboBoxItem Content="弹性动画" />
+                                            <ComboBoxItem Content="三角函数动画" />
+                                            <ComboBoxItem Content="Lyricify 动效" />
+                                        </ComboBox>
+                                    </controls3:SettingsCard>
                                 </controls3:SettingsExpander.Items>
                                 
                             </controls3:SettingsExpander>

@@ -118,6 +118,12 @@ public sealed partial class ExpandedPlayer : Page, IDisposable
         LyricBox.Context.CurrentLyricTime = 0;
         LyricBox.Context.Debug = Common.Setting.LyricRendererDebugMode;
         LyricBox.Context.Effects.Blur = Common.Setting.lyricRenderBlur;
+        LyricBox.Context.LineRollingEaseCalculator = Common.Setting.LineRollingCalculator switch
+        {
+            1 => new SinRollingCalculator(),
+            2 => new LyricifyRollingCalculator(),
+            _ => new ElasticEaseRollingCalculator()
+        };
         LyricBox.Context.Effects.ScaleWhenFocusing = Common.Setting.lyricRenderScaleWhenFocusing;
         LyricBox.Context.Effects.FocusHighlighting = Common.Setting.lyricRenderFocusHighlighting;
         LyricBox.Context.Effects.TransliterationScanning = Common.Setting.lyricRenderTransliterationScanning;

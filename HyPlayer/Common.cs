@@ -1569,6 +1569,17 @@ namespace HyPlayer
                 OnPropertyChanged();
             }
         }
+        
+        public int LineRollingCalculator
+        {
+            //  0 - 不进行转换  1 - 自动选择  2 - 网易云优先  3 - Kawazu 转换优先
+            get => GetSettings(nameof(LineRollingCalculator), 0);
+            set
+            {
+                ApplicationData.Current.LocalSettings.Values[nameof(LineRollingCalculator)] = value;
+                OnPropertyChanged();
+            }
+        }
 
         public bool UseHttp
         {

@@ -73,7 +73,7 @@ namespace HyPlayer.LyricRenderer.LyricLineRenderers
             {
                 var color = new Color
                 {
-                    A = (byte)40,
+                    A = 40,
                     R = 0,
                     G = 0,
                     B = 0
@@ -562,7 +562,7 @@ namespace HyPlayer.LyricRenderer.LyricLineRenderers
                     ? TypographySelector(t => t?.LyricFontSize, context)!.Value / 2
                     : TypographySelector(t => t?.LyricFontSize, context)!.Value) / 8f;
             RenderingHeight = (float)textLayout.LayoutBounds.Height + _drawingOffsetY + add;
-            RenderingWidth = _canvasWidth - 4;
+            RenderingWidth = (float)textLayout.LayoutBounds.Width;
             _isInitialized = true;
         }
     }

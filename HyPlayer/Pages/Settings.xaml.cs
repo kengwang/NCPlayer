@@ -520,4 +520,14 @@ public sealed partial class Settings : Page, IDisposable
         await AboutRomajiDialog.ShowAsync();
 
     }
+
+    private void DisplayMaintain_OnChecked(object sender, RoutedEventArgs e)
+    {
+        Common.DisplayRequest.RequestActive();
+    }
+
+    private void DisplayMaintain_OnUnchecked(object sender, RoutedEventArgs e)
+    {
+        Common.DisplayRequest.RequestRelease();
+    }
 }

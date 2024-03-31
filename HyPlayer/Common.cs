@@ -25,6 +25,7 @@ using System.Threading.Tasks;
 using Windows.ApplicationModel.Core;
 using Windows.Foundation;
 using Windows.Storage;
+using Windows.System.Display;
 using Windows.UI;
 using Windows.UI.Core;
 using Windows.UI.Xaml;
@@ -69,6 +70,7 @@ namespace HyPlayer
         public static bool ShowLyricTrans = true;
         public static List<string> LikedSongs = new();
         public static List<NCPlayList> MySongLists = new();
+        public static DisplayRequest DisplayRequest = new();
         public static readonly Stack<NavigationHistoryItem> NavigationHistory = new();
         public static readonly DateTime UnixEpoch = new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc).ToLocalTime();
         public static void InitializeHttpClientAndAPI()
@@ -602,6 +604,16 @@ namespace HyPlayer
             }
         }
 
+        public bool displayMaintain
+        {
+            get => GetSettings(nameof(displayMaintain), false);
+            set
+            {
+                ApplicationData.Current.LocalSettings.Values[nameof(displayMaintain)] = value;
+                OnPropertyChanged();
+            }
+        }
+        
         public bool localProgressiveLoad
         {
             get => GetSettings(nameof(localProgressiveLoad), false);

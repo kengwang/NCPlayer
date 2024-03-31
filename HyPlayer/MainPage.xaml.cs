@@ -44,6 +44,11 @@ public sealed partial class MainPage
         _ = HyPlayList.OnAudioRenderDeviceChangedOrInitialized();
         ActualThemeChanged += MainPage_ActualThemeChanged;
         Common.OnPlaybarVisibilityChanged += OnPlaybarVisibilityChanged;
+        if (Common.Setting.displayMaintain)
+        {
+            // displayRequest
+            Common.DisplayRequest.RequestActive();
+        }
     }
 
     private void MainPage_ActualThemeChanged(FrameworkElement sender, object args)

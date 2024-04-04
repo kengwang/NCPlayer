@@ -158,12 +158,12 @@ namespace HyPlayer.LyricRenderer.LyricLineRenderers
                                 clds.FillGeometry(highlightTextGeometry2, (float)(textLayout.LayoutBounds.X + actualX), textTop, color);
                             }
 
-                            clds.FillGeometry(highlightTextGeometry, 0, textTop,
+                            clds.FillGeometry(highlightTextGeometry, (float)(textLayout.LayoutBounds.X + actualX), textTop,
                                 TypographySelector(t => t?.FocusingColor, context)!.Value);
                         }
                         else
                         {
-                            clds.DrawTextLayout(textLayout, actualX, textTop,
+                            clds.DrawTextLayout(textLayout, (float)(textLayout.LayoutBounds.X + actualX), textTop,
                                 TypographySelector(t => t?.FocusingColor, context)!.Value);
                         }
                     }

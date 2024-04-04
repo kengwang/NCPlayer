@@ -246,7 +246,7 @@ public sealed partial class ExpandedPlayer : Page, IDisposable
                 LyricWidth = nowwidth - 15;
             LyricWidth = Math.Max(LyricWidth, 0);
             showsize = Common.Setting.lyricSize <= 0
-                ? Math.Max(nowwidth / 66, 23)
+                ? Math.Max(nowwidth / 40, 40)
                 : Common.Setting.lyricSize;
 
             lastwidth = nowwidth;

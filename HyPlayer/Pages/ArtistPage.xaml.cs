@@ -57,6 +57,15 @@ public sealed partial class ArtistPage : Page, IDisposable
         {
             var res = await Common.ncapi?.RequestAsync(CloudMusicApiProviders.ArtistDetail,
                 new Dictionary<string, object> { { "id", (string)e.Parameter } });
+            if (res["code"].ToString() == "404")
+            {
+                TextBoxArtistName.Text = "未知艺人";
+                TextboxArtistNameTranslated.Visibility = Visibility.Collapsed;
+                TextBlockDesc.Text = "艺人不存在";
+                TextBlockInfo.Text = "无信息";
+                Common.AddToTeachingTipLists("艺人不存在", null);
+                return;
+            }
             artist = NCArtist.CreateFromJson(res["data"]["artist"]);
             if (res["data"]["artist"]["cover"].ToString().StartsWith("http"))
             {

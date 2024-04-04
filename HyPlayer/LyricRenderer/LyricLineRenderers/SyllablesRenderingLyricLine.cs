@@ -492,7 +492,7 @@ namespace HyPlayer.LyricRenderer.LyricLineRenderers
                             ? string.Join("", Syllables!.Select(s => s.Transliteration))
                             : Transliteration;
                     tll = new CanvasTextLayout(session, _transliterationActual, transliterationFormat,
-                        Math.Clamp(_canvasWidth - 4, 0, int.MaxValue),
+                        Math.Clamp(context.ItemWidth - 16, 0, int.MaxValue),
                         _canvasHeight);
                     add += 10;
                 }
@@ -517,7 +517,7 @@ namespace HyPlayer.LyricRenderer.LyricLineRenderers
                         FontWeight = FontWeights.Normal
                     };
                     tl = new CanvasTextLayout(session, Translation, translationFormat,
-                        Math.Clamp(_canvasWidth - 4, 0, int.MaxValue), _canvasHeight);
+                        Math.Clamp(context.ItemWidth - 16, 0, int.MaxValue), _canvasHeight);
                     add += 30;
                 }
 
@@ -530,7 +530,7 @@ namespace HyPlayer.LyricRenderer.LyricLineRenderers
                 _sizeChanged = false;
                 _text = IsSyllable ? string.Join("", Syllables.Select(t => t.Syllable)) : Text ?? "";
                 textLayout = new CanvasTextLayout(session, _text, textFormat,
-                    Math.Clamp(_canvasWidth - 4, 0, int.MaxValue), _canvasHeight);
+                    Math.Clamp(context.ItemWidth - 16, 0, int.MaxValue), _canvasHeight);
 
                 // 创建所有行矩形
                 if (!IsSyllable && Text is not null)
@@ -563,11 +563,11 @@ namespace HyPlayer.LyricRenderer.LyricLineRenderers
             _unfocusMatrix = GetCenterMatrix(0, 0, _scalingCenterX,
                 (float)textLayout.LayoutBounds.Height / 2, 0.8F, 0.8F);
             _drawingOffsetY =
-                (float)(HiddenOnBlur
+                (HiddenOnBlur
                     ? TypographySelector(t => t?.LyricFontSize, context)!.Value / 2
                     : TypographySelector(t => t?.LyricFontSize, context)!.Value) / 8f;
             RenderingHeight = (float)textLayout.LayoutBounds.Height + _drawingOffsetY + add;
-            RenderingWidth = (float)textLayout.LayoutBounds.Width;
+            RenderingWidth = (float)textLayout.LayoutBounds.Width + 16;
             _isInitialized = true;
         }
     }

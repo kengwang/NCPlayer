@@ -25,17 +25,20 @@ public static class LrcConverter
             if (string.IsNullOrWhiteSpace(alrcLine.RawText) && alrcLine.Words is not { Count: > 0 })
             {
                 // Empty Line
-                result.Add(new ProgressBarRenderingLyricLine
+               if(alrcLine.End -  alrcLine.Start >= 750)
                 {
-                    KeyFrames =
-                    [
-                        alrcLine.Start ?? 0,
-                        alrcLine.End ?? 0
-                    ],
-                    StartTime = alrcLine.Start ?? 0,
-                    EndTime = alrcLine.End ?? 0,
-                    HiddenOnBlur = true
-                });
+                    result.Add(new ProgressBarRenderingLyricLine
+                    {
+                        KeyFrames =
+                   [
+                       alrcLine.Start ?? 0,
+                       alrcLine.End ?? 0
+                   ],
+                        StartTime = alrcLine.Start ?? 0,
+                        EndTime = alrcLine.End ?? 0,
+                        HiddenOnBlur = true
+                    });
+                }
                 continue;
             }
             

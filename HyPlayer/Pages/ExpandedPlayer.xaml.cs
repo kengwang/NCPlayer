@@ -239,7 +239,11 @@ public sealed partial class ExpandedPlayer : Page, IDisposable
         nowheight = e is null ? (int)Window.Current.Bounds.Height : (int)e.Size.Height;
         if (lastwidth != nowwidth)
         {
-            //这段不要放出去了
+            if (nowwidth > 800 || WindowMode == ExpandedWindowMode.Both)
+                LyricWidth = nowwidth * 0.4;
+            else
+                LyricWidth = nowwidth - 15;
+            LyricWidth = Math.Max(LyricWidth, 0);
             showsize = Common.Setting.lyricSize <= 0
                 ? Math.Max(nowwidth / 40, 40)
                 : Common.Setting.lyricSize;

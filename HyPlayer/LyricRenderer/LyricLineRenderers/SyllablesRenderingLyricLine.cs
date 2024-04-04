@@ -74,10 +74,10 @@ namespace HyPlayer.LyricRenderer.LyricLineRenderers
             switch (TypographySelector(t => t?.Alignment, context)!.Value)
             {
                 case TextAlignment.Left:
-                    actualX += 6;
+                    actualX += offset.X;
                     break;
                 case TextAlignment.Right:
-                    actualX -= 6;
+                    actualX -= offset.Y;
                     break;
             }
 

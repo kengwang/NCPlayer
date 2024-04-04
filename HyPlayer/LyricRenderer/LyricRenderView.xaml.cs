@@ -123,7 +123,7 @@ namespace HyPlayer.LyricRenderer
             {
                 Context.RenderOffsets[renderingLyricLine.Id] = new LineRenderOffset
                 {
-                    X = 4,
+                    X = 6,
                     Y = topleftPosition
                 };
                 Context.SnapshotRenderOffsets[renderingLyricLine.Id] = new LineRenderOffset();

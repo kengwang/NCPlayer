@@ -116,7 +116,7 @@ namespace HyPlayer.LyricRenderer
             _targetingKeyFrames.Clear();
             Context.RenderOffsets.Clear();
             _keyFrameRendered[0] = false; // 将 0 时刻添加到 KeyFrame, 以便初始化时渲染           
-                                          // 初始化位置
+            // 初始化位置
             float topleftPosition = Context.ViewHeight * Context.LyricPaddingTopRatio;
 
             foreach (var renderingLyricLine in Context.LyricLines)
@@ -127,7 +127,7 @@ namespace HyPlayer.LyricRenderer
                     Y = topleftPosition
                 };
                 Context.SnapshotRenderOffsets[renderingLyricLine.Id] = new LineRenderOffset();
-                topleftPosition += renderingLyricLine.RenderingHeight;
+                topleftPosition += renderingLyricLine.RenderingHeight + Context.LineSpacing;
                 // 获取 Keyframe
                 _keyFrameRendered[renderingLyricLine.StartTime] = false;
                 _keyFrameRendered[renderingLyricLine.EndTime] = false;
@@ -149,6 +149,7 @@ namespace HyPlayer.LyricRenderer
                     _keyFrameRendered[renderOptionsKey] = false;
                 }
             }
+
             _initializing = false;
         }
 
@@ -171,7 +172,8 @@ namespace HyPlayer.LyricRenderer
                 Context.LyricLines.FindIndex(x =>
                     x.StartTime <= Context.CurrentLyricTime && x.EndTime >= Context.CurrentLyricTime);
             if (Context.CurrentLyricLineIndex < 0)
-                Context.CurrentLyricLineIndex = Context.LyricLines.FindIndex(x => x.StartTime >= Context.CurrentLyricTime);
+                Context.CurrentLyricLineIndex =
+                    Context.LyricLines.FindIndex(x => x.StartTime >= Context.CurrentLyricTime);
             if (Context.CurrentLyricLineIndex < 0) Context.CurrentLyricLineIndex = Context.LyricLines.Count - 1;
             Context.CurrentLyricLine = Context.LyricLines[Context.CurrentLyricLineIndex];
             Context.RenderingLyricLines.Clear();
@@ -196,21 +198,22 @@ namespace HyPlayer.LyricRenderer
                         Math.Abs(theoryRenderAfterPosition - Context.RenderOffsets[currentLine.Id].Y) >
                         Epsilon)
                     {
-
                         renderedAfterStartPosition = Context.LineRollingEaseCalculator.CalculateCurrentY(
                             Context.SnapshotRenderOffsets[currentLine.Id].Y, theoryRenderAfterPosition,
                             currentLine, Context);
                         if (Context.Debug)
                         {
-                            session.DrawText(renderedAfterStartPosition.ToString(), 0, renderedAfterStartPosition, Colors.Green);
+                            session.DrawText(renderedAfterStartPosition.ToString(), 0, renderedAfterStartPosition,
+                                Colors.Green);
                         }
+
                         _needRecalculate = true; // 滚动中, 下一帧继续渲染
                     }
 
                 Context.RenderOffsets[currentLine.Id].Y = renderedAfterStartPosition;
                 if (renderedAfterStartPosition <= Context.ViewHeight) Context.RenderingLyricLines.Add(currentLine);
-                theoryRenderAfterPosition += currentLine.RenderingHeight;
-                renderedAfterStartPosition += currentLine.RenderingHeight;
+                theoryRenderAfterPosition += currentLine.RenderingHeight + Context.LineSpacing;
+                renderedAfterStartPosition += currentLine.RenderingHeight + Context.LineSpacing;
             }
 
             // 算之前的
@@ -223,11 +226,12 @@ namespace HyPlayer.LyricRenderer
                     renderedBeforeStartPosition -= currentLine.Hidden ? 0 : currentLine.RenderingHeight;
                     theoryRenderBeforePosition -= currentLine.Hidden ? 0 : currentLine.RenderingHeight;
                 }
+
                 if (!currentLine.Hidden && Context.CurrentKeyframe != 0)
                 {
                     // 行前也要算一下
-                    renderedBeforeStartPosition -= currentLine.RenderingHeight;
-                    theoryRenderBeforePosition -= currentLine.RenderingHeight;
+                    renderedBeforeStartPosition -= currentLine.RenderingHeight + Context.LineSpacing;
+                    theoryRenderBeforePosition -= currentLine.RenderingHeight + Context.LineSpacing;
                     if (renderedBeforeStartPosition + currentLine.RenderingHeight > 0) // 可见区域, 需要判断缓动
                     {
                         if (Context.SnapshotRenderOffsets.ContainsKey(currentLine.Id) &&
@@ -239,20 +243,24 @@ namespace HyPlayer.LyricRenderer
                                 currentLine, Context);
                             if (Context.Debug)
                             {
-                                session.DrawText(renderedBeforeStartPosition.ToString(), 0, renderedBeforeStartPosition, Colors.Green);
+                                session.DrawText(renderedBeforeStartPosition.ToString(), 0, renderedBeforeStartPosition,
+                                    Colors.Green);
                             }
+
                             _needRecalculate = true; // 滚动中, 下一帧继续渲染
                         }
-                        if (renderedBeforeStartPosition + currentLine.RenderingHeight > 0) Context.RenderingLyricLines.Add(currentLine);
+
+                        if (renderedBeforeStartPosition + currentLine.RenderingHeight > 0)
+                            Context.RenderingLyricLines.Add(currentLine);
                         Context.RenderingLyricLines.Add(currentLine);
                     }
                 }
                 else
                 {
-                    renderedBeforeStartPosition  = theoryRenderBeforePosition;
+                    renderedBeforeStartPosition = theoryRenderBeforePosition;
                 }
 
-                
+
                 Context.RenderOffsets[currentLine.Id].Y = renderedBeforeStartPosition;
             }
         }
@@ -265,7 +273,7 @@ namespace HyPlayer.LyricRenderer
             if (_initializing) return;
             OnBeforeRender?.Invoke(this);
             // 鼠标滚轮时间 5 s 清零
-            if (Context.ScrollingDelta != 0 && Context.RenderTick - _lastWheelTime > 50000000&&Context.IsPlaying)
+            if (Context.ScrollingDelta != 0 && Context.RenderTick - _lastWheelTime > 50000000 && Context.IsPlaying)
             {
                 // 缓动来一下吧
                 // 0.5 秒缓动到 0
@@ -275,8 +283,8 @@ namespace HyPlayer.LyricRenderer
                 if (Math.Abs(progress - 1) < Epsilon)
                 {
                     _lastWheelTime = 0;
-                    Context.ScrollingDelta = 0;                    
-            }
+                    Context.ScrollingDelta = 0;
+                }
 
                 _needRecalculate = true;
             }
@@ -305,7 +313,7 @@ namespace HyPlayer.LyricRenderer
                     Context.SnapshotRenderOffsets[i].Y = value.Y;
                 }
 
-                
+
                 // 0 时刻渲染所有, 也就是初始化
                 var targets = key == 0 ? Context.LyricLines : _targetingKeyFrames[key];
                 foreach (var renderingLyricLine in targets)
@@ -336,18 +344,18 @@ namespace HyPlayer.LyricRenderer
                     var doRender = renderingLyricLine.Render(args.DrawingSession, offset, Context);
                     if (doRender == false) break;
                 }
-
             }
 
             if (Context.Debug)
             {
-                args.DrawingSession.DrawText($"绘制时间: {args.Timing.ElapsedTime}", 0,0, Colors.Yellow);
+                args.DrawingSession.DrawText($"绘制时间: {args.Timing.ElapsedTime}", 0, 0, Colors.Yellow);
                 args.DrawingSession.DrawText($"滚动偏移: {Context.ScrollingDelta}", 0, 15, Colors.Yellow);
                 args.DrawingSession.DrawText($"歌词时间: {Context.CurrentLyricTime}", 0, 30, Colors.Yellow);
                 args.DrawingSession.DrawText($"绘制行数: {Context.RenderingLyricLines.Count}", 0, 45, Colors.Yellow);
                 // 绘制绘制边框
-                args.DrawingSession.DrawRectangle(0,0,Context.ViewWidth, Context.ViewHeight, Colors.Red, 5);
+                args.DrawingSession.DrawRectangle(0, 0, Context.ViewWidth, Context.ViewHeight, Colors.Red, 5);
             }
+
             args.DrawingSession.Dispose();
         }
 
@@ -367,9 +375,11 @@ namespace HyPlayer.LyricRenderer
         private void LyricView_OnPointerWheelChanged(object sender, PointerRoutedEventArgs e)
         {
             var delta = e.GetCurrentPoint(this).Properties.MouseWheelDelta;
-            var min = -(long)Context.LyricLines.Where(p => p.StartTime > Context.CurrentLyricTime).Sum(p => p.RenderingHeight);
-            var max = (long)Context.LyricLines.Where(p => p.EndTime < Context.CurrentLyricTime).Sum(p => p.RenderingHeight);
-            Context.ScrollingDelta = Math.Clamp(Context.ScrollingDelta + delta, min, max);//限制滚动范围
+            var min = -(long)Context.LyricLines.Where(p => p.StartTime > Context.CurrentLyricTime)
+                .Sum(p => p.RenderingHeight);
+            var max = (long)Context.LyricLines.Where(p => p.EndTime < Context.CurrentLyricTime)
+                .Sum(p => p.RenderingHeight);
+            Context.ScrollingDelta = Math.Clamp(Context.ScrollingDelta + delta, min, max); //限制滚动范围
             Context.IsScrolling = true;
             _lastWheelTime = Context.RenderTick;
             _needRecalculate = true;

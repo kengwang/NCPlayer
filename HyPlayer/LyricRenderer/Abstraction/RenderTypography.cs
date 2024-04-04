@@ -26,6 +26,6 @@ public class RenderTypography
         TranslationFontSize = 16,
         FontWeight = FontWeights.Normal,
         FontStyle = Windows.UI.Text.FontStyle.Normal,
-        Font = "Microsoft YaHei"
+        Font = "Microsoft YaHei UI"
     };
 }

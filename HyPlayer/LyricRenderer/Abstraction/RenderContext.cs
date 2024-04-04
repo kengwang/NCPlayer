@@ -114,5 +114,13 @@ public class RenderContext
     /// </summary>
     public float LyricWidthRatio { get; set; }
     
+    /// <summary>
+    /// 特殊效果设置
+    /// </summary>
     public RenderEffects Effects { get; set; } = new();
+
+    /// <summary>
+    /// 行间距
+    /// </summary>
+    public int LineSpacing { get; set; } = 0;
 }

@@ -363,6 +363,25 @@ namespace HyPlayer
             }
         }
         
+        public string lyricFontFamily
+        {
+            get => GetSettings(nameof(lyricFontFamily), "Microsoft YaHei UI");
+            set
+            {
+                ApplicationData.Current.LocalSettings.Values[nameof(lyricFontFamily)] = value;
+            }
+        }
+        
+        public int lyricLineSpacing
+        {
+            get => GetSettings(nameof(lyricLineSpacing), 0);
+            set
+            {
+                ApplicationData.Current.LocalSettings.Values[nameof(lyricLineSpacing)] = value;
+                OnPropertyChanged();
+            }
+        }
+        
         public int lyricSize
         {
             get => GetSettings(nameof(lyricSize), 0);

@@ -449,10 +449,16 @@ public sealed partial class SongsList : UserControl, IDisposable
             HyPlayList.PlaySourceId = ListSource.Substring(2);
 
         if (!shiftSong)
+        {
             HyPlayList.SongMoveTo(HyPlayList.List.FindIndex(t => t.PlayItem?.Id == ncSong.sid));
+        }
         else
+        {
+            Common.AddToTeachingTipLists("无感歌单切换", "成功无感切换到歌单 " + ListSource);
             HyPlayList.NowPlaying =
                 HyPlayList.List.FindIndex(song => song.PlayItem.Id == ncSong.sid);
+        }
+
         IsAddingSongToPlaylist = false;
     }
 

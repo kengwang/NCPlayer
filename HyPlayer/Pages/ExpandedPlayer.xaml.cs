@@ -129,6 +129,8 @@ public sealed partial class ExpandedPlayer : Page, IDisposable
         LyricBox.Context.Effects.FocusHighlighting = Common.Setting.lyricRenderFocusHighlighting;
         LyricBox.Context.Effects.TransliterationScanning = Common.Setting.lyricRenderTransliterationScanning;
         LyricBox.Context.Effects.SimpleLineScanning = Common.Setting.lyricRenderSimpleLineScanning;
+        LyricBox.Context.PreferTypography.Font = Common.Setting.lyricFontFamily;
+        LyricBox.Context.LineSpacing = Common.Setting.lyricLineSpacing;
     }
 
     private void LyricBoxOnOnRequestSeek(long time)

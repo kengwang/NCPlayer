@@ -7,6 +7,7 @@ using LyricParser.Abstraction;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
@@ -27,6 +28,8 @@ using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Controls.Primitives;
 using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media.Animation;
+using Windows.UI.Xaml.Navigation;
+using Microsoft.Graphics.Canvas.Text;
 using Point = Windows.Foundation.Point;
 
 #endregion
@@ -40,15 +43,30 @@ namespace HyPlayer.Pages;
 /// </summary>
 public sealed partial class Settings : Page, IDisposable
 {
-    private readonly LyricItem _lyricItem;
-    private readonly bool isbyprogram;
+    private LyricItem _lyricItem;
+    private bool isbyprogram;
     private int _elapse = 10;
     private bool disposedValue = false;
+
+
+    public static readonly DependencyProperty IsAdvancedLyricColorSettingsShowProperty = DependencyProperty.Register(
+        "IsAdvancedLyricColorSettingsShow", typeof(bool), typeof(Settings), new PropertyMetadata(default(bool)));
+
+    public bool IsAdvancedLyricColorSettingsShow
+    {
+        get => (bool)GetValue(IsAdvancedLyricColorSettingsShowProperty);
+        set => SetValue(IsAdvancedLyricColorSettingsShowProperty, value);
+    }
 
     public Settings()
     {
         isbyprogram = true;
         InitializeComponent();
+    }
+    
+    protected override void OnNavigatedTo(NavigationEventArgs e)
+    {
+
         RomajiStatus.Header = (Common.KawazuConv == null ? "请下载Kawazu资源文件" : "可以转换");
         ButtonDownloadRomaji.Visibility = Common.KawazuConv == null ? Visibility.Visible : Visibility.Collapsed;
         if (Common.Setting.audioRate.EndsWith('0') || Common.Setting.downloadAudioRate.EndsWith('0'))
@@ -90,14 +108,30 @@ public sealed partial class Settings : Page, IDisposable
 #endif
         //ToggleButtonDaylight.IsChecked = Application.Current.RequestedTheme == ApplicationTheme.Dark;
         BtnXboxReserve.Visibility = true ? Visibility.Visible : Visibility.Collapsed;
+        FontBox.ItemsSource = GetAllFonts();
     }
-    public static readonly DependencyProperty IsAdvancedLyricColorSettingsShowProperty = DependencyProperty.Register(
-        "IsAdvancedLyricColorSettingsShow", typeof(bool), typeof(Settings), new PropertyMetadata(default(bool)));
 
-    public bool IsAdvancedLyricColorSettingsShow
+    private List<FontInfo> GetAllFonts()
     {
-        get => (bool)GetValue(IsAdvancedLyricColorSettingsShowProperty);
-        set => SetValue(IsAdvancedLyricColorSettingsShowProperty, value);
+        var names = CanvasTextFormat.GetSystemFontFamilies();
+        var displayNames = CanvasTextFormat.GetSystemFontFamilies(new[] { "zh-cn" });
+        var models = new List<FontInfo>();
+        for (var i = 0; i < names.Length; i++)
+        {
+            models.Add(new FontInfo
+            {
+                Name = displayNames[i],
+                Value = names[i]
+            });
+        }
+
+        return models.OrderBy(t=>t.Name).ToList();
+    }
+
+    public class FontInfo
+    {
+        public string Name { get; set; }
+        public string Value { get; set; }
     }
 
     private async Task GetRomaji()
@@ -468,6 +502,7 @@ public sealed partial class Settings : Page, IDisposable
             {
                 StackPanelLyricSet.Children.Clear();
             }
+
             disposedValue = true;
         }
     }
@@ -516,9 +551,7 @@ public sealed partial class Settings : Page, IDisposable
 
     private async void AboutRomaji_Click(object sender, RoutedEventArgs e)
     {
-
         await AboutRomajiDialog.ShowAsync();
-
     }
 
     private void DisplayMaintain_OnChecked(object sender, RoutedEventArgs e)

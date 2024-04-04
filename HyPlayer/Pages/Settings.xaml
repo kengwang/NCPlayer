@@ -329,7 +329,7 @@
                                     <FontIcon Glyph="&#xE794;" />
                                 </controls3:SettingsExpander.HeaderIcon>
                                 <controls3:SettingsExpander.Items>
-                                    <controls3:SettingsCard Header="高亮焦点歌词">
+                                    <controls3:SettingsCard Header="焦点歌词增加整体辉光">
                                         <ToggleSwitch
                                             MinWidth="10"
                                             HorizontalAlignment="Right"
@@ -347,7 +347,7 @@
                                             HorizontalAlignment="Right"
                                             IsOn="{x:Bind hyplayer:Common.Setting.lyricRenderSimpleLineScanning, Mode=TwoWay}" />
                                     </controls3:SettingsCard>
-                                    <controls3:SettingsCard Header="焦点歌词行放大">
+                                    <controls3:SettingsCard Header="焦点歌词整体放大">
                                         <ToggleSwitch
                                             MinWidth="10"
                                             HorizontalAlignment="Right"
@@ -359,7 +359,7 @@
                                             HorizontalAlignment="Right"
                                             IsOn="{x:Bind hyplayer:Common.Setting.lyricRenderBlur, Mode=TwoWay}" />
                                     </controls3:SettingsCard>
-                                    <controls3:SettingsCard Description="切歌后生效" Header="罗马字源">
+                                    <controls3:SettingsCard Description="不同函数有不同的效果" Header="行滚动函数">
                                         <ComboBox
                                             HorizontalAlignment="Right"
                                             SelectedIndex="{x:Bind hyplayer:Common.Setting.LineRollingCalculator, Mode=TwoWay}">

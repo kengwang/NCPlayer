@@ -467,7 +467,7 @@ namespace HyPlayer.LyricRenderer.LyricLineRenderers
             if (!string.IsNullOrWhiteSpace(Transliteration) || !string.IsNullOrWhiteSpace(Translation) ||
                 _isRomajiSyllable)
             {
-                if (!string.IsNullOrWhiteSpace(Transliteration))
+                if (!string.IsNullOrWhiteSpace(Transliteration) && context.EnableTransliteration)
                 {
                     transliterationFormat = new CanvasTextFormat
                     {
@@ -495,8 +495,19 @@ namespace HyPlayer.LyricRenderer.LyricLineRenderers
                         _canvasHeight);
                     add += 10;
                 }
+                else
+                {
+                    if (tll != null)
+                    {
+                        tll = null;
+                    }
+                    if(transliterationFormat != null)
+                    {
+                        transliterationFormat = null;
+                    }
+                }
 
-                if (!string.IsNullOrWhiteSpace(Translation))
+                if (!string.IsNullOrWhiteSpace(Translation) && context.EnableTranslation)
                 {
                     translationFormat = new CanvasTextFormat
                     {
@@ -520,10 +531,21 @@ namespace HyPlayer.LyricRenderer.LyricLineRenderers
                     add += 30;
                     
                 }
-
+                else
+                {
+                    if (tl != null)
+                    {
+                        tl = null;
+                    }
+                    if (translationFormat != null)
+                    {
+                        translationFormat = null;
+                    }
+                }
                 add += (float)(tll?.LayoutBounds.Height ?? 0f);
                 add += (float)(tl?.LayoutBounds.Height ?? 0);
             }
+            
 
             if (textLayout is null || _sizeChanged)
             {

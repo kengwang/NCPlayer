@@ -19,5 +19,6 @@
         PointerWheelChanged="LyricView_OnPointerWheelChanged"
         SizeChanged="LyricView_OnSizeChanged"
         PointerMoved="LyricView_OnPointerMoved"
+        PointerReleased="LyricView_PointerReleased"
         Draw="LyricView_Draw" />
 </UserControl>

@@ -793,13 +793,21 @@ public sealed partial class ExpandedPlayer : Page, IDisposable
     private void ToggleButtonTranslation_OnClick(object sender, RoutedEventArgs e)
     {
         Common.ShowLyricTrans = ToggleButtonTranslation.IsChecked;
-        LoadLyricsBox();
+        if (LyricBox != null)
+        {
+            LyricBox.EnableTranslation = Common.ShowLyricTrans;
+        }
+        
     }
 
     private void ToggleButtonSound_OnClick(object sender, RoutedEventArgs e)
     {
         Common.ShowLyricSound = ToggleButtonSound.IsChecked;
-        LoadLyricsBox();
+        if(LyricBox != null)
+        {
+            LyricBox.EnableTransliteration = Common.ShowLyricSound;
+        }
+        
     }
 
     private async void TextBlockAlbum_OnTapped(object sender, RoutedEventArgs e)

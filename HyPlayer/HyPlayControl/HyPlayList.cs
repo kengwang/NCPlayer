@@ -288,13 +288,11 @@ public static class HyPlayList
     }
     public static async void DecreaseRunningSeekingHandler()
     {
-        var shallowCopy = TargetSeekingTimeSpans.ToList();
-        await Task.Delay(500);
-        while (shallowCopy.Count != 0 && shallowCopy.Last() != RunningTimeSpan)
+        await Task.Delay(750);
+        while (TargetSeekingTimeSpans.Count != 0 && TargetSeekingTimeSpans.Last() != RunningTimeSpan)
         {
-            await Task.Delay(500);
             Seek(null, true);
-            shallowCopy = TargetSeekingTimeSpans.ToList();
+            await Task.Delay(500);
         }
         TargetSeekingTimeSpans.Clear();
         if (CurrentRunningSeekingHandler >= 1) CurrentRunningSeekingHandler--;

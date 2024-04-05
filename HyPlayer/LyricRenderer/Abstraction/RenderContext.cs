@@ -123,4 +123,14 @@ public class RenderContext
     /// 行间距
     /// </summary>
     public int LineSpacing { get; set; } = 0;
+
+    /// <summary>
+    /// 启用翻译
+    /// </summary>
+    public bool EnableTranslation { get; set; } = true;
+
+    /// <summary>
+    /// 启用音译
+    /// </summary>
+    public bool EnableTransliteration { get; set; } = true;
 }

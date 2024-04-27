@@ -2278,7 +2278,7 @@ public static class HyPlayList
                 new Dictionary<string, object> { { "id", playlistId } });
 
             var nowIndex = 0;
-            var trackIds = (json["playlist"]?["trackIds"] ?? new JArray()).Select(t => (int)t["id"])
+            var trackIds = (json["playlist"]?["trackIds"] ?? new JArray()).Select(t => (string)t["id"])
                 .ToList();
             while (nowIndex * 500 < trackIds.Count)
             {

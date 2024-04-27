@@ -194,7 +194,7 @@ public sealed partial class SongListDetail : Page, IDisposable
                 throw new Exception($"渐进加载速度过于快, 将在 {cooldownTime * 10} 秒后尝试继续加载, 正在清洗请求");
             }
             if (!json["playlist"]["trackIds"].HasValues) return;
-            var trackIds = json["playlist"]["trackIds"].Select(t => (int)t["id"]).Skip(page * 500)
+            var trackIds = json["playlist"]["trackIds"].Select(t => (string)t["id"]).Skip(page * 500)
                 .Take(500)
                 .ToArray();
 

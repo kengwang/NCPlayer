@@ -113,23 +113,21 @@ namespace HyPlayer.LyricRenderer.LyricLineRenderers
                                 clds.DrawTextLayout(tll, actualX, actualTop, idleColor);
                                 var highlightGeometry = CreateHighlightGeometries(context.CurrentLyricTime, tll,
                                     session, Syllables, false, true);
-                                var textGeometry = CanvasGeometry.CreateText(tll);
-
-                                var highlightTextGeometry = highlightGeometry.geo1.CombineWith(textGeometry,
-                                    Matrix3x2.Identity,
-                                    CanvasGeometryCombine.Intersect);
-                                if (highlightGeometry.geo2 is not null) //填充渐变矩形
+                                var matrix = Matrix3x2.CreateTranslation(actualX, actualTop);
+                                using (clds.CreateLayer(1, highlightGeometry.geo1, matrix))
                                 {
-                                    var color = TypographySelector(t => t?.FocusingColor, context)!.Value;
-                                    color.A = (byte)(255 * highlightGeometry.currentPrecentage);
-                                    var highlightTextGeometry2 = highlightGeometry.geo2.CombineWith(textGeometry,
-                                        Matrix3x2.Identity,
-                                        CanvasGeometryCombine.Intersect);
-                                    clds.FillGeometry(highlightTextGeometry2, actualX, actualTop, color);
-                                }
+                                    clds.DrawTextLayout(tll, actualX, actualTop, TypographySelector(t => t?.FocusingColor, context)!.Value);
 
-                                clds.FillGeometry(highlightTextGeometry, actualX, actualTop,
-                                    TypographySelector(t => t?.FocusingColor, context)!.Value);
+                                    if (highlightGeometry.geo2 is not null) //填充渐变矩形
+                                    {
+                                        var color = TypographySelector(t => t?.FocusingColor, context)!.Value;
+                                        color.A = (byte)(255 * highlightGeometry.currentPrecentage);
+                                        clds.DrawTextLayout(tll, actualX, actualTop, color);
+                                    }
+
+                                    clds.DrawTextLayout(tll, actualX, actualTop,
+                                        TypographySelector(t => t?.FocusingColor, context)!.Value);
+                                }
                             }
                             else
                             {
@@ -156,23 +154,22 @@ namespace HyPlayer.LyricRenderer.LyricLineRenderers
                         {
                             var highlightGeometry = CreateHighlightGeometries(context.CurrentLyricTime, textLayout,
                                 session, Syllables);
-                            var textGeometry = CanvasGeometry.CreateText(textLayout);
-
-                            var highlightTextGeometry = highlightGeometry.geo1.CombineWith(textGeometry,
-                                Matrix3x2.Identity,
-                                CanvasGeometryCombine.Intersect);
-                            if (highlightGeometry.geo2 is not null) //填充渐变矩形
+                            clds.DrawGeometry(highlightGeometry.geo1, actualX, textTop, Colors.Green);
+                            var matrix = Matrix3x2.CreateTranslation(actualX, textTop);
+                            using (clds.CreateLayer(1, highlightGeometry.geo1, matrix))
                             {
-                                var color = TypographySelector(t => t?.FocusingColor, context)!.Value;
-                                color.A = (byte)(128 * highlightGeometry.currentPrecentage);
-                                var highlightTextGeometry2 = highlightGeometry.geo2.CombineWith(textGeometry,
-                                    Matrix3x2.Identity,
-                                    CanvasGeometryCombine.Intersect);
-                                clds.FillGeometry(highlightTextGeometry2, actualX, textTop, color);
-                            }
+                                if (highlightGeometry.geo2 is not null) //填充渐变矩形
+                                {
+                                    var color = TypographySelector(t => t?.FocusingColor, context)!.Value;
+                                    color.A = (byte)(128 * highlightGeometry.currentPrecentage);
+                                    clds.DrawTextLayout(textLayout, actualX, textTop, color);
+                                    
+                                }
 
-                            clds.FillGeometry(highlightTextGeometry, actualX, textTop,
-                                TypographySelector(t => t?.FocusingColor, context)!.Value);
+                                clds.DrawTextLayout (textLayout, actualX, textTop,
+                                    TypographySelector(t => t?.FocusingColor, context)!.Value);
+                            }
+                            
                         }
                         else
                         {

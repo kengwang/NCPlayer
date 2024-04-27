@@ -22,7 +22,7 @@ public static class LrcConverter
         var result = new List<RenderingLyricLine>();
         foreach (var alrcLine in alrc.Lines)
         {
-            if (string.IsNullOrWhiteSpace(alrcLine.RawText) && alrcLine.Words is not { Count: > 0 })
+            if (string.IsNullOrWhiteSpace(alrcLine.RawText) && alrcLine.Words is not { Count: > 0 } && alrcLine.End - alrcLine.Start >= 1500)
             {
                 // Empty Line
                 result.Add(new ProgressBarRenderingLyricLine

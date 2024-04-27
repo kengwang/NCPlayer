@@ -18,6 +18,7 @@ using Windows.Storage;
 using Windows.Storage.AccessCache;
 using Windows.System;
 using Windows.UI.StartScreen;
+using Windows.UI.ViewManagement;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Navigation;
@@ -316,6 +317,7 @@ sealed partial class App : Application
         await HistoryManagement.SetcurPlayingListHistory(HyPlayList.List
             .Where(t => t.ItemType == HyPlayItemType.Netease)
             .Select(t => t.PlayItem.Id).ToList());
+        ApplicationView.PreferredLaunchWindowingMode = ApplicationViewWindowingMode.Auto; //咱就是说 行行好，别FullScreen了 行不？
         deferral.Complete();
     }
 }

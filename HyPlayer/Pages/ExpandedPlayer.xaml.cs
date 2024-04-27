@@ -918,13 +918,11 @@ public sealed partial class ExpandedPlayer : Page, IDisposable
         if (BtnToggleFullScreen.IsChecked)
         {
             ApplicationView.GetForCurrentView().TryEnterFullScreenMode();
-            ApplicationView.PreferredLaunchWindowingMode = ApplicationViewWindowingMode.FullScreen;
             ChangeWindowMode();
         }
         else if (ApplicationView.GetForCurrentView().IsFullScreenMode)
         {
             ApplicationView.GetForCurrentView().ExitFullScreenMode();
-            ApplicationView.PreferredLaunchWindowingMode = ApplicationViewWindowingMode.Auto;
             ChangeWindowMode();
         }
     }

@@ -317,7 +317,6 @@ sealed partial class App : Application
         await HistoryManagement.SetcurPlayingListHistory(HyPlayList.List
             .Where(t => t.ItemType == HyPlayItemType.Netease)
             .Select(t => t.PlayItem.Id).ToList());
-        ApplicationView.PreferredLaunchWindowingMode = ApplicationViewWindowingMode.Auto; //咱就是说 行行好，别FullScreen了 行不？
         deferral.Complete();
     }
 }

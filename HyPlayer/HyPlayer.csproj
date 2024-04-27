@@ -592,7 +592,7 @@
       <Version>2.8.6</Version>
     </PackageReference>
     <PackageReference Include="QRCoder">
-      <Version>1.4.3</Version>
+      <Version>1.5.1</Version>
     </PackageReference>
     <PackageReference Include="TagLibSharp">
       <Version>2.3.0</Version>

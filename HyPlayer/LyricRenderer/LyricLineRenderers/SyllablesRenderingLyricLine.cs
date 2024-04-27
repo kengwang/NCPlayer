@@ -154,7 +154,6 @@ namespace HyPlayer.LyricRenderer.LyricLineRenderers
                         {
                             var highlightGeometry = CreateHighlightGeometries(context.CurrentLyricTime, textLayout,
                                 session, Syllables);
-                            clds.DrawGeometry(highlightGeometry.geo1, actualX, textTop, Colors.Green);
                             var matrix = Matrix3x2.CreateTranslation(actualX, textTop);
                             using (clds.CreateLayer(1, highlightGeometry.geo1, matrix))
                             {

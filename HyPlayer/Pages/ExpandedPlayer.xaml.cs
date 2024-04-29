@@ -59,10 +59,10 @@ public sealed partial class ExpandedPlayer : Page, IDisposable
         new PropertyMetadata("x" + HyPlayList.Player.PlaybackSession.PlaybackRate));
 
     public SolidColorBrush ForegroundAccentTextBrush =
-        Application.Current.Resources["SystemControlPageTextBaseHighBrush"] as SolidColorBrush;
+        (SolidColorBrush)Application.Current.Resources["SystemControlPageTextBaseHighBrush"];
 
     public SolidColorBrush ForegroundIdleTextBrush =
-        Application.Current.Resources["TextFillColorTertiaryBrush"] as SolidColorBrush;
+        (SolidColorBrush)Application.Current.Resources["TextFillColorTertiaryBrush"];
 
 
     public bool jumpedLyrics;
@@ -71,13 +71,10 @@ public sealed partial class ExpandedPlayer : Page, IDisposable
     private bool _lyricHasBeenLoaded = false;
     private bool _lyricIsReadyToGo = false;
     private bool _lyricIsCleaning = false;
-    private bool _lyricColorLoaded = false;
-    private bool _lyricCoverChanged = false;
 
-    private LyricItemModel lastitem;
     private int lastlrcid;
 
-    public PlayItem lastSongForBrush;
+    public PlayItem? lastSongForBrush;
 
     private int lastwidth;
 
@@ -91,7 +88,7 @@ public sealed partial class ExpandedPlayer : Page, IDisposable
     private bool realclick;
     private int sclock;
     private ExpandedWindowMode WindowMode;
-    private AppWindow expandedPlayerWindow;
+    private AppWindow? expandedPlayerWindow;
     public Windows.UI.Color? albumMainColor;
     private bool disposedValue;
     public System.Diagnostics.Stopwatch time = new System.Diagnostics.Stopwatch();
@@ -235,7 +232,7 @@ public sealed partial class ExpandedPlayer : Page, IDisposable
         needRedesign++;
     }
 
-    private void Current_SizeChanged(object sender, WindowSizeChangedEventArgs e)
+    private void Current_SizeChanged(object? sender, WindowSizeChangedEventArgs? e)
     {
         nowwidth = e is null ? (int)Window.Current.Bounds.Width : (int)e.Size.Width;
         nowheight = e is null ? (int)Window.Current.Bounds.Height : (int)e.Size.Height;
@@ -682,7 +679,6 @@ public sealed partial class ExpandedPlayer : Page, IDisposable
         var lyricIsReady = lastlrcid == HyPlayList.NowPlayingItem.GetHashCode();
         _lyricIsReadyToGo = lyricIsReady;
         _lyricHasBeenLoaded = lyricIsReady;
-        _lyricCoverChanged = !lyricIsReady;
         _ = Common.Invoke(() =>
         {
             TextBlockSinger.Content = mpi?.PlayItem?.ArtistString;
@@ -759,7 +755,7 @@ public sealed partial class ExpandedPlayer : Page, IDisposable
         try
         {
             if (Common.Setting.expandAnimation &&
-                Common.BarPlayBar.GridSongInfoContainer.Visibility == Visibility.Visible)
+                Common.BarPlayBar!.GridSongInfoContainer.Visibility == Visibility.Visible)
             {
                 if (TextBlockSongTitle.ActualSize.X != 0 && TextBlockSongTitle.ActualSize.Y != 0)
                     ConnectedAnimationService.GetForCurrentView().PrepareToAnimate("SongTitle", TextBlockSongTitle);
@@ -824,7 +820,7 @@ public sealed partial class ExpandedPlayer : Page, IDisposable
 
             if (Common.Setting.forceMemoryGarbage)
                 Common.NavigatePage(typeof(BlankPage));
-            await Common.BarPlayBar.CollapseExpandedPlayer();
+            await Common.BarPlayBar!.CollapseExpandedPlayer();
         }
         catch
         {
@@ -852,7 +848,7 @@ public sealed partial class ExpandedPlayer : Page, IDisposable
 
             if (Common.Setting.forceMemoryGarbage)
                 Common.NavigatePage(typeof(BlankPage));
-            await Common.BarPlayBar.CollapseExpandedPlayer();
+            await Common.BarPlayBar!.CollapseExpandedPlayer();
         }
         catch
         {
@@ -873,7 +869,7 @@ public sealed partial class ExpandedPlayer : Page, IDisposable
                 HyPlayList.NowPlayingItem.ItemType != HyPlayItemType.LocalProgressive)
             {
                 using var coverResult =
-                    await Common.HttpClient.GetAsync(new Uri(HyPlayList.NowPlayingItem.PlayItem.Album.cover));
+                    await Common.HttpClient!.GetAsync(new Uri(HyPlayList.NowPlayingItem.PlayItem.Album.cover));
                 if (coverResult.IsSuccessStatusCode)
                 {
                     var cover = await coverResult.Content.ReadAsBufferAsync();
@@ -1136,7 +1132,6 @@ public sealed partial class ExpandedPlayer : Page, IDisposable
     private void ExpandedPlayerClosed(AppWindow sender, AppWindowClosedEventArgs args)
     {
         BtnToggleTinyMode.IsChecked = false;
-        expandedPlayerWindow = null;
     }
 
     private void SetABStartPointButton_Click(object sender, RoutedEventArgs e)
@@ -1151,7 +1146,7 @@ public sealed partial class ExpandedPlayer : Page, IDisposable
 
     private void Page_Loaded(object sender, RoutedEventArgs e)
     {
-        Common.PageMain.IsExpandedPlayerInitialized = true;
+        Common.PageMain!.IsExpandedPlayerInitialized = true;
         ToggleButtonSound.IsChecked = Common.ShowLyricSound;
         ToggleButtonTranslation.IsChecked = Common.ShowLyricTrans;
         if (Common.Setting.albumRound) ImageAlbum.CornerRadius = new CornerRadius(300);
@@ -1216,7 +1211,7 @@ public sealed partial class ExpandedPlayer : Page, IDisposable
             {
                 // 竖直方向滑动
                 if (e.Cumulative.Translation.Y >= 0)
-                    Common.PageMain.ExpandedPlayerPositionOffset.Y = e.Cumulative.Translation.Y;
+                    Common.PageMain!.ExpandedPlayerPositionOffset.Y = e.Cumulative.Translation.Y;
                 else
                 {
                     ImagePositionOffset.Y = e.Cumulative.Translation.Y / 10;
@@ -1225,7 +1220,7 @@ public sealed partial class ExpandedPlayer : Page, IDisposable
                 if (e.Cumulative.Translation.Y > 200)
                 {
                     e.Complete();
-                    await Common.BarPlayBar.CollapseExpandedPlayer();
+                    await Common.BarPlayBar!.CollapseExpandedPlayer();
                 }
 
                 break;
@@ -1245,7 +1240,7 @@ public sealed partial class ExpandedPlayer : Page, IDisposable
 
     private async void ImageAlbum_OnManipulationCompleted(object sender, ManipulationCompletedRoutedEventArgs e)
     {
-        Common.PageMain.ImageResetPositionAni.Begin();
+        Common.PageMain!.ImageResetPositionAni.Begin();
         if (Common.Setting.gestureMode == 0)
         {
             if (Math.Abs(e.Cumulative.Translation.Y) < Math.Abs(e.Cumulative.Translation.X))
@@ -1296,7 +1291,6 @@ public sealed partial class ExpandedPlayer : Page, IDisposable
             {
                 try
                 {
-                    _lyricColorLoaded = false;
                     if (hashCode != HyPlayList.NowPlayingHashCode) return;
                     var isBright = await IsBrightAsync(stream);
                     await ImageAlbumSource.SetSourceAsync(stream);
@@ -1352,9 +1346,8 @@ public sealed partial class ExpandedPlayer : Page, IDisposable
                     TextBlockSinger.Foreground = ForegroundAccentTextBrush;
                     TextBlockAlbum.Foreground = ForegroundAccentTextBrush;
                     if (Common.Setting.playbarBackgroundElay)
-                        Common.BarPlayBar.SetPlayBarIdleBackground(ForegroundIdleTextBrush);
+                        Common.BarPlayBar!.SetPlayBarIdleBackground(ForegroundIdleTextBrush);
                     //LoadLyricsBox();
-                    _lyricColorLoaded = true;
                     RefreshLyricColor();
 
                     if (Common.Setting.expandedPlayerBackgroundType == 6)
@@ -1383,7 +1376,6 @@ public sealed partial class ExpandedPlayer : Page, IDisposable
         {
             if (disposing)
             {
-                lastitem = null;
                 _ = Common.Invoke(() =>
                 {
                     ImageAlbum.Source = null;

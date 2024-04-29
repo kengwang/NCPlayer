@@ -8,13 +8,13 @@ namespace HyPlayer.LyricRenderer.Abstraction.Render;
 public abstract class RenderingLyricLine
 {
     public int Id { get; set; }
-    public RenderTypography Typography { get; set; }
+    public RenderTypography? Typography { get; set; }
     public float RenderingHeight { get; set; }
     public float RenderingWidth { get; set; }
 
     public bool Hidden { get; set; }
 
-    public List<long> KeyFrames { get; set; }
+    public List<long>? KeyFrames { get; set; }
 
     public long StartTime { get; set; }
     public long EndTime { get; set; }

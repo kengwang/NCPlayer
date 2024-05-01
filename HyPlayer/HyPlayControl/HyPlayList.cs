@@ -1840,7 +1840,7 @@ public static class HyPlayList
             if (Common.Setting.showComposerInLyric)
                 Lyrics.Add(new SongLyric
                 {
-                    LyricLine = new LrcLyricsLine(pureLyricInfo.PureLyrics, string.Empty, TimeSpan.Zero)
+                    LyricLine = new LrcLyricsLine(pureLyricInfo.PureLyrics, TimeSpan.Zero)
                 });
         }
         else
@@ -1851,7 +1851,7 @@ public static class HyPlayList
 
             if (Lyrics.Count != 0 && Lyrics[0].LyricLine.StartTime != TimeSpan.Zero)
                 Lyrics.Insert(0,
-                    new SongLyric { LyricLine = new LrcLyricsLine(string.Empty, string.Empty, TimeSpan.Zero) });
+                    new SongLyric { LyricLine = new LrcLyricsLine(string.Empty, TimeSpan.Zero) });
         }
 
         LyricPos = 0;

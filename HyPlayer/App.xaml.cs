@@ -36,7 +36,9 @@ sealed partial class App : Application
     ///     初始化单一实例应用程序对象。这是执行的创作代码的第一行，
     ///     已执行，逻辑上等同于 main() 或 WinMain()。
     /// </summary>
+#pragma warning disable CS0169 // 从不使用字段“App.executionSession”
     private ExtendedExecutionSession executionSession;
+#pragma warning restore CS0169 // 从不使用字段“App.executionSession”
     private Frame rootFrame;
 
     public App()

@@ -22,7 +22,9 @@ namespace HyPlayer.LyricRenderer.LyricLineRenderers
 {
     public class RenderingSyllable
     {
+#pragma warning disable CS8618 // 在退出构造函数时，不可为 null 的字段必须包含非 null 值。请考虑声明为可以为 null。还我required字段
         public string Syllable { get; set; }
+#pragma warning restore CS8618 // 在退出构造函数时，不可为 null 的字段必须包含非 null 值。请考虑声明为可以为 null。
         public long StartTime { get; set; }
         public long EndTime { get; set; }
         public string? Transliteration { get; set; }
@@ -37,8 +39,6 @@ namespace HyPlayer.LyricRenderer.LyricLineRenderers
         private CanvasTextLayout? textLayout;
 
         private bool _isRomajiSyllable = false;
-
-        public RenderTypography? Typography { get; set; }
 
         private CanvasTextLayout? tl;
         private CanvasTextLayout? tll;

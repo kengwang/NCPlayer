@@ -20,5 +20,6 @@
         SizeChanged="LyricView_OnSizeChanged"
         PointerMoved="LyricView_OnPointerMoved"
         PointerReleased="LyricView_PointerReleased"
+        DoubleTapped="LyricView_DoubleTapped"
         Draw="LyricView_Draw" />
 </UserControl>

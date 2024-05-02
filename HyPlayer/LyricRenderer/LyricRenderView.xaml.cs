@@ -444,7 +444,7 @@ namespace HyPlayer.LyricRenderer
             {
                 var yValue = e.GetCurrentPoint(this).Position.Y;
                 var delta = (long)(yValue - _lastPointerPressedYValue);
-                if(Math.Abs(delta) > 10)
+                if(Math.Abs(delta) > 20)
                 {
                     _lastPointerPressedYValue = yValue;
                     return;
@@ -486,7 +486,7 @@ namespace HyPlayer.LyricRenderer
 
         private void LyricView_OnPointerPressed(object sender, PointerRoutedEventArgs e)
         {
-            if(Context.RenderTick - _lastWheelTime > 7500000 || e.Pointer.PointerDeviceType == Windows.Devices.Input.PointerDeviceType.Mouse)
+            if(e.Pointer.PointerDeviceType == Windows.Devices.Input.PointerDeviceType.Mouse)
             {
                 foreach (var renderOffsetsKey in Context.RenderOffsets.Keys)
                 {
@@ -511,5 +511,28 @@ namespace HyPlayer.LyricRenderer
             _pointerPressed = false;
             _lastPointerPressedYValue = null;
         }
+
+        private void LyricView_DoubleTapped(object sender, DoubleTappedRoutedEventArgs e)
+        {
+            if (e.PointerDeviceType != Windows.Devices.Input.PointerDeviceType.Mouse)
+            {
+                foreach (var renderOffsetsKey in Context.RenderOffsets.Keys)
+                {
+                    if (Context.LyricLines[renderOffsetsKey].Hidden)
+                        continue;
+                    if (Context.RenderOffsets[renderOffsetsKey].Y <= e.GetPosition(this).Y &&
+                        Context.RenderOffsets[renderOffsetsKey].Y + Context.LyricLines[renderOffsetsKey].RenderingHeight >=
+                        e.GetPosition(this).Y)
+                    {
+                        Context.LyricLines[renderOffsetsKey].GoToReactionState(ReactionState.Press, Context);
+                        OnRequestSeek?.Invoke(Context.LyricLines[renderOffsetsKey].StartTime);
+                        break;
+                    }
+                }
+                Context.ScrollingDelta = 0;
+            }
+            _pointerPressed = true;
+        }
+
     }
 }

@@ -534,9 +534,5 @@ namespace HyPlayer.LyricRenderer
             _pointerPressed = true;
         }
 
-        private void LyricView_Tapped(object sender, TappedRoutedEventArgs e)
-        {
-            Common.AddToTeachingTipLists("Tapped");
-        }
     }
 }

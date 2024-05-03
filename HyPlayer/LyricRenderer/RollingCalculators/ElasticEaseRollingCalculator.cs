@@ -39,14 +39,13 @@ public class ElasticEaseRollingCalculator : LineRollingCalculator
                     ((float)Math.Log10(-gap + 15) + 1), 0, 1);
             }
         }
-        var calculateResult = fromY + (targetY - fromY) * progress;
-        if(calculateResult != 0) 
+        if(progress != 0) 
         { 
-            return calculateResult; 
+            return fromY + (targetY - fromY) * progress;
         }
         else
         {
-            return targetY; //弄个Fallback，如果calculateResult是0那就直接返回它应到的目标位置
+            return targetY; //弄个Fallback，如果progress是0那就直接返回它应到的目标位置
         }
     }
 }

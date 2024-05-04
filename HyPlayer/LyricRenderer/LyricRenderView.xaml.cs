@@ -218,7 +218,7 @@ namespace HyPlayer.LyricRenderer
                 if (currentLine.Hidden)
                     continue;
               
-                if (renderedAfterStartPosition <= Context.ViewHeight && !(Context.IsScrolling && !Context.IsPlaying)) // 在可视区域, 需要缓动
+                if (renderedAfterStartPosition <= Context.ViewHeight && !Context.IsScrolling && Context.IsPlaying) // 在可视区域, 需要缓动
                     if (Context.SnapshotRenderOffsets.ContainsKey(currentLine.Id) &&
                         Math.Abs(theoryRenderAfterPosition - Context.RenderOffsets[currentLine.Id].Y) >
                         Epsilon)

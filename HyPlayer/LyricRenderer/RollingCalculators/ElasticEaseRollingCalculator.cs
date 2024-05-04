@@ -19,7 +19,6 @@ public class ElasticEaseRollingCalculator : LineRollingCalculator
     {
         float progress = 1;
         var gap = currentLine.Id - context.CurrentLyricLineIndex;
-        if (context.IsScrolling) return targetY;
         if (true)
         {
             if (!(fromY < targetY) && gap >= 0)

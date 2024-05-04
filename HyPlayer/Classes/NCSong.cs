@@ -151,7 +151,7 @@ public class NCFmItem : NCSong
                 description = song["radio"]["desc"].ToString()
             },
             LengthInMilliseconds = song["duration"].ToObject<double>(),
-            mvid = -1,
+            mvid = "-1",
             alias = null,
             transname = null,
             fmId = song["id"].ToString(),
@@ -174,7 +174,7 @@ public class NCSong
 
     public double LengthInMilliseconds;
 
-    public int mvid;
+    public string mvid;
     public int Order = 0;
     public string sid;
     public string songname;
@@ -225,7 +225,7 @@ public class NCSong
             song[arpath].ToList().ForEach(t => { NCSong.Artist.Add(NCArtist.CreateFromJson(t)); });
         else
             NCSong.Artist.Add(new NCArtist());
-        if (song["mv"] != null) NCSong.mvid = song["mv"].ToObject<int>();
+        if (song["mv"] != null) NCSong.mvid = song["mv"].ToObject<string>();
 
         if (song["alia"] != null)
             NCSong.alias = string.Join(" / ", song["alia"].ToArray().Select(t => t.ToString()));

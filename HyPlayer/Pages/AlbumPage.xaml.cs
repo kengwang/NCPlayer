@@ -152,7 +152,7 @@ public sealed partial class AlbumPage : Page, IDisposable
                 IsAvailable = jsonSong["privilege"]["st"].ToString() == "0",
                 IsVip = jsonSong["fee"]?.ToString() == "1",
                 LengthInMilliseconds = double.Parse(jsonSong["dt"].ToString()),
-                mvid = jsonSong["mv"]?.ToObject<int>() ?? -1,
+                mvid = jsonSong["mv"]?.ToObject<string>() ?? "",
                 Order = ++idx,
                 sid = jsonSong["id"].ToString(),
                 songname = jsonSong["name"].ToString(),

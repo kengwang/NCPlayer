@@ -33,7 +33,7 @@ internal static class The163KeyHelper
     /// <param name="tag"></param>
     /// <param name="trackId"></param>
     /// <returns></returns>
-    public static bool TryGetTrackId(Tag tag, out int trackId)
+    public static bool TryGetTrackId(Tag tag, out ulong trackId)
     {
         if (tag is null)
             throw new ArgumentNullException(nameof(tag));
@@ -57,7 +57,7 @@ internal static class The163KeyHelper
     }
 
 
-    public static bool TryGetTrackId(string the163Key, out int trackId)
+    public static bool TryGetTrackId(string the163Key, out ulong trackId)
     {
         if (string.IsNullOrEmpty(the163Key))
             throw new ArgumentNullException(nameof(the163Key));
@@ -71,7 +71,7 @@ internal static class The163KeyHelper
                 byt163Key = cryptoTransform.TransformFinalBlock(byt163Key, 0, byt163Key.Length);
             }
             var jObject = JObject.Parse(Encoding.UTF8.GetString(byt163Key).Substring(6));
-            trackId = (int)jObject["musicId"];
+            trackId = (ulong)jObject["musicId"];
             jObject.RemoveAll();
         }
         catch
@@ -167,7 +167,7 @@ internal static class The163KeyHelper
             var key = new The163KeyClass
             {
                 album = pi.Album.name,
-                albumId = int.Parse(pi.Album.id),
+                albumId = ulong.Parse(pi.Album.id),
                 albumPic = pi.Album.cover,
                 bitrate = pi.Bitrate,
                 artist = null,
@@ -203,7 +203,7 @@ internal static class The163KeyHelper
 
 internal class The163KeyClass
 {
-    public int albumId { get; set; }
+    public ulong albumId { get; set; }
 
     //public string[] alias { get; set; }
     public string album { get; set; }

@@ -158,7 +158,7 @@ internal static class NCMFile
                 var obj = JsonConvert.DeserializeObject<JObject>(infoStr);
                 keys = new The163KeyClass
                 {
-                    albumId = obj["albumId"].ToObject<int>(),
+                    albumId = obj["albumId"].ToObject<ulong>(),
                     album = obj["album"].ToString(),
                     musicId = long.Parse(Regex.Match(obj["musicId"].ToString(), "\\d*$").Value),
                     musicName = obj["musicName"].ToString(),

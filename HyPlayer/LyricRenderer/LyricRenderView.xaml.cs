@@ -298,7 +298,7 @@ namespace HyPlayer.LyricRenderer
             if (_initializing) return;
             OnBeforeRender?.Invoke(this);
             // 鼠标滚轮时间 5 s 清零
-            if (Context.ScrollingDelta != 0 && Context.RenderTick - _lastWheelTime > 50000000 && Context.IsPlaying)
+            if ((Context.ScrollingDelta != 0 || (Context.IsScrolling && !_pointerPressed)) && Context.RenderTick - _lastWheelTime > 50000000 && Context.IsPlaying)
             {
                 // 缓动来一下吧
                 // 0.5 秒缓动到 0

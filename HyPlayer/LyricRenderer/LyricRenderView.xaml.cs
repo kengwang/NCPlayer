@@ -261,7 +261,9 @@ namespace HyPlayer.LyricRenderer
                     {
                         if (Context.SnapshotRenderOffsets.ContainsKey(currentLine.Id) &&
                             Math.Abs(Context.RenderOffsets[currentLine.Id].Y - theoryRenderBeforePosition) >
-                            Epsilon)
+                            Epsilon &&
+                            Context.IsPlaying &&
+                            !Context.IsScrolling)
                         {
                             renderedBeforeStartPosition = Context.LineRollingEaseCalculator.CalculateCurrentY(
                                 Context.SnapshotRenderOffsets[currentLine.Id].Y, theoryRenderBeforePosition,

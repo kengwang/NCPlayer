@@ -297,7 +297,7 @@ namespace HyPlayer.LyricRenderer
             Microsoft.Graphics.Canvas.UI.Xaml.CanvasAnimatedDrawEventArgs args)
         {
             Context.RenderTick = args.Timing.TotalTime.Ticks;
-            if (_initializing) return;
+            if (_initializing || Context.ViewHeight == 0 || Context.ViewWidth == 0) return;
             OnBeforeRender?.Invoke(this);
             // 鼠标滚轮时间 5 s 清零
             if ((Context.ScrollingDelta != 0 || (Context.IsScrolling && !_pointerPressed)) && Context.RenderTick - _lastWheelTime > 50000000 && Context.IsPlaying)
@@ -402,9 +402,9 @@ namespace HyPlayer.LyricRenderer
         private void LyricView_OnPointerWheelChanged(object sender, PointerRoutedEventArgs e)
         {
             var delta = e.GetCurrentPoint(this).Properties.MouseWheelDelta;
-            var min = -(long)Context.LyricLines.Where(p => p.StartTime > Context.CurrentLyricTime)
+            var min = -(long)Context.LyricLines.Where(p => Context.LyricLines.IndexOf(p) >= Context.CurrentLyricLineIndex)
                 .Sum(p => p.RenderingHeight);
-            var max = (long)Context.LyricLines.Where(p => p.EndTime < Context.CurrentLyricTime)
+            var max = (long)Context.LyricLines.Where(p => Context.LyricLines.IndexOf(p) < Context.CurrentLyricLineIndex)
                 .Sum(p => p.RenderingHeight);
             Context.ScrollingDelta = Math.Clamp(Context.ScrollingDelta + delta, min, max); //限制滚动范围
             Context.IsScrolling = true;

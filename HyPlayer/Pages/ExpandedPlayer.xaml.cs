@@ -1294,6 +1294,7 @@ public sealed partial class ExpandedPlayer : Page, IDisposable
                     if (hashCode != HyPlayList.NowPlayingHashCode) return;
                     var isBright = await IsBrightAsync(stream);
                     await ImageAlbumSource.SetSourceAsync(stream);
+                    ImageAlbumImerssive.Source= (ImageSource)ImageAlbum.Source;
                     if (Common.Setting.expandedPlayerBackgroundType == 0 && Background?.GetType() != typeof(ImageBrush))
                     {
                         var brush = new ImageBrush
@@ -1379,9 +1380,11 @@ public sealed partial class ExpandedPlayer : Page, IDisposable
                 _ = Common.Invoke(() =>
                 {
                     ImageAlbum.Source = null;
+                    ImageAlbumImerssive.Source = null;
                     Background = null;
                 });
                 ImageAlbumSource = null;
+                ImageAlbumImerssiveSource = null;
                 LyricList.Clear();
             }
 
@@ -1486,8 +1489,8 @@ public sealed partial class ExpandedPlayer : Page, IDisposable
 
     private void BtnToggleImmersiveMode_OnClicked(object sender, RoutedEventArgs e)
     {
-        if (Common.Setting.expandedPlayerBackgroundType == 0)
-        {
+        //if (Common.Setting.expandedPlayerBackgroundType == 0)
+        //{
             if (BtnToggleImmersiveMode.IsChecked)
             {
                 ImmersiveModeIn();
@@ -1496,17 +1499,17 @@ public sealed partial class ExpandedPlayer : Page, IDisposable
             {
                 ImmersiveModeExit();
             }
-        }
-        else
-        {
-            BtnToggleImmersiveMode.IsChecked = false;
-            var dialog = new ContentDialog();
-            dialog.Title = "请调整背景样式";
-            dialog.Content = "沉浸模式只推荐在展开页背景样式为\"专辑背景模糊\"时才能展现最好效果，否则将无法开启沉浸模式\n请在设置中将背景显示设置更改为\"专辑背景模糊\"后再开启沉浸模式";
-            dialog.CloseButtonText = "好";
-            dialog.IsPrimaryButtonEnabled = true;
-            _ = dialog.ShowAsync();
-        }
+        //}
+        //else
+        //{
+        //    BtnToggleImmersiveMode.IsChecked = false;
+        //    var dialog = new ContentDialog();
+        //    dialog.Title = "请调整背景样式";
+        //    dialog.Content = "沉浸模式只推荐在展开页背景样式为\"专辑背景模糊\"时才能展现最好效果，否则将无法开启沉浸模式\n请在设置中将背景显示设置更改为\"专辑背景模糊\"后再开启沉浸模式";
+        //    dialog.CloseButtonText = "好";
+        //    dialog.IsPrimaryButtonEnabled = true;
+        //    _ = dialog.ShowAsync();
+        //}
     }
 
     private void ImmersiveModeIn()
@@ -1516,13 +1519,17 @@ public sealed partial class ExpandedPlayer : Page, IDisposable
         DefaultRow.Height = new GridLength(1.1, GridUnitType.Star);
         // Clear Shadow
         AlbumCoverDropShadow.Opacity = 0;
+        ImageAlbumImerssive.Visibility= Visibility.Visible;
         //MoreBtn.Margin = new Thickness(0,0,30,130);
         Grid.SetRow(LyricBox, 1);
         if (Common.Setting.albumRotate)
             RotateAnimationSet.Stop();
         if (Common.Setting.expandAlbumBreath)
             ImageAlbumAni.Pause();
-        ImmersiveModeInAni.Begin();
+        if (Common.Setting.expandedPlayerBackgroundType == 0)
+            ImmersiveModeInAni.Begin();
+        else
+            ImmersiveModeInAniOtrMode.Begin();
         LeftPanel.VerticalAlignment = VerticalAlignment.Bottom;
         Common.IsInImmersiveMode = true;
     }
@@ -1532,6 +1539,7 @@ public sealed partial class ExpandedPlayer : Page, IDisposable
         //MoreBtn.Margin = new Thickness(0, 0, 30, 50);
         MainGrid.Margin = new Thickness(0, 0, 0, 80);
         DefaultRow.Height = new GridLength(25, GridUnitType.Star);
+        ImageAlbumImerssive.Visibility = Visibility.Collapsed;
         if (!Common.Setting.albumRound)
             AlbumCoverDropShadow.Opacity = (double)Common.Setting.expandedCoverShadowDepth / 10;
         Grid.SetRow(LyricBox, 0);
@@ -1539,7 +1547,10 @@ public sealed partial class ExpandedPlayer : Page, IDisposable
             RotateAnimationSet.StartAsync();
         if (Common.Setting.expandAlbumBreath)
             ImageAlbumAni.Begin();
-        ImmersiveModeOutAni.Begin();
+        if (Common.Setting.expandedPlayerBackgroundType == 0)
+            ImmersiveModeOutAni.Begin();
+        else
+            ImmersiveModeOutAniOtrMode.Begin();
         LeftPanel.VerticalAlignment = VerticalAlignment.Top;
         Common.IsInImmersiveMode = false;
     }

@@ -199,9 +199,9 @@ namespace HyPlayer.LyricRenderer.LyricLineRenderers
                         Source = new GaussianBlurEffect
                         {
                             Source = cl,
-                            BlurAmount = 4,
+                            BlurAmount = 8,
                         },
-                        Opacity = 0.4f
+                        Opacity = 0.5f
                     };
                     targetDrawingSession.DrawImage(opacityEffect);
                     targetDrawingSession.DrawImage(cl);
@@ -268,7 +268,12 @@ namespace HyPlayer.LyricRenderer.LyricLineRenderers
                     Source = finalEffect,
                     BlurAmount = Math.Clamp(Math.Abs(gap), 0, 250),
                 };
-                session.DrawImage(blurEffect, actualX, drawingTop);
+                var opacityEffect = new OpacityEffect
+                {
+                    Source = blurEffect,
+                    Opacity = 1-Math.Clamp(Math.Abs(gap), 0, 0.35f),
+                }; 
+                session.DrawImage(opacityEffect, actualX, drawingTop);
             }
             if (context.Debug)
             {
@@ -524,7 +529,8 @@ namespace HyPlayer.LyricRenderer.LyricLineRenderers
                         FontFamily = TypographySelector(t => t?.Font, context),
                         FontWeight = FontWeights.Normal
                     };
-                    tl = new CanvasTextLayout(session, Translation, translationFormat,
+                    string trimmedText = Translation.ToString().TrimEnd();
+                    tl = new CanvasTextLayout(session, trimmedText, translationFormat,
                         Math.Clamp(context.ItemWidth - 16, 0, int.MaxValue), _canvasHeight);
                     add += 30;
                     

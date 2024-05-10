@@ -18,36 +18,39 @@
         
         <Storyboard x:Key="ImageAlbumAni" x:Name="ImageAlbumAni">
             <DoubleAnimation
+                x:Name="albumAniOpacity"
                 AutoReverse="True"
                 RepeatBehavior="Forever"
                 Storyboard.TargetName="ImageAlbum"
                 Storyboard.TargetProperty="Opacity"
                 From="1"
-                To="0.65"
+                To="0.8"
                 Duration="0:0:4">
                 <DoubleAnimation.EasingFunction>
                     <QuadraticEase EasingMode="EaseInOut" />
                 </DoubleAnimation.EasingFunction>
             </DoubleAnimation>
             <DoubleAnimation
+                x:Name="albumAniScaleX"
                 AutoReverse="True"
                 RepeatBehavior="Forever"
                 Storyboard.TargetName="ImageScale"
                 Storyboard.TargetProperty="ScaleX"
                 From="1"
-                To="0.9"
+                To="0.95"
                 Duration="0:0:4">
                 <DoubleAnimation.EasingFunction>
                     <QuadraticEase EasingMode="EaseInOut" />
                 </DoubleAnimation.EasingFunction>
             </DoubleAnimation>
             <DoubleAnimation
+                x:Name="albumAniScaleY"
                 AutoReverse="True"
                 RepeatBehavior="Forever"
                 Storyboard.TargetName="ImageScale"
                 Storyboard.TargetProperty="ScaleY"
                 From="1"
-                To="0.9"
+                To="0.95"
                 Duration="0:0:4">
                 <DoubleAnimation.EasingFunction>
                     <QuadraticEase EasingMode="EaseInOut" />
@@ -196,7 +199,7 @@
             Opacity="0">
             <Rectangle.Fill>
                 <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
-                    <GradientStop Offset="0.25" Color="{ThemeResource SystemAltLowColor}" />
+                    <GradientStop x:Name="ImmersiveTopStop" Offset="0.25"  />
                     <GradientStop x:Name="ImmersiveCover" Offset="0.95" />
                 </LinearGradientBrush>
             </Rectangle.Fill>

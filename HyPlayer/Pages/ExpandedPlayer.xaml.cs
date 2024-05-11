@@ -1327,6 +1327,22 @@ public sealed partial class ExpandedPlayer : Page, IDisposable
                         BlackCover.Fill = new SolidColorBrush(Windows.UI.Color.FromArgb(80, 255, 255, 255));
                     else if (Common.Setting.expandedPlayerBackgroundType == 6 && !isBright)
                         BlackCover.Fill = new SolidColorBrush(Windows.UI.Color.FromArgb(80, 0,0, 0));
+                    //if (Common.Setting.expandedPlayerBackgroundType == 0 && isBright)
+                    //{
+                    //    var darkResource = new ResourceDictionary
+                    //    {
+                    //        Source = new Uri("ms-appx:///Themes/Dark.xaml")
+                    //    };
+                    //    AcrylicCover.Fill = (SolidColorBrush)darkResource["ExpandedPlayerMask"];
+                    //}
+                    //else if (Common.Setting.expandedPlayerBackgroundType == 0 && !isBright)
+                    //{
+                    //    var lightResource = new ResourceDictionary
+                    //    {
+                    //        Source = new Uri("ms-appx:///Themes/Light.xaml")
+                    //    };
+                    //    AcrylicCover.Fill = (SolidColorBrush)lightResource["ExpandedPlayerMask"];
+                    //}
                     if (Common.Setting.lyricColor != 3 || albumMainColor == null)
                     {
                         if (isBright)
@@ -1347,23 +1363,35 @@ public sealed partial class ExpandedPlayer : Page, IDisposable
                     }
                     else
                     {
-                        if (isBright)
+                        if (Common.Setting.expandedPlayerBackgroundType != 0)
                         {
-                            var AccentColor = AdjustBrightness((Windows.UI.Color)albumMainColor, -0.3f);
-                            ForegroundAccentTextBrush = new SolidColorBrush(AccentColor);
-                            var idleColor =AccentColor;
-                            idleColor.A = 150;
-                            ForegroundIdleTextBrush = new SolidColorBrush(idleColor);
-                            ImmersiveTopStop.Color = Windows.UI.Color.FromArgb(0, 255, 255, 255);
+                            if (isBright)
+                            {
+                                var AccentColor = AdjustBrightness((Windows.UI.Color)albumMainColor, -0.3f);
+                                ForegroundAccentTextBrush = new SolidColorBrush(AccentColor);
+                                var idleColor = AccentColor;
+                                idleColor.A = 150;
+                                ForegroundIdleTextBrush = new SolidColorBrush(idleColor);
+                                ImmersiveTopStop.Color = Windows.UI.Color.FromArgb(0, 255, 255, 255);
+                            }
+                            else
+                            {
+                                var AccentColor = AdjustBrightness((Windows.UI.Color)albumMainColor, 0.3f);
+                                ForegroundAccentTextBrush = new SolidColorBrush(AccentColor);
+                                var idleColor = AdjustBrightness((Windows.UI.Color)AccentColor, -0.15f);
+                                idleColor.A = 150;
+                                ForegroundIdleTextBrush = new SolidColorBrush(idleColor);
+                                ImmersiveTopStop.Color = Windows.UI.Color.FromArgb(0, 0, 0, 0);
+                            }
                         }
                         else
                         {
-                            var AccentColor = AdjustBrightness((Windows.UI.Color)albumMainColor, 0.3f);
-                            ForegroundAccentTextBrush = new SolidColorBrush(AccentColor);
-                            var idleColor = AdjustBrightness((Windows.UI.Color)AccentColor, -0.15f);
-                            idleColor.A = 150;
-                            ForegroundIdleTextBrush = new SolidColorBrush(idleColor);
-                            ImmersiveTopStop.Color = Windows.UI.Color.FromArgb(0, 0, 0, 0);
+                                var AccentColor = AdjustBrightness((Windows.UI.Color)albumMainColor, -0.3f);
+                                ForegroundAccentTextBrush = new SolidColorBrush(AccentColor);
+                                var idleColor = AccentColor;
+                                idleColor.A = 150;
+                                ForegroundIdleTextBrush = new SolidColorBrush(idleColor);
+                                ImmersiveTopStop.Color = Windows.UI.Color.FromArgb(0, 255, 255, 255);
                         }
                     }
 

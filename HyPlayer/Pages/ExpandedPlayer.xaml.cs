@@ -1476,10 +1476,10 @@ public sealed partial class ExpandedPlayer : Page, IDisposable
     {
         time.Reset();
         MainGrid.Margin = new Thickness(0, 0, 0, 80);
-        if (Common.IsInImmersiveMode)
-        {
-            DefaultRow.Height = new GridLength(1.1, GridUnitType.Star);
-        }
+        //if (Common.IsInImmersiveMode)
+        //{
+        //    DefaultRow.Height = new GridLength(1.1, GridUnitType.Star);
+        //}
 
         var BtnAni = new DoubleAnimation
         {
@@ -1508,10 +1508,10 @@ public sealed partial class ExpandedPlayer : Page, IDisposable
             _ = Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
             {
                 MainGrid.Margin = new Thickness(0);
-                if (Common.IsInImmersiveMode)
-                {
-                    DefaultRow.Height = new GridLength(1.35, GridUnitType.Star);
-                }
+                //if (Common.IsInImmersiveMode)
+                //{
+                //    DefaultRow.Height = new GridLength(1.35, GridUnitType.Star);
+                //}
 
                 var BtnAni = new DoubleAnimation
                 {
@@ -1567,11 +1567,17 @@ public sealed partial class ExpandedPlayer : Page, IDisposable
         //}
     }
 
+    public static double Map(double value, double fromSource, double toSource, double fromTarget, double toTarget)
+    {
+        return (value - fromSource) / (toSource - fromSource) * (toTarget - fromTarget) + fromTarget;
+    }
+
     private void ImmersiveModeIn()
     {
         // if (Common.Setting.AutoHidePlaybar)
         MainGrid.Margin = new Thickness(0, 0, 0, 80);
-        DefaultRow.Height = new GridLength(1.2, GridUnitType.Star);
+        DefaultRow.Height = new GridLength(0, GridUnitType.Star);
+        LyricBox.Context.LyricPaddingTopRatio = (float)Map(Common.Setting.lyricPaddingTopRatio, 0, 100, 55, 100)/100f;
         LeftPanel.Margin = new Thickness(90, 0, 0, 100);
         // Clear Shadow
         AlbumCoverDropShadow.Opacity = 0;
@@ -1595,6 +1601,7 @@ public sealed partial class ExpandedPlayer : Page, IDisposable
         //MoreBtn.Margin = new Thickness(0, 0, 30, 50);
         MainGrid.Margin = new Thickness(0, 0, 0, 80);
         DefaultRow.Height = new GridLength(25, GridUnitType.Star);
+        LyricBox.Context.LyricPaddingTopRatio = Common.Setting.lyricPaddingTopRatio/100f;
         LeftPanel.Margin = new Thickness(0);
         ImageAlbumImerssive.Visibility = Visibility.Collapsed;
         if (!Common.Setting.albumRound)

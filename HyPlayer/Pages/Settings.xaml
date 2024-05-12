@@ -299,6 +299,18 @@
                                             Value="{x:Bind hyplayer:Common.Setting.lyricPaddingTopRatio, Mode=TwoWay}" />
                                     </controls3:SettingsCard>
                                     <controls3:SettingsCard
+                                        Description="单位 %"
+                                        Header="歌词渐隐程度"
+                                        Visibility="{x:Bind hyplayer:Common.Setting.lyricRenderFade}">
+                                        <Slider
+                                            MinWidth="200"
+                                            HorizontalAlignment="Right"
+                                            Minimum="0"
+                                            Maximum="99"
+                                            Value="{x:Bind hyplayer:Common.Setting.lyricFadingRatio, Mode=TwoWay}" />
+                                    </controls3:SettingsCard>
+
+                                    <controls3:SettingsCard
                                         Header="歌词行间距">
                                         <controls:NumberBox
                                             MinWidth="100"
@@ -379,6 +391,13 @@
                                             HorizontalAlignment="Right"
                                             IsOn="{x:Bind hyplayer:Common.Setting.lyricRenderBlur, Mode=TwoWay}" />
                                     </controls3:SettingsCard>
+                                    <controls3:SettingsCard Header="非聚焦行逐渐渐隐">
+                                        <ToggleSwitch
+                                            MinWidth="10"
+                                            HorizontalAlignment="Right"
+                                            IsOn="{x:Bind hyplayer:Common.Setting.lyricRenderFade, Mode=TwoWay}" />
+                                    </controls3:SettingsCard>
+
                                     <controls3:SettingsCard Description="不同函数有不同的效果" Header="行滚动函数">
                                         <ComboBox
                                             HorizontalAlignment="Right"

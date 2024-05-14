@@ -11,7 +11,7 @@ public class ElasticEaseRollingCalculator : LineRollingCalculator
 
     private readonly CustomElasticEase _ease = new() { EasingMode = EasingMode.EaseOut };
     
-    public const long AnimationDuration = 630;
+    public const long AnimationDuration = 1300;
 
 
     public override float CalculateCurrentY(float fromY, float targetY, RenderingLyricLine currentLine,
@@ -34,14 +34,17 @@ public class ElasticEaseRollingCalculator : LineRollingCalculator
             }
             else
             {
-                progress = Math.Clamp(
-                    (context.CurrentLyricTime - context.CurrentKeyframe) * 1.0f / AnimationDuration *
-                    ((float)Math.Log10(-gap + 15) + 1), 0, 1);
+                //progress = Math.Clamp(
+                //    (context.CurrentLyricTime - context.CurrentKeyframe) * 1.0f / AnimationDuration *
+                //    ((float)Math.Log10(-gap + 15) + 1), 0, 1);
+                var theoryTime = AnimationDuration * ((float)Math.Log10(Math.Max(gap, 0.9)) + 1);
+                progress = Math.Clamp((context.CurrentLyricTime - context.CurrentKeyframe) / theoryTime, 0, 1);
+                progress = (float)_ease.Ease(progress);
             }
         }
         if(progress != 0) 
         { 
-            return fromY + (targetY - fromY) * progress;
+            return fromY + (targetY - fromY) *  progress;
         }
         else
         {

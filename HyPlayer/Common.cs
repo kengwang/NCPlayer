@@ -362,7 +362,17 @@ namespace HyPlayer
                 OnPropertyChanged();
             }
         }
-        
+        public int lyricFadingRatio
+        {
+            get => GetSettings(nameof(lyricFadingRatio), 5);
+            set
+            {
+                ApplicationData.Current.LocalSettings.Values[nameof(lyricFadingRatio)] = value;
+                OnPropertyChanged();
+            }
+        }
+
+
         public string lyricFontFamily
         {
             get => GetSettings(nameof(lyricFontFamily), "Microsoft YaHei UI");
@@ -878,7 +888,16 @@ namespace HyPlayer
                 OnPropertyChanged();
             }
         }
-        
+
+        public bool lyricRenderFade
+        {
+            get => GetSettings(nameof(lyricRenderFade), true);
+            set
+            {
+                ApplicationData.Current.LocalSettings.Values[nameof(lyricRenderFade)] = value;
+                OnPropertyChanged();
+            }
+        }
 #nullable enable
         public Color? pureLyricIdleColor
         {

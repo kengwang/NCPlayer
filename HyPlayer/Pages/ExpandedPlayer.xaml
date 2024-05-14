@@ -18,36 +18,39 @@
         
         <Storyboard x:Key="ImageAlbumAni" x:Name="ImageAlbumAni">
             <DoubleAnimation
+                x:Name="albumAniOpacity"
                 AutoReverse="True"
                 RepeatBehavior="Forever"
                 Storyboard.TargetName="ImageAlbum"
                 Storyboard.TargetProperty="Opacity"
                 From="1"
-                To="0.65"
+                To="0.8"
                 Duration="0:0:4">
                 <DoubleAnimation.EasingFunction>
                     <QuadraticEase EasingMode="EaseInOut" />
                 </DoubleAnimation.EasingFunction>
             </DoubleAnimation>
             <DoubleAnimation
+                x:Name="albumAniScaleX"
                 AutoReverse="True"
                 RepeatBehavior="Forever"
                 Storyboard.TargetName="ImageScale"
                 Storyboard.TargetProperty="ScaleX"
                 From="1"
-                To="0.9"
+                To="0.95"
                 Duration="0:0:4">
                 <DoubleAnimation.EasingFunction>
                     <QuadraticEase EasingMode="EaseInOut" />
                 </DoubleAnimation.EasingFunction>
             </DoubleAnimation>
             <DoubleAnimation
+                x:Name="albumAniScaleY"
                 AutoReverse="True"
                 RepeatBehavior="Forever"
                 Storyboard.TargetName="ImageScale"
                 Storyboard.TargetProperty="ScaleY"
                 From="1"
-                To="0.9"
+                To="0.95"
                 Duration="0:0:4">
                 <DoubleAnimation.EasingFunction>
                     <QuadraticEase EasingMode="EaseInOut" />
@@ -96,6 +99,25 @@
             </DoubleAnimation>
 
         </Storyboard>
+        <Storyboard x:Name="ImmersiveModeInAniOtrMode">
+            <DoubleAnimation
+                Storyboard.TargetName="BlackCover"
+                Storyboard.TargetProperty="Opacity"
+                To="1">
+                <DoubleAnimation.EasingFunction>
+                    <PowerEase EasingMode="EaseInOut" />
+                </DoubleAnimation.EasingFunction>
+            </DoubleAnimation>
+            <DoubleAnimation
+                Storyboard.TargetName="ImageAlbum"
+                Storyboard.TargetProperty="Opacity"
+                To="0">
+                <DoubleAnimation.EasingFunction>
+                    <PowerEase EasingMode="EaseInOut" />
+                </DoubleAnimation.EasingFunction>
+            </DoubleAnimation>
+
+        </Storyboard>
         <Storyboard x:Name="ImmersiveModeOutAni">
             <DoubleAnimation
                 Storyboard.TargetName="BlackCover"
@@ -109,6 +131,25 @@
                 Storyboard.TargetName="AcrylicCover"
                 Storyboard.TargetProperty="Opacity"
                 To="1">
+                <DoubleAnimation.EasingFunction>
+                    <PowerEase EasingMode="EaseInOut" />
+                </DoubleAnimation.EasingFunction>
+            </DoubleAnimation>
+            <DoubleAnimation
+                Storyboard.TargetName="ImageAlbum"
+                Storyboard.TargetProperty="Opacity"
+                To="1">
+                <DoubleAnimation.EasingFunction>
+                    <PowerEase EasingMode="EaseInOut" />
+                </DoubleAnimation.EasingFunction>
+            </DoubleAnimation>
+
+        </Storyboard>
+        <Storyboard x:Name="ImmersiveModeOutAniOtrMode">
+            <DoubleAnimation
+                Storyboard.TargetName="BlackCover"
+                Storyboard.TargetProperty="Opacity"
+                To="0">
                 <DoubleAnimation.EasingFunction>
                     <PowerEase EasingMode="EaseInOut" />
                 </DoubleAnimation.EasingFunction>
@@ -158,7 +199,7 @@
             Opacity="0">
             <Rectangle.Fill>
                 <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
-                    <GradientStop Offset="0.25" Color="{ThemeResource SystemAltLowColor}" />
+                    <GradientStop x:Name="ImmersiveTopStop" Offset="0.25"  />
                     <GradientStop x:Name="ImmersiveCover" Offset="0.95" />
                 </LinearGradientBrush>
             </Rectangle.Fill>
@@ -280,15 +321,36 @@
                         </controls:ImageEx.Source>
                     </controls:ImageEx>
                     <StackPanel
-                        x:Name="SongInfo"
                         Grid.Row="2"
+                        Orientation="Horizontal">
+                        <controls:ImageEx
+                        x:Name="ImageAlbumImerssive"
+                        Width="200"
+                        Height="200"
+                        Visibility="Collapsed"
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Center"
+                        ui:Effects.Shadow="{StaticResource AlbumShadow}"
+                        ui:VisualExtensions.NormalizedCenterPoint="0.5"
+                        x:FieldModifier="public"
+                        BorderBrush="Black"
+                        CornerRadius="12"
+                        IsCacheEnabled="False"
+                        PlaceholderStretch="Uniform"
+                        Stretch="Uniform">
+                            <controls:ImageEx.Source>
+                                <BitmapImage x:Name="ImageAlbumImerssiveSource" UriSource="/Assets/icon.png" />
+                            </controls:ImageEx.Source>
+                        </controls:ImageEx>
+                        <StackPanel
+                        x:Name="SongInfo"
                         MaxWidth="600"
                         Margin="20"
                         HorizontalAlignment="Stretch"
                         CornerRadius="0"
                         Orientation="Vertical"
                         Spacing="5">
-                        <controls1:SelectableTextBox
+                            <controls1:SelectableTextBox
                             x:Name="TextBlockSongTitle"
                             Margin="0,-10,0,0"
                             HorizontalAlignment="Stretch"
@@ -297,36 +359,37 @@
                             FontWeight="Bold"
                             Text="歌曲名"
                             TextWrapping="Wrap" />
-                        <StackPanel
+                            <StackPanel
                             x:Name="SongInfoContainer"
                             Orientation="Horizontal"
                             Spacing="4">
-                            <TextBlock
+                                <TextBlock
                                 x:Name="TextBlockSingerNameTip"
                                 Padding="0,6,0,6"
                                 FontSize="18"
                                 Foreground="{ThemeResource TextFillColorSecondaryBrush}"
                                 Text="歌手: "
                                 TextAlignment="Center" />
-                            <HyperlinkButton
+                                <HyperlinkButton
                                 Name="TextBlockSinger"
                                 Click="TextBlockSinger_OnTapped"
                                 FontSize="18"
                                 Style="{StaticResource TextBlockButtonStyle}" />
-                        </StackPanel>
-                        <StackPanel Orientation="Horizontal" Spacing="5">
-                            <TextBlock
+                            </StackPanel>
+                            <StackPanel Orientation="Horizontal" Spacing="5">
+                                <TextBlock
                                 x:Name="TextBlockAlbumNameTip"
                                 Padding="0,6,0,6"
                                 FontSize="18"
                                 Foreground="{StaticResource SystemControlForegroundBaseMediumBrush}"
                                 Text="专辑: "
                                 TextAlignment="Center" />
-                            <HyperlinkButton
+                                <HyperlinkButton
                                 Name="TextBlockAlbum"
                                 Click="TextBlockAlbum_OnTapped"
                                 FontSize="18"
                                 Style="{StaticResource TextBlockButtonStyle}" />
+                            </StackPanel>
                         </StackPanel>
                     </StackPanel>
                 </Grid>

@@ -538,7 +538,7 @@ public sealed partial class ExpandedPlayer : Page, IDisposable
                         1.8,
                         1,
                         TimeSpan.Zero,
-                        TimeSpan.FromSeconds(60 * (Common.Setting.gentleBPMAnimation ? 10 : 1) / bpm),
+                        TimeSpan.FromSeconds(60 * (Common.Setting.gentleBPMAnimation ? 8 : 1) / bpm),
                         repeatBehavior: RepeatBehavior.Forever,
                         autoReverse: true,
                         easing: Common.Setting.gentleBPMAnimation
@@ -549,7 +549,7 @@ public sealed partial class ExpandedPlayer : Page, IDisposable
                         1.8,
                         1,
                         TimeSpan.Zero,
-                        TimeSpan.FromSeconds(60 * (Common.Setting.gentleBPMAnimation ? 10 : 1) / bpm),
+                        TimeSpan.FromSeconds(60 * (Common.Setting.gentleBPMAnimation ? 8 : 1) / bpm),
                         repeatBehavior: RepeatBehavior.Forever,
                         autoReverse: true,
                         easing: Common.Setting.gentleBPMAnimation
@@ -561,6 +561,7 @@ public sealed partial class ExpandedPlayer : Page, IDisposable
                     bpmAniStoryboard.Begin();
                     luminousColorsRotateAnimation.Duration = TimeSpan.FromSeconds(3200 / bpm);
                     LyricBox.ChangeBeatPerMinute((float)bpm);
+                    albumAniScaleX.Duration = albumAniScaleY.Duration = albumAniOpacity.Duration = TimeSpan.FromSeconds(60 * (Common.Setting.gentleBPMAnimation ? 4 : 1) / bpm);
                 }
             }
         }
@@ -1165,6 +1166,9 @@ public sealed partial class ExpandedPlayer : Page, IDisposable
             case 4: // Force Black
                 PageContainer.Background = new SolidColorBrush(Colors.Black);
                 break;
+            case 6:
+                BlackCover.Opacity = 1;
+                break;
         }
 
         if (!Common.IsInImmersiveMode)
@@ -1282,6 +1286,16 @@ public sealed partial class ExpandedPlayer : Page, IDisposable
         ImageResetPositionAni.Begin();
     }
 
+    public static Windows.UI.Color AdjustBrightness(Windows.UI.Color color, float percentage)
+    {
+        int adjustment = (int)(255 * percentage);
+        int r = Math.Max(0, Math.Min(255, color.R + adjustment));
+        int g = Math.Max(0, Math.Min(255, color.G + adjustment));
+        int b = Math.Max(0, Math.Min(255, color.B + adjustment));
+        return Windows.UI.Color.FromArgb(color.A, (byte)r, (byte)g, (byte)b);
+    }
+
+
     public async Task RefreshAlbumCover(int hashCode, IRandomAccessStream coverStream)
     {
         await Dispatcher.RunAsync(CoreDispatcherPriority.Normal, async () =>
@@ -1294,6 +1308,7 @@ public sealed partial class ExpandedPlayer : Page, IDisposable
                     if (hashCode != HyPlayList.NowPlayingHashCode) return;
                     var isBright = await IsBrightAsync(stream);
                     await ImageAlbumSource.SetSourceAsync(stream);
+                    ImageAlbumImerssive.Source= (ImageSource)ImageAlbum.Source;
                     if (Common.Setting.expandedPlayerBackgroundType == 0 && Background?.GetType() != typeof(ImageBrush))
                     {
                         var brush = new ImageBrush
@@ -1303,21 +1318,38 @@ public sealed partial class ExpandedPlayer : Page, IDisposable
                     }
 
                     if (hashCode != HyPlayList.NowPlayingHashCode) return;
+                    if (albumMainColor != null)
+                    {
+                        var coverColor = albumMainColor.Value;
+                        ImmersiveCover.Color = coverColor;
+                    }
+                    if (Common.Setting.expandedPlayerBackgroundType == 6 && isBright)
+                        BlackCover.Fill = new SolidColorBrush(Windows.UI.Color.FromArgb(80, 255, 255, 255));
+                    else if (Common.Setting.expandedPlayerBackgroundType == 6 && !isBright)
+                        BlackCover.Fill = new SolidColorBrush(Windows.UI.Color.FromArgb(80, 0,0, 0));
+                    //if (Common.Setting.expandedPlayerBackgroundType == 0 && isBright)
+                    //{
+                    //    var darkResource = new ResourceDictionary
+                    //    {
+                    //        Source = new Uri("ms-appx:///Themes/Dark.xaml")
+                    //    };
+                    //    AcrylicCover.Fill = (SolidColorBrush)darkResource["ExpandedPlayerMask"];
+                    //}
+                    //else if (Common.Setting.expandedPlayerBackgroundType == 0 && !isBright)
+                    //{
+                    //    var lightResource = new ResourceDictionary
+                    //    {
+                    //        Source = new Uri("ms-appx:///Themes/Light.xaml")
+                    //    };
+                    //    AcrylicCover.Fill = (SolidColorBrush)lightResource["ExpandedPlayerMask"];
+                    //}
                     if (Common.Setting.lyricColor != 3 || albumMainColor == null)
                     {
-                        if (Common.Setting.expandedPlayerBackgroundType == 0)
-                        {
-                            if (albumMainColor != null)
-                            {
-                                var coverColor = albumMainColor.Value;
-                                ImmersiveCover.Color = coverColor;
-                            }
-                        }
-
                         if (isBright)
                         {
                             ForegroundAccentTextBrush = new SolidColorBrush(Windows.UI.Color.FromArgb(255, 0, 0, 0));
                             ForegroundIdleTextBrush = new SolidColorBrush(Windows.UI.Color.FromArgb(114, 0, 0, 0));
+                            ImmersiveTopStop.Color = Windows.UI.Color.FromArgb(0, 255, 255, 255);
                             //ImmersiveCover.Color = Windows.UI.Color.FromArgb(255, 210,210, 210);
                         }
                         else
@@ -1325,18 +1357,42 @@ public sealed partial class ExpandedPlayer : Page, IDisposable
                             ForegroundAccentTextBrush =
                                 new SolidColorBrush(Windows.UI.Color.FromArgb(255, 255, 255, 255));
                             ForegroundIdleTextBrush = new SolidColorBrush(Windows.UI.Color.FromArgb(66, 255, 255, 255));
+                            ImmersiveTopStop.Color = Windows.UI.Color.FromArgb(0, 0, 0, 0);
                             //ImmersiveCover.Color = Windows.UI.Color.FromArgb(255, 35, 35, 35);
                         }
                     }
                     else
                     {
-                        ForegroundAccentTextBrush = new SolidColorBrush(albumMainColor.Value);
-                        var idleColor = albumMainColor.Value;
-                        idleColor.A -= 10;
-                        idleColor.R -= 10;
-                        idleColor.G -= 10;
-                        idleColor.B -= 10;
-                        ForegroundIdleTextBrush = new SolidColorBrush(idleColor);
+                        if (Common.Setting.expandedPlayerBackgroundType != 0)
+                        {
+                            if (isBright)
+                            {
+                                var AccentColor = AdjustBrightness((Windows.UI.Color)albumMainColor, -0.3f);
+                                ForegroundAccentTextBrush = new SolidColorBrush(AccentColor);
+                                var idleColor = AccentColor;
+                                idleColor.A = 150;
+                                ForegroundIdleTextBrush = new SolidColorBrush(idleColor);
+                                ImmersiveTopStop.Color = Windows.UI.Color.FromArgb(0, 255, 255, 255);
+                            }
+                            else
+                            {
+                                var AccentColor = AdjustBrightness((Windows.UI.Color)albumMainColor, 0.3f);
+                                ForegroundAccentTextBrush = new SolidColorBrush(AccentColor);
+                                var idleColor = AdjustBrightness((Windows.UI.Color)AccentColor, -0.15f);
+                                idleColor.A = 150;
+                                ForegroundIdleTextBrush = new SolidColorBrush(idleColor);
+                                ImmersiveTopStop.Color = Windows.UI.Color.FromArgb(0, 0, 0, 0);
+                            }
+                        }
+                        else
+                        {
+                                var AccentColor = AdjustBrightness((Windows.UI.Color)albumMainColor, -0.3f);
+                                ForegroundAccentTextBrush = new SolidColorBrush(AccentColor);
+                                var idleColor = AccentColor;
+                                idleColor.A = 150;
+                                ForegroundIdleTextBrush = new SolidColorBrush(idleColor);
+                                ImmersiveTopStop.Color = Windows.UI.Color.FromArgb(0, 255, 255, 255);
+                        }
                     }
 
 
@@ -1379,9 +1435,11 @@ public sealed partial class ExpandedPlayer : Page, IDisposable
                 _ = Common.Invoke(() =>
                 {
                     ImageAlbum.Source = null;
+                    ImageAlbumImerssive.Source = null;
                     Background = null;
                 });
                 ImageAlbumSource = null;
+                ImageAlbumImerssiveSource = null;
                 LyricList.Clear();
             }
 
@@ -1418,10 +1476,10 @@ public sealed partial class ExpandedPlayer : Page, IDisposable
     {
         time.Reset();
         MainGrid.Margin = new Thickness(0, 0, 0, 80);
-        if (Common.IsInImmersiveMode)
-        {
-            DefaultRow.Height = new GridLength(1.1, GridUnitType.Star);
-        }
+        //if (Common.IsInImmersiveMode)
+        //{
+        //    DefaultRow.Height = new GridLength(1.1, GridUnitType.Star);
+        //}
 
         var BtnAni = new DoubleAnimation
         {
@@ -1450,10 +1508,10 @@ public sealed partial class ExpandedPlayer : Page, IDisposable
             _ = Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
             {
                 MainGrid.Margin = new Thickness(0);
-                if (Common.IsInImmersiveMode)
-                {
-                    DefaultRow.Height = new GridLength(1.35, GridUnitType.Star);
-                }
+                //if (Common.IsInImmersiveMode)
+                //{
+                //    DefaultRow.Height = new GridLength(1.35, GridUnitType.Star);
+                //}
 
                 var BtnAni = new DoubleAnimation
                 {
@@ -1486,8 +1544,8 @@ public sealed partial class ExpandedPlayer : Page, IDisposable
 
     private void BtnToggleImmersiveMode_OnClicked(object sender, RoutedEventArgs e)
     {
-        if (Common.Setting.expandedPlayerBackgroundType == 0)
-        {
+        //if (Common.Setting.expandedPlayerBackgroundType == 0)
+        //{
             if (BtnToggleImmersiveMode.IsChecked)
             {
                 ImmersiveModeIn();
@@ -1496,33 +1554,44 @@ public sealed partial class ExpandedPlayer : Page, IDisposable
             {
                 ImmersiveModeExit();
             }
-        }
-        else
-        {
-            BtnToggleImmersiveMode.IsChecked = false;
-            var dialog = new ContentDialog();
-            dialog.Title = "请调整背景样式";
-            dialog.Content = "沉浸模式只推荐在展开页背景样式为\"专辑背景模糊\"时才能展现最好效果，否则将无法开启沉浸模式\n请在设置中将背景显示设置更改为\"专辑背景模糊\"后再开启沉浸模式";
-            dialog.CloseButtonText = "好";
-            dialog.IsPrimaryButtonEnabled = true;
-            _ = dialog.ShowAsync();
-        }
+        //}
+        //else
+        //{
+        //    BtnToggleImmersiveMode.IsChecked = false;
+        //    var dialog = new ContentDialog();
+        //    dialog.Title = "请调整背景样式";
+        //    dialog.Content = "沉浸模式只推荐在展开页背景样式为\"专辑背景模糊\"时才能展现最好效果，否则将无法开启沉浸模式\n请在设置中将背景显示设置更改为\"专辑背景模糊\"后再开启沉浸模式";
+        //    dialog.CloseButtonText = "好";
+        //    dialog.IsPrimaryButtonEnabled = true;
+        //    _ = dialog.ShowAsync();
+        //}
+    }
+
+    public static double Map(double value, double fromSource, double toSource, double fromTarget, double toTarget)
+    {
+        return (value - fromSource) / (toSource - fromSource) * (toTarget - fromTarget) + fromTarget;
     }
 
     private void ImmersiveModeIn()
     {
         // if (Common.Setting.AutoHidePlaybar)
         MainGrid.Margin = new Thickness(0, 0, 0, 80);
-        DefaultRow.Height = new GridLength(1.1, GridUnitType.Star);
+        DefaultRow.Height = new GridLength(0, GridUnitType.Star);
+        LyricBox.Context.LyricPaddingTopRatio = (float)Map(Common.Setting.lyricPaddingTopRatio, 0, 100, 55, 100)/100f;
+        LeftPanel.Margin = new Thickness(90, 0, 0, 100);
         // Clear Shadow
         AlbumCoverDropShadow.Opacity = 0;
+        ImageAlbumImerssive.Visibility= Visibility.Visible;
         //MoreBtn.Margin = new Thickness(0,0,30,130);
         Grid.SetRow(LyricBox, 1);
         if (Common.Setting.albumRotate)
             RotateAnimationSet.Stop();
         if (Common.Setting.expandAlbumBreath)
             ImageAlbumAni.Pause();
-        ImmersiveModeInAni.Begin();
+        if (Common.Setting.expandedPlayerBackgroundType == 0)
+            ImmersiveModeInAni.Begin();
+        else
+            ImmersiveModeInAniOtrMode.Begin();
         LeftPanel.VerticalAlignment = VerticalAlignment.Bottom;
         Common.IsInImmersiveMode = true;
     }
@@ -1532,6 +1601,9 @@ public sealed partial class ExpandedPlayer : Page, IDisposable
         //MoreBtn.Margin = new Thickness(0, 0, 30, 50);
         MainGrid.Margin = new Thickness(0, 0, 0, 80);
         DefaultRow.Height = new GridLength(25, GridUnitType.Star);
+        LyricBox.Context.LyricPaddingTopRatio = Common.Setting.lyricPaddingTopRatio/100f;
+        LeftPanel.Margin = new Thickness(0);
+        ImageAlbumImerssive.Visibility = Visibility.Collapsed;
         if (!Common.Setting.albumRound)
             AlbumCoverDropShadow.Opacity = (double)Common.Setting.expandedCoverShadowDepth / 10;
         Grid.SetRow(LyricBox, 0);
@@ -1539,7 +1611,10 @@ public sealed partial class ExpandedPlayer : Page, IDisposable
             RotateAnimationSet.StartAsync();
         if (Common.Setting.expandAlbumBreath)
             ImageAlbumAni.Begin();
-        ImmersiveModeOutAni.Begin();
+        if (Common.Setting.expandedPlayerBackgroundType == 0)
+            ImmersiveModeOutAni.Begin();
+        else
+            ImmersiveModeOutAniOtrMode.Begin();
         LeftPanel.VerticalAlignment = VerticalAlignment.Top;
         Common.IsInImmersiveMode = false;
     }

@@ -17,6 +17,7 @@ using Microsoft.Graphics.Canvas.Effects;
 using Microsoft.Graphics.Canvas.Geometry;
 using Microsoft.Graphics.Canvas.Text;
 using System.Diagnostics;
+using Microsoft.Toolkit.Uwp.UI.Media;
 
 namespace HyPlayer.LyricRenderer.LyricLineRenderers
 {
@@ -194,12 +195,12 @@ namespace HyPlayer.LyricRenderer.LyricLineRenderers
                 if (_isFocusing && context.Effects.FocusHighlighting)
                 {
                     //画发光效果
-                    var opacityEffect = new OpacityEffect
+                    var opacityEffect = new Microsoft.Graphics.Canvas.Effects.OpacityEffect
                     {
                         Source = new GaussianBlurEffect
                         {
                             Source = cl,
-                            BlurAmount = 4,
+                            BlurAmount = 6,
                         },
                         Opacity = 0.4f
                     };
@@ -237,7 +238,7 @@ namespace HyPlayer.LyricRenderer.LyricLineRenderers
                     TransformMatrix = GetCenterMatrix(0, 0, _scalingCenterX,
                         (float)textLayout.LayoutBounds.Height / 2, scaling, scaling),
                 };
-                finalEffect = new OpacityEffect
+                finalEffect = new Microsoft.Graphics.Canvas.Effects.OpacityEffect
                 {
                     Source = transformEffect,
                     Opacity = 0.5f + progress * 0.5f,
@@ -257,9 +258,27 @@ namespace HyPlayer.LyricRenderer.LyricLineRenderers
                 
             }
             
-            if (context.IsScrolling || !context.Effects.Blur)
+            if (context.IsScrolling ||(!context.Effects.Blur && !Common.Setting.lyricRenderFade))
             {
                 session.DrawImage(finalEffect, actualX, drawingTop);
+            }
+            else if(context.Effects.Blur&& !Common.Setting.lyricRenderFade)
+            {
+                var blurEffect = new GaussianBlurEffect
+                {
+                    Source = finalEffect,
+                    BlurAmount = Math.Clamp(Math.Abs(gap), 0, 250),
+                };
+                session.DrawImage(blurEffect, actualX, drawingTop);
+            }
+            else if (Common.Setting.lyricRenderFade&& !context.Effects.Blur)
+            {
+                var opacityEffect = new Microsoft.Graphics.Canvas.Effects.OpacityEffect
+                {
+                    Source = finalEffect,
+                    Opacity = 1 - Math.Clamp(Math.Abs(gap)/(10f-(Common.Setting.lyricFadingRatio/10f)), 0, 0.9f),
+                };
+                session.DrawImage(opacityEffect, actualX, drawingTop);
             }
             else
             {
@@ -268,7 +287,12 @@ namespace HyPlayer.LyricRenderer.LyricLineRenderers
                     Source = finalEffect,
                     BlurAmount = Math.Clamp(Math.Abs(gap), 0, 250),
                 };
-                session.DrawImage(blurEffect, actualX, drawingTop);
+                var opacityEffect = new Microsoft.Graphics.Canvas.Effects.OpacityEffect
+                {
+                    Source = blurEffect,
+                    Opacity = 1 - Math.Clamp(Math.Abs(gap) / (10f - (Common.Setting.lyricFadingRatio / 10f)), 0, 0.9f),
+                }; 
+                session.DrawImage(opacityEffect, actualX, drawingTop);
             }
             if (context.Debug)
             {
@@ -524,7 +548,8 @@ namespace HyPlayer.LyricRenderer.LyricLineRenderers
                         FontFamily = TypographySelector(t => t?.Font, context),
                         FontWeight = FontWeights.Normal
                     };
-                    tl = new CanvasTextLayout(session, Translation, translationFormat,
+                    string trimmedText = Translation.ToString().TrimEnd();
+                    tl = new CanvasTextLayout(session, trimmedText, translationFormat,
                         Math.Clamp(context.ItemWidth - 16, 0, int.MaxValue), _canvasHeight);
                     add += 30;
                     

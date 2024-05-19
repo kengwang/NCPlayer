@@ -133,4 +133,9 @@ public class RenderContext
     /// 启用音译
     /// </summary>
     public bool EnableTransliteration { get; set; } = true;
+
+    /// <summary>
+    /// 播放位置改变是否由Seek操作引起
+    /// </summary>
+    public bool IsSeek { get; set; } = false;
 }

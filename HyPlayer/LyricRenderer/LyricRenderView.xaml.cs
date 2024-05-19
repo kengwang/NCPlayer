@@ -217,12 +217,12 @@ namespace HyPlayer.LyricRenderer
 
                 if (currentLine.Hidden)
                     continue;
-              
-                if (renderedAfterStartPosition <= Context.ViewHeight && !Context.IsScrolling && Context.IsPlaying) // 在可视区域, 需要缓动
+                if (renderedAfterStartPosition <= Context.ViewHeight && (Context.IsPlaying || !Context.IsScrolling) && !Context.IsSeek) // 在可视区域, 需要缓动
                     if (Context.SnapshotRenderOffsets.ContainsKey(currentLine.Id) &&
                         Math.Abs(theoryRenderAfterPosition - Context.RenderOffsets[currentLine.Id].Y) >
                         Epsilon)
                     {
+                        
                         renderedAfterStartPosition = Context.LineRollingEaseCalculator.CalculateCurrentY(
                             Context.SnapshotRenderOffsets[currentLine.Id].Y, theoryRenderAfterPosition,
                             currentLine, Context);
@@ -262,8 +262,9 @@ namespace HyPlayer.LyricRenderer
                         if (Context.SnapshotRenderOffsets.ContainsKey(currentLine.Id) &&
                             Math.Abs(Context.RenderOffsets[currentLine.Id].Y - theoryRenderBeforePosition) >
                             Epsilon &&
-                            Context.IsPlaying &&
+                            (Context.IsPlaying ||
                             !Context.IsScrolling)
+                            && !Context.IsSeek)
                         {
                             renderedBeforeStartPosition = Context.LineRollingEaseCalculator.CalculateCurrentY(
                                 Context.SnapshotRenderOffsets[currentLine.Id].Y, theoryRenderBeforePosition,

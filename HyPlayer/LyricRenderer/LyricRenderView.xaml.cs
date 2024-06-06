@@ -217,12 +217,12 @@ namespace HyPlayer.LyricRenderer
 
                 if (currentLine.Hidden)
                     continue;
-              
-                if (renderedAfterStartPosition <= Context.ViewHeight && !Context.IsScrolling && Context.IsPlaying) // 在可视区域, 需要缓动
+                if (renderedAfterStartPosition <= Context.ViewHeight && (Context.IsPlaying || !Context.IsScrolling) && !Context.IsSeek) // 在可视区域, 需要缓动
                     if (Context.SnapshotRenderOffsets.ContainsKey(currentLine.Id) &&
                         Math.Abs(theoryRenderAfterPosition - Context.RenderOffsets[currentLine.Id].Y) >
                         Epsilon)
                     {
+                        
                         renderedAfterStartPosition = Context.LineRollingEaseCalculator.CalculateCurrentY(
                             Context.SnapshotRenderOffsets[currentLine.Id].Y, theoryRenderAfterPosition,
                             currentLine, Context);
@@ -262,8 +262,9 @@ namespace HyPlayer.LyricRenderer
                         if (Context.SnapshotRenderOffsets.ContainsKey(currentLine.Id) &&
                             Math.Abs(Context.RenderOffsets[currentLine.Id].Y - theoryRenderBeforePosition) >
                             Epsilon &&
-                            Context.IsPlaying &&
+                            (Context.IsPlaying ||
                             !Context.IsScrolling)
+                            && !Context.IsSeek)
                         {
                             renderedBeforeStartPosition = Context.LineRollingEaseCalculator.CalculateCurrentY(
                                 Context.SnapshotRenderOffsets[currentLine.Id].Y, theoryRenderBeforePosition,
@@ -300,14 +301,14 @@ namespace HyPlayer.LyricRenderer
             if (_initializing || Context.ViewHeight == 0 || Context.ViewWidth == 0) return;
             OnBeforeRender?.Invoke(this);
             // 鼠标滚轮时间 5 s 清零
-            if ((Context.ScrollingDelta != 0 || (Context.IsScrolling && !_pointerPressed)) && Context.RenderTick - _lastWheelTime > 50000000 && Context.IsPlaying)
+            if ((Context.ScrollingDelta != 0 || (Context.IsScrolling && !_pointerPressed)) && Context.RenderTick - _lastWheelTime > 50000000 && Context.IsPlaying || Context.IsSeek)
             {
                 // 缓动来一下吧
                 // 0.5 秒缓动到 0
                 Context.IsScrolling = false;
                 var progress = Math.Clamp((Context.RenderTick - _lastWheelTime - 50000000) / 5000000.0, 0, 1);
                 Context.ScrollingDelta = (int)(Context.ScrollingDelta * _circleEase.Ease(1 - progress));
-                if (Math.Abs(progress - 1) < Epsilon)
+                if (Math.Abs(progress - 1) < Epsilon || Context.IsSeek)
                 {
                     _lastWheelTime = 0;
                     Context.ScrollingDelta = 0;

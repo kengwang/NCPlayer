@@ -71,6 +71,7 @@ public sealed partial class ExpandedPlayer : Page, IDisposable
     private bool _lyricHasBeenLoaded = false;
     private bool _lyricIsReadyToGo = false;
     private bool _lyricIsCleaning = false;
+    private bool _positionChangedBySeeking = false;
 
     private int lastlrcid;
 
@@ -128,6 +129,12 @@ public sealed partial class ExpandedPlayer : Page, IDisposable
         LyricBox.Context.Effects.SimpleLineScanning = Common.Setting.lyricRenderSimpleLineScanning;
         LyricBox.Context.PreferTypography.Font = Common.Setting.lyricFontFamily;
         LyricBox.Context.LineSpacing = Common.Setting.lyricLineSpacing;
+        HyPlayList.Player.SeekCompleted += Player_SeekCompleted;
+    }
+
+    private void Player_SeekCompleted(Windows.Media.Playback.MediaPlayer sender, object args)
+    {
+        _positionChangedBySeeking = true;
     }
 
     private void LyricBoxOnOnRequestSeek(long time)
@@ -147,6 +154,8 @@ public sealed partial class ExpandedPlayer : Page, IDisposable
         {
             view.Context.CurrentLyricTime = (long)HyPlayList.Player.PlaybackSession.Position.TotalMilliseconds;
         }
+        view.Context.IsSeek = _positionChangedBySeeking;
+        _positionChangedBySeeking = false;
 
     }
 
@@ -1451,6 +1460,7 @@ public sealed partial class ExpandedPlayer : Page, IDisposable
             Common.OnEnterForegroundFromBackground -= OnEnteringForeground;
             HyPlayList.OnSongCoverChanged -= RefreshAlbumCover;
             Common.OnPlaybarVisibilityChanged -= OnPlaybarVisibilityChanged;
+            HyPlayList.Player.SeekCompleted -= Player_SeekCompleted;
             if (Window.Current != null)
                 Window.Current.SizeChanged -= Current_SizeChanged;
             if (Common.Setting.albumRotate)

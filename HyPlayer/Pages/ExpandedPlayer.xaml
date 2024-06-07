@@ -250,20 +250,20 @@
                 Canvas.ZIndex="0"
                 HorizontalScrollMode="Disabled"
                 VerticalScrollBarVisibility="Hidden"
-                VerticalScrollMode="Disabled">
+                VerticalScrollMode="Disabled"
+                SizeChanged="UIAugmentationSys_SizeChanged">
                 <Grid
                     x:Name="LeftPanel"
                     MaxWidth="600"
                     HorizontalAlignment="Stretch">
                     <Grid.RowDefinitions>
-                        <RowDefinition Height="*" />
                         <RowDefinition Height="Auto" />
-                        <RowDefinition Height="10*" />
+                        <RowDefinition Height="Auto" />
                     </Grid.RowDefinitions>
-                    <Border x:Name="ShadowTarget" Grid.Row="1" />
+                    <Border x:Name="ShadowTarget" Grid.Row="0" />
                     <controls:ImageEx
                         x:Name="ImageAlbum"
-                        Grid.Row="1"
+                        Grid.Row="0"
                         MaxWidth="600"
                         MaxHeight="600"
                         Margin="20"
@@ -320,13 +320,19 @@
                             <BitmapImage x:Name="ImageAlbumSource" UriSource="/Assets/icon.png" />
                         </controls:ImageEx.Source>
                     </controls:ImageEx>
-                    <StackPanel
-                        Grid.Row="2"
-                        Orientation="Horizontal">
+                    <Grid
+                        Grid.Row="1"
+                        Margin="20">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
                         <controls:ImageEx
                         x:Name="ImageAlbumImerssive"
                         Width="200"
                         Height="200"
+                        Grid.Row="0"
+                        Grid.Column="0"
                         Visibility="Collapsed"
                         HorizontalAlignment="Center"
                         VerticalAlignment="Center"
@@ -342,57 +348,75 @@
                                 <BitmapImage x:Name="ImageAlbumImerssiveSource" UriSource="/Assets/icon.png" />
                             </controls:ImageEx.Source>
                         </controls:ImageEx>
-                        <StackPanel
-                        x:Name="SongInfo"
-                        MaxWidth="600"
-                        Margin="20"
-                        HorizontalAlignment="Stretch"
-                        CornerRadius="0"
-                        Orientation="Vertical"
-                        Spacing="5">
-                            <controls1:SelectableTextBox
-                            x:Name="TextBlockSongTitle"
+                        <Grid
+                            x:Name="SongInfo"
+                            Grid.Row="1"
+                            Grid.Column="1"
+                            MaxWidth="600"
+                            HorizontalAlignment="Stretch"
+                            CornerRadius="0">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+                        <controls1:SelectableTextBox
+                             x:Name="TextBlockSongTitle"
                             Margin="0,-10,0,0"
                             HorizontalAlignment="Stretch"
                             x:FieldModifier="public"
                             FontSize="36"
                             FontWeight="Bold"
                             Text="歌曲名"
-                            TextWrapping="Wrap" />
-                            <StackPanel
+                            TextWrapping="Wrap" 
+                            Grid.Row="0"/>
+                            <Grid 
                             x:Name="SongInfoContainer"
-                            Orientation="Horizontal"
-                            Spacing="4">
+                            ColumnSpacing="4"
+                            Grid.Row="1">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
                                 <TextBlock
-                                x:Name="TextBlockSingerNameTip"
-                                Padding="0,6,0,6"
-                                FontSize="18"
-                                Foreground="{ThemeResource TextFillColorSecondaryBrush}"
-                                Text="歌手: "
-                                TextAlignment="Center" />
-                                <HyperlinkButton
-                                Name="TextBlockSinger"
-                                Click="TextBlockSinger_OnTapped"
-                                FontSize="18"
-                                Style="{StaticResource TextBlockButtonStyle}" />
-                            </StackPanel>
-                            <StackPanel Orientation="Horizontal" Spacing="5">
+                                    x:Name="TextBlockSingerNameTip"
+                                    Padding="0,6,0,6"
+                                     Grid.Column="0"
+                                     FontSize="18"
+                                    Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                    Text="歌手: "
+                                    TextAlignment="Center" />
+                               <HyperlinkButton
+                                    Name="TextBlockSinger"
+                                     Grid.Column="1"
+                                    Click="TextBlockSinger_OnTapped"
+                                    FontSize="18"
+                                    Style="{StaticResource TextBlockButtonStyle}" />
+                        </Grid>
+                        <Grid ColumnSpacing="4" Grid.Row="2">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
                                 <TextBlock
-                                x:Name="TextBlockAlbumNameTip"
-                                Padding="0,6,0,6"
-                                FontSize="18"
-                                Foreground="{StaticResource SystemControlForegroundBaseMediumBrush}"
-                                Text="专辑: "
-                                TextAlignment="Center" />
-                                <HyperlinkButton
-                                Name="TextBlockAlbum"
-                                Click="TextBlockAlbum_OnTapped"
-                                FontSize="18"
-                                Style="{StaticResource TextBlockButtonStyle}" />
-                            </StackPanel>
-                        </StackPanel>
-                    </StackPanel>
+                                   x:Name="TextBlockAlbumNameTip"
+                                   Padding="0,6,0,6"
+                                   FontSize="18"
+                                   Foreground="{StaticResource SystemControlForegroundBaseMediumBrush}"
+                                   Text="专辑: "
+                                   Grid.Column="0" 
+                            />
+                        <HyperlinkButton
+                            Name="TextBlockAlbum"
+                            Click="TextBlockAlbum_OnTapped"
+                            FontSize="18"
+                            Style="{StaticResource TextBlockButtonStyle}"
+                            Grid.Column="1"/>
+                        </Grid>
+                    </Grid>
+                    </Grid>
                 </Grid>
+                
             </ScrollViewer>
             <Grid
                 x:Name="RightPanel"

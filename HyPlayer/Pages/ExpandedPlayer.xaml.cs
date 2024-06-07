@@ -258,12 +258,10 @@ public sealed partial class ExpandedPlayer : Page, IDisposable
                 : Common.Setting.lyricSize;
 
             lastwidth = nowwidth;
-            needRedesign += 2;
         }
         else if (lastheight != nowheight)
         {
             lastheight = nowheight;
-            needRedesign += 2;
         }
     }
 
@@ -324,26 +322,26 @@ public sealed partial class ExpandedPlayer : Page, IDisposable
         // 这个函数里面放无法用XAML实现的页面布局方式
 
 
-        if (600 > Math.Min(LeftPanel.ActualHeight, MainGrid.ActualHeight))
+        if (750 > UIAugmentationSys.ActualHeight)
         {
-            /*
-            ImageAlbum.Width = Math.Max(Math.Min(MainGrid.ActualHeight, LeftPanel.ActualWidth) - 80, 1);
-            ImageAlbum.Height = ImageAlbum.Width;
-            */
-
-            /*
-            if (ImageAlbum.Width < 250 || iscompact)
+            var width = UIAugmentationSys.ActualHeight - 80;
+            ImageAlbum.Height = width > 1 ? width : double.NaN;
+            if (ImageAlbum.Height < 400 || UIAugmentationSys.ActualWidth < 400)
                 SongInfo.Visibility = Visibility.Collapsed;
             else
+            {
                 SongInfo.Visibility = Visibility.Visible;
-            */
-            SongInfo.Width = ImageAlbum.Width;
+                ImageAlbum.Height -= SongInfo.ActualHeight;
+                SongInfo.Width = UIAugmentationSys.ActualWidth;
+            }            
+            ImageAlbum.Width = ImageAlbum.Height;
         }
         else
         {
             ImageAlbum.Width = double.NaN;
             ImageAlbum.Height = double.NaN;
             SongInfo.Width = double.NaN;
+            SongInfo.Visibility = Visibility.Visible;
         }
 
         BtnToggleFullScreen.IsChecked = ApplicationView.GetForCurrentView().IsFullScreenMode;
@@ -1627,6 +1625,11 @@ public sealed partial class ExpandedPlayer : Page, IDisposable
             ImmersiveModeOutAniOtrMode.Begin();
         LeftPanel.VerticalAlignment = VerticalAlignment.Top;
         Common.IsInImmersiveMode = false;
+    }
+
+    private void UIAugmentationSys_SizeChanged(object sender, SizeChangedEventArgs e)
+    {
+        needRedesign++;
     }
 }
 

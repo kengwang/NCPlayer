@@ -10,6 +10,7 @@
     xmlns:muxc="using:Microsoft.UI.Xaml.Controls"
     xmlns:ui="using:Microsoft.Toolkit.Uwp.UI"
     xmlns:lyricrenderer="using:HyPlayer.LyricRenderer"
+    xmlns:win2d="using:Microsoft.Graphics.Canvas.UI.Xaml"
     muxc:BackdropMaterial.ApplyToRootOrPageBackground="True"
     Loaded="Page_Loaded"
     NavigationCacheMode="Disabled">
@@ -196,7 +197,8 @@
             Grid.RowSpan="3"
             HorizontalAlignment="Stretch"
             VerticalAlignment="Stretch"
-            Opacity="0">
+            Opacity="0"
+            Canvas.ZIndex="-1">
             <Rectangle.Fill>
                 <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
                     <GradientStop x:Name="ImmersiveTopStop" Offset="0.25"  />
@@ -210,31 +212,12 @@
             Grid.Column="0"
             Background="Transparent" />
         <Grid Grid.Row="0" x:Name="LuminousBackgroundContainer" Canvas.ZIndex="-1" Grid.Column="0" Grid.RowSpan="3">
-            <Grid.RenderTransform>
-                <TransformGroup>
-                    <RotateTransform x:Name="BgRotate" CenterY="{x:Bind BgScale.CenterY, Mode=OneWay}" CenterX="{x:Bind BgScale.CenterX, Mode=OneWay}" />
-                    <ScaleTransform x:Name="BgScale" />
-                </TransformGroup>
-            </Grid.RenderTransform>
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition />
-                <ColumnDefinition />
-                <ColumnDefinition />
-            </Grid.ColumnDefinitions>
-            <Grid.RowDefinitions>
-                <RowDefinition />
-                <RowDefinition />
-                <RowDefinition />
-            </Grid.RowDefinitions>
-            <Rectangle x:Name="BgRect00" Grid.Row="0" Grid.Column="0" />
-            <Rectangle x:Name="BgRect01" Grid.Row="0" Grid.Column="1" />
-            <Rectangle x:Name="BgRect02" Grid.Row="0" Grid.Column="2" />
-            <Rectangle x:Name="BgRect10" Grid.Row="1" Grid.Column="0" />
-            <Rectangle x:Name="BgRect11" Grid.Row="1" Grid.Column="1" />
-            <Rectangle x:Name="BgRect12" Grid.Row="1" Grid.Column="2" />
-            <Rectangle x:Name="BgRect20" Grid.Row="2" Grid.Column="0" />
-            <Rectangle x:Name="BgRect21" Grid.Row="2" Grid.Column="1" />
-            <Rectangle x:Name="BgRect22" Grid.Row="2" Grid.Column="2" />
+            <win2d:CanvasAnimatedControl x:Name="LuminousBackground" 
+                                         CreateResources="LuminousBackground_CreateResources"
+                                         Update="LuminousBackground_Update"
+                                         SizeChanged="LuminousBackground_SizeChanged"
+                                         Draw="LuminousBackground_Draw"
+                                         x:Load="{x:Bind hyplayer:Common.Setting.expandedPlayerBackgroundType, Converter={StaticResource ShaderConverter}}"/>
         </Grid>
         <Grid
             x:Name="MainGrid"

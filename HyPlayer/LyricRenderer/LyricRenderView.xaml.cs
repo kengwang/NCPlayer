@@ -180,11 +180,19 @@ namespace HyPlayer.LyricRenderer
 
         private void RecalculateItemsSize(CanvasDrawingSession session)
         {
-            Context.ItemWidth = Context.ViewWidth * Context.LyricWidthRatio;
-            foreach (var renderingLyricLine in Context.LyricLines)
+            try
             {
-                renderingLyricLine.OnRenderSizeChanged(session, Context);
+                Context.ItemWidth = Context.ViewWidth * Context.LyricWidthRatio;
+                foreach (var renderingLyricLine in Context.LyricLines)
+                {
+                    renderingLyricLine.OnRenderSizeChanged(session, Context);
+                }
             }
+            catch 
+            { 
+                //Ignore
+            }
+
         }
 
         private readonly Dictionary<long, bool> _keyFrameRendered = new();

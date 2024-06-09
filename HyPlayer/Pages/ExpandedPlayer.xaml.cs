@@ -45,6 +45,7 @@ using LrcConverter = HyPlayer.LyricRenderer.Converters.LrcConverter;
 using Microsoft.Graphics.Canvas.Effects;
 using System.Runtime.InteropServices.WindowsRuntime;
 using System.Numerics;
+using PaletteMixr;
 
 #endregion
 
@@ -186,16 +187,6 @@ public sealed partial class ExpandedPlayer : Page, IDisposable
                     ImageAlbumAni.Begin();
                 }
             }
-
-            if (bpmAniStoryboard.Children.Count > 0)
-            {
-                bpmAniStoryboard.Resume();
-            }
-
-            if (luminousColorsRotateStoryBoard.Children.Count > 0)
-            {
-                luminousColorsRotateStoryBoard.Resume();
-            }
         });
     }
 
@@ -210,15 +201,6 @@ public sealed partial class ExpandedPlayer : Page, IDisposable
                 ImageAlbumAni.Pause();
             }
 
-            if (bpmAniStoryboard.Children.Count > 0)
-            {
-                bpmAniStoryboard.Pause();
-            }
-
-            if (luminousColorsRotateStoryBoard.Children.Count > 0)
-            {
-                luminousColorsRotateStoryBoard.Pause();
-            }
         });
     }
 
@@ -439,9 +421,6 @@ public sealed partial class ExpandedPlayer : Page, IDisposable
         Common.PageExpandedPlayer = null;
     }
 
-    private Storyboard luminousColorsRotateStoryBoard = new Storyboard();
-    private DoubleAnimation luminousColorsRotateAnimation = new DoubleAnimation();
-
     protected override async void OnNavigatedTo(NavigationEventArgs e)
     {
         base.OnNavigatedTo(e);
@@ -499,8 +478,8 @@ public sealed partial class ExpandedPlayer : Page, IDisposable
             AnimationDesired = false,
         };
 
-    private Storyboard bpmAniStoryboard = new Storyboard();
     /*
+    private Storyboard bpmAniStoryboard = new Storyboard();
     public async void InitializeBPM()
     {
         bpmAniStoryboard.Stop();
@@ -986,17 +965,23 @@ public sealed partial class ExpandedPlayer : Page, IDisposable
             var mime = MIMEHelper.GetPictureCodecFromBuffer(buffer);
             BitmapDecoder decoder = await BitmapDecoder.CreateAsync(mime, stream);
             var color = await Common.ColorThief.GetColor(decoder, ignoreWhite: false);
-            if (Common.Setting.expandedPlayerBackgroundType is 6)
-            {
-                var palette = await Common.ColorThief.GetPalette(decoder, 6, 10, false);
-                albumColors = palette
-                    .OrderByDescending(t => t.Population)
-                        .Select(t => new Vector3((float)t.Color.R / 0xff, (float)t.Color.G / 0xff, (float)t.Color.B / 0xff)).ToList();
-            }
 
             //var c = GetPixel(bytes, 0, 0, decoder.PixelWidth, decoder.PixelHeight);
             lastSongForBrush = HyPlayList.NowPlayingItem.PlayItem;
             albumMainColor = Windows.UI.Color.FromArgb(color.Color.A, color.Color.R, color.Color.G, color.Color.B);
+            if (Common.Setting.expandedPlayerBackgroundType is 6)
+            {
+                var systemColor = Color.FromArgb(color.Color.A, color.Color.R, color.Color.G, color.Color.B);
+                var paletteGenerator = new PaletteGenerator(systemColor);
+                var result = paletteGenerator.GenerateHuePalette(PaletteSize.Small).Select(color => new Vector3((float)color.R / 0xFF, (float)color.G / 0xFF, (float)color.B / 0xFF)).ToList();
+                albumColors = new List<Vector3>
+                {
+                    new Vector3((float)color.Color.R / 0xFFf, (float)color.Color.G / 0xFF, (float)color.Color.B / 0xFF),
+                    result[0],
+                    result[1],
+                    result[2]
+                };
+            }
             if (Common.Setting.expandedPlayerBackgroundType is 1)
             {
                 PageContainer.Background =
@@ -1134,9 +1119,6 @@ public sealed partial class ExpandedPlayer : Page, IDisposable
                 break;
             case 4: // Force Black
                 PageContainer.Background = new SolidColorBrush(Colors.Black);
-                break;
-            case 6:
-                LuminousBackground.Opacity = 0.8;
                 break;
         }
 
@@ -1423,8 +1405,13 @@ public sealed partial class ExpandedPlayer : Page, IDisposable
                 Window.Current.SizeChanged -= Current_SizeChanged;
             if (Common.Setting.albumRotate)
                 RotateAnimationSet.Stop();
-            if (!Common.Setting.expandAlbumBreath) return;
-            ImageAlbumAni?.Stop();
+            if (Common.Setting.expandAlbumBreath) 
+            {
+                ImageAlbumAni?.Stop();
+            }
+            LuminousBackground.RemoveFromVisualTree();
+            _shaderEffect?.Dispose();
+            _shaderEffect = null;
             disposedValue = true;
         }
     }
@@ -1609,9 +1596,17 @@ public sealed partial class ExpandedPlayer : Page, IDisposable
             var bytes = buffer.ToArray();
             var effect = new PixelShaderEffect(bytes);
             _shaderEffect = effect;
+            if (albumColors.Count != 0)
+            {
+                _shaderEffect.Properties["color1"] = albumColors[0];
+                _shaderEffect.Properties["color2"] = albumColors[1];
+                _shaderEffect.Properties["color3"] = albumColors[2];
+                _shaderEffect.Properties["color4"] = albumColors[3];
+            }
         }
         _shaderEffect.Properties["Width"] = Convert.ToSingle(LuminousBackground.ActualWidth);
         _shaderEffect.Properties["Height"] = Convert.ToSingle(LuminousBackground.ActualHeight);
+        LuminousBackground.TargetElapsedTime = TimeSpan.FromMilliseconds(66.4);
     }
 
     private void LuminousBackground_Update(Microsoft.Graphics.Canvas.UI.Xaml.ICanvasAnimatedControl sender, Microsoft.Graphics.Canvas.UI.Xaml.CanvasAnimatedUpdateEventArgs args)

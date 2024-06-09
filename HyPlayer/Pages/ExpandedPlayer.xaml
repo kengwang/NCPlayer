@@ -217,7 +217,8 @@
                                          Update="LuminousBackground_Update"
                                          SizeChanged="LuminousBackground_SizeChanged"
                                          Draw="LuminousBackground_Draw"
-                                         x:Load="{x:Bind hyplayer:Common.Setting.expandedPlayerBackgroundType, Converter={StaticResource ShaderConverter}}"/>
+                                         x:Load="{x:Bind hyplayer:Common.Setting.expandedPlayerBackgroundType, Converter={StaticResource ShaderConverter}}"
+                                         IsFixedTimeStep="True"/>
         </Grid>
         <Grid
             x:Name="MainGrid"

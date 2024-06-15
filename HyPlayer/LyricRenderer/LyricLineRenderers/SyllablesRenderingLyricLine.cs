@@ -546,7 +546,7 @@ namespace HyPlayer.LyricRenderer.LyricLineRenderers
                         FontFamily = TypographySelector(t => t?.Font, context),
                         FontWeight = FontWeights.Normal
                     };
-                    string trimmedText = Translation.ToString().TrimEnd();
+                    string? trimmedText = Translation?.ToString().TrimEnd();
                     tl = new CanvasTextLayout(session, trimmedText, translationFormat,
                         Math.Clamp(context.ItemWidth - 16, 0, int.MaxValue), _canvasHeight);
                     add += 30;

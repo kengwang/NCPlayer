@@ -32,17 +32,21 @@ public class ProgressBarRenderingLyricLine : RenderingLyricLine
     public override bool Render(CanvasDrawingSession session, LineRenderOffset offset, RenderContext context)
     {
         float actualX = offset.X;
-        switch (TypographySelector(t => t?.Alignment, context)!.Value)
+        switch (TypographySelector(t=>t?.Alignment, context)!.Value)
         {
             case TextAlignment.Left:
-                actualX += 8;
+                actualX += (context.PreferTypography.LyricFontSize!/10).Value + 6;
                 break;
             case TextAlignment.Center:
                 actualX += (float)(RenderingWidth / 2 - Width / 2.0);
                 break;
             case TextAlignment.Right:
                 actualX += RenderingWidth - Width;
-                actualX -= 12;
+                actualX -= (context.PreferTypography.LyricFontSize! / 10).Value + 15;
+                break;
+            case TextAlignment.Justify:
+            case TextAlignment.DetectFromContent:
+            default:
                 break;
         }
 

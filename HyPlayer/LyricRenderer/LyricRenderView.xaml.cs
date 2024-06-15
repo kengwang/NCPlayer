@@ -326,9 +326,16 @@ namespace HyPlayer.LyricRenderer
             if (_isTypographyChanged)
             {
                 _isTypographyChanged = false;
-                foreach (var renderingLyricLine in Context.LyricLines)
+                try
                 {
-                    renderingLyricLine.OnTypographyChanged(args.DrawingSession, Context);
+                    foreach (var renderingLyricLine in Context.LyricLines)
+                    {
+                        renderingLyricLine.OnTypographyChanged(args.DrawingSession, Context);
+                    }
+                }
+                catch
+                {
+                    //Ignore
                 }
             }
 

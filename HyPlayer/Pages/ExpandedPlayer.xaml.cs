@@ -93,6 +93,7 @@ public sealed partial class ExpandedPlayer : Page, IDisposable
     private bool disposedValue;
     public System.Diagnostics.Stopwatch time = new System.Diagnostics.Stopwatch();
     private PixelShaderEffect? _shaderEffect;
+    private float _randomValue = -1;
 
 
     public ExpandedPlayer()
@@ -482,10 +483,6 @@ public sealed partial class ExpandedPlayer : Page, IDisposable
                 autoReverse: false);
             luminousColorsRotateStoryBoard.Children.Add(luminousColorsRotateAnimation);
             luminousColorsRotateStoryBoard.Begin();
-        }
-        if (Common.Setting.expandedPlayerBackgroundType == 7)
-        {
-            AcrylicCover.Fill = new BackdropBlurBrush { Amount = 5 }; // TintAmountChange
         }
         if (Common.Setting.expandedPlayerBackgroundType == 5)
             PageContainer.Background =
@@ -999,23 +996,27 @@ public sealed partial class ExpandedPlayer : Page, IDisposable
             //var c = GetPixel(bytes, 0, 0, decoder.PixelWidth, decoder.PixelHeight);
             lastSongForBrush = HyPlayList.NowPlayingItem.PlayItem;
             albumMainColor = Windows.UI.Color.FromArgb(color.Color.A, color.Color.R, color.Color.G, color.Color.B);
-            if (Common.Setting.expandedPlayerBackgroundType is 7 or 6)
+            if (Common.Setting.expandedPlayerBackgroundType is 6)
             {
                 var palette = await Common.ColorThief.GetPalette(decoder, 12, 10, false);
                 albumColors = palette.OrderByDescending(t => t.Population)
                     .Select(quantizedColor => Windows.UI.Color.FromArgb(quantizedColor.Color.A, quantizedColor.Color.R, quantizedColor.Color.G, quantizedColor.Color.B))
                     .ToList();
-                if (Common.Setting.expandedPlayerBackgroundType is 7)
-                {
-                    var result = palette.Select(color => new Vector3((float)color.Color.R / 0xFF, (float)color.Color.G / 0xFF, (float)color.Color.B / 0xFF)).ToList();
-                    albumColorVectors = new List<Vector3>
+            }
+            if (Common.Setting.expandedPlayerBackgroundType is 7)
+            {
+                var netColor = Color.FromArgb(color.Color.A, color.Color.R, color.Color.G, color.Color.B);
+                var paletteGenerator = new PaletteGenerator(netColor);
+                var palette = paletteGenerator.GenerateHuePalette(PaletteSize.Small);
+                var result = palette.Select(color => new Vector3((float)color.R / 0xFF, (float)color.G / 0xFF, (float)color.B / 0xFF)).ToList();
+                albumColorVectors = new List<Vector3>
                     {
+                        
                         result[0],
+                        new Vector3(color.Color.R / 255f, color.Color.G / 255f, color.Color.B / 255f),
                         result[1],
-                        result[2],
-                        result[3]
+                        result[2]
                     };
-                }
             }
             if (Common.Setting.expandedPlayerBackgroundType is 1)
             {
@@ -1157,6 +1158,11 @@ public sealed partial class ExpandedPlayer : Page, IDisposable
                 break;
             case 6:
                 BlackCover.Opacity = 1;
+                break;
+            case 7:
+                BlackCover.Fill = new SolidColorBrush(Colors.Transparent);
+                AcrylicCover.Fill = new SolidColorBrush(Colors.Transparent);
+                PageContainer.Background = new SolidColorBrush(Colors.Transparent);
                 break;
         }
 
@@ -1419,6 +1425,7 @@ public sealed partial class ExpandedPlayer : Page, IDisposable
                     {
                         if (_shaderEffect != null)
                         {
+                            _randomValue = _randomValue = new Random().Next(100);
                             _shaderEffect.Properties["color1"] = albumColorVectors[0];
                             _shaderEffect.Properties["color2"] = albumColorVectors[1];
                             _shaderEffect.Properties["color3"] = albumColorVectors[2];
@@ -1648,6 +1655,7 @@ public sealed partial class ExpandedPlayer : Page, IDisposable
             var bytes = buffer.ToArray();
             var effect = new PixelShaderEffect(bytes);
             _shaderEffect = effect;
+            _randomValue = new Random().Next(100);
             if (albumColors.Count != 0)
             {
                 _shaderEffect.Properties["color1"] = albumColorVectors[0];
@@ -1663,7 +1671,7 @@ public sealed partial class ExpandedPlayer : Page, IDisposable
 
     private void LuminousBackground_Update(Microsoft.Graphics.Canvas.UI.Xaml.ICanvasAnimatedControl sender, Microsoft.Graphics.Canvas.UI.Xaml.CanvasAnimatedUpdateEventArgs args)
     {
-        var progress = Convert.ToSingle(HyPlayList.Player.PlaybackSession.Position.TotalSeconds) * 0.75f;
+        var progress = Convert.ToSingle(HyPlayList.Player.PlaybackSession.Position.TotalSeconds) + _randomValue;
         if (_shaderEffect != null)
         {
             _shaderEffect.Properties["iTime"] = progress;

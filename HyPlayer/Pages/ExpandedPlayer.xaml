@@ -230,7 +230,7 @@
             x:Name="LuminousBackgroundContainer"
             Grid.Row="0"
             Grid.RowSpan="3"
-            Grid.Column="0" 
+            Grid.Column="0"
             Canvas.ZIndex="-1">
             <Grid.RenderTransform>
                 <TransformGroup>
@@ -391,7 +391,10 @@
                             Source="{x:Bind ImageAlbumSource}"
                             Stretch="Uniform"
                             Visibility="Collapsed" />
-                        <Grid Margin="20" CornerRadius="0">
+                        <Grid
+                            MaxWidth="600"
+                            Margin="20"
+                            CornerRadius="0">
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="Auto" />
                                 <RowDefinition Height="Auto" />
@@ -410,6 +413,7 @@
                             <StackPanel
                                 x:Name="SongInfoContainer"
                                 Grid.Row="1"
+                                MaxWidth="600"
                                 Orientation="Horizontal"
                                 Spacing="4">
                                 <TextBlock
@@ -427,6 +431,7 @@
                             </StackPanel>
                             <StackPanel
                                 Grid.Row="2"
+                                MaxWidth="600"
                                 Orientation="Horizontal"
                                 Spacing="5">
                                 <TextBlock

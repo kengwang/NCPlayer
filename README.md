@@ -103,6 +103,7 @@ CheckNetIsolation LoopbackExempt -a -n="48848aaaaaaccd.hyplayer_fkcggvf9kbkw0"
 * LyricParser [HyPlayer/LrcParser](https://github.com/HyPlayer/LyricParser) (MIT License)
 * Inflatable Last.fm [inflatablefriends/lastfm](https://github.com/inflatablefriends/lastfm) ([MIT Licence](https://github.com/inflatablefriends/lastfm/blob/next/LICENCE.md))
 * KSemenenko ColorThief [KSemenenko/ColorThief](https://github.com/KSemenenko/ColorThief) ([MIT License](https://github.com/KSemenenko/ColorThief/blob/master/LICENSE))
+* StoryTeller-Studios Isolation [StoryTeller-Studios/Isolation](https://github.com/Storyteller-Studios/Isolation) ([MIT License](https://github.com/Storyteller-Studios/Isolation/blob/main/LICENSE))
 
 
 

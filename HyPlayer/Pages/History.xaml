@@ -41,8 +41,8 @@
         </NavigationView>
         <controls:SongsList
             x:Name="SongsList"
-            Margin="20,0,20,0"
             Grid.Row="2"
+            Margin="20,0,20,0"
             Songs="{x:Bind Songs, Mode=OneWay}" />
     </Grid>
 

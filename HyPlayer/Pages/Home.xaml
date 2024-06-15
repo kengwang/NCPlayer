@@ -3,164 +3,183 @@
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" xmlns:muxc="using:Microsoft.UI.Xaml.Controls" xmlns:hyplayer="using:HyPlayer"
+    xmlns:hyplayer="using:HyPlayer"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:muxc="using:Microsoft.UI.Xaml.Controls"
     NavigationCacheMode="Disabled"
     mc:Ignorable="d">
     <ScrollViewer VerticalScrollBarVisibility="Auto">
         <Grid>
             <TextBlock
-                Text="主页"
+                Margin="24,24,0,0"
+                CharacterSpacing="90"
                 FontSize="40"
                 FontWeight="Bold"
-                CharacterSpacing="90"
-                Margin="24,24,0,0" />
-            <Grid Height="320" Margin="0,70,0,0" VerticalAlignment="Top">
+                Text="主页" />
+            <Grid
+                Height="320"
+                Margin="0,70,0,0"
+                VerticalAlignment="Top">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition />
-                    <ColumnDefinition x:Name="BtnsColm" Width="610"/>
+                    <ColumnDefinition x:Name="BtnsColm" Width="610" />
                 </Grid.ColumnDefinitions>
                 <Rectangle
                     Grid.Row="0"
-                Height=" 110"
-                VerticalAlignment="Top"
-                RadiusX="10"
-                RadiusY="10"
-                Margin="15,30,15,0">
+                    Height=" 110"
+                    Margin="15,30,15,0"
+                    VerticalAlignment="Top"
+                    RadiusX="10"
+                    RadiusY="10">
                     <Rectangle.Fill>
-                        <LinearGradientBrush EndPoint="1,0" StartPoint="0,1">
-                            <GradientStop Color="{ThemeResource SystemAccentColorLight2}" Offset="1" />
-                            <GradientStop Color="{ThemeResource SystemAccentColor}" Offset="0.6" />
+                        <LinearGradientBrush StartPoint="0,1" EndPoint="1,0">
+                            <GradientStop Offset="1" Color="{ThemeResource SystemAccentColorLight2}" />
+                            <GradientStop Offset="0.6" Color="{ThemeResource SystemAccentColor}" />
                         </LinearGradientBrush>
                     </Rectangle.Fill>
                 </Rectangle>
                 <!--  欢迎语  -->
                 <StackPanel
-                    Orientation="Vertical"
-                        Margin="40,40,20,0"
-                        x:Name="GreetingText">
+                    x:Name="GreetingText"
+                    Margin="40,40,20,0"
+                    Orientation="Vertical">
                     <StackPanel Orientation="Horizontal">
-                        <TextBlock Text="Hi~ " FontWeight="Bold" Foreground="White" Style="{StaticResource HeaderTextBlockStyle}" FontSize="36"/>
-                        <TextBlock x:Name="TbHelloUserName" Foreground="White" Style="{StaticResource HeaderTextBlockStyle}" FontWeight="Bold" FontSize="36" />
+                        <TextBlock
+                            FontSize="36"
+                            FontWeight="Bold"
+                            Foreground="White"
+                            Style="{StaticResource HeaderTextBlockStyle}"
+                            Text="Hi~ " />
+                        <TextBlock
+                            x:Name="TbHelloUserName"
+                            FontSize="36"
+                            FontWeight="Bold"
+                            Foreground="White"
+                            Style="{StaticResource HeaderTextBlockStyle}" />
                     </StackPanel>
                     <TextBlock
-                    Margin="0,5,0,0"
-                    x:Name="TbRamdomWelcome"
-                    FontSize="18"
-                    Foreground="AntiqueWhite"
-                    Text="用音乐开启新的一天吧" />
+                        x:Name="TbRamdomWelcome"
+                        Margin="0,5,0,0"
+                        FontSize="18"
+                        Foreground="AntiqueWhite"
+                        Text="用音乐开启新的一天吧" />
                 </StackPanel>
-                <StackPanel Grid.Column="1" x:Name="HomeBtns" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,35,20,0"
-                        Spacing="20">
+                <StackPanel
+                    x:Name="HomeBtns"
+                    Grid.Column="1"
+                    Margin="0,35,20,0"
+                    HorizontalAlignment="Right"
+                    Orientation="Horizontal"
+                    Spacing="20">
                     <Button
-                    x:Name="LikedSongListBtn"
-                    Height="100"
-                    Width="100"
-                    CornerRadius="16"
-                    VerticalAlignment="Top"
-                    HorizontalAlignment="Center"
-                    Margin="0,0,0,0"
-                    Tapped="LikedSongListTapped">
+                        x:Name="LikedSongListBtn"
+                        Width="100"
+                        Height="100"
+                        Margin="0,0,0,0"
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Top"
+                        CornerRadius="16"
+                        Tapped="LikedSongListTapped">
                         <StackPanel>
                             <FontIcon
-                            x:Name="IconLiked"
-                            FontSize="28"
-                            Glyph="&#xE00B;" />
+                                x:Name="IconLiked"
+                                FontSize="28"
+                                Glyph="&#xE00B;" />
                             <TextBlock
-                            HorizontalAlignment="Center"
-                            VerticalAlignment="Top"
-                            Text="喜欢音乐"
-                            FontWeight="Bold"
-                            Margin="0,8,0,0"
-                            FontSize="12" />
+                                Margin="0,8,0,0"
+                                HorizontalAlignment="Center"
+                                VerticalAlignment="Top"
+                                FontSize="12"
+                                FontWeight="Bold"
+                                Text="喜欢音乐" />
 
                         </StackPanel>
                     </Button>
                     <Button
-                    x:Name="DailyRcmBtn"
-                    Height="100"
-                    Width="100"
-                    CornerRadius="16"
-                    VerticalAlignment="Top"
-                    HorizontalAlignment="Center"
-                    Margin="0,0,0,0"               
-                    Tapped="dailyRcmTapped">
+                        x:Name="DailyRcmBtn"
+                        Width="100"
+                        Height="100"
+                        Margin="0,0,0,0"
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Top"
+                        CornerRadius="16"
+                        Tapped="dailyRcmTapped">
                         <StackPanel>
                             <FontIcon
-                            x:Name="IconDailyRcm"
-                            FontSize="28"
-                            Glyph="&#xEA89;" />
+                                x:Name="IconDailyRcm"
+                                FontSize="28"
+                                Glyph="&#xEA89;" />
                             <TextBlock
-                            HorizontalAlignment="Center"
-                            VerticalAlignment="Top"
-                            Text="每日推荐"
-                            FontWeight="Bold"
-                            Margin="0,8,0,0"
-                            FontSize="12" />
+                                Margin="0,8,0,0"
+                                HorizontalAlignment="Center"
+                                VerticalAlignment="Top"
+                                FontSize="12"
+                                FontWeight="Bold"
+                                Text="每日推荐" />
 
                         </StackPanel>
                     </Button>
                     <Button
-                    x:Name="PersonalFMBtn"
-                    Height="100"
-                    Width="100"
-                    CornerRadius="16"
-                    VerticalAlignment="Top"
-                    HorizontalAlignment="Center"
-                    Margin="0,0,0,0"
-                    Tapped="FMTapped">
+                        x:Name="PersonalFMBtn"
+                        Width="100"
+                        Height="100"
+                        Margin="0,0,0,0"
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Top"
+                        CornerRadius="16"
+                        Tapped="FMTapped">
                         <StackPanel>
                             <FontIcon
-                            x:Name="IconFM"
-                            FontSize="28"
-                            Glyph="&#xF8B2;" />
+                                x:Name="IconFM"
+                                FontSize="28"
+                                Glyph="&#xF8B2;" />
                             <TextBlock
-                            HorizontalAlignment="Center"
-                            VerticalAlignment="Top"
-                            Text="私人FM"
-                            FontWeight="Bold"
-                            Margin="0,8,0,0"
-                            FontSize="12" />
+                                Margin="0,8,0,0"
+                                HorizontalAlignment="Center"
+                                VerticalAlignment="Top"
+                                FontSize="12"
+                                FontWeight="Bold"
+                                Text="私人FM" />
 
                         </StackPanel>
                     </Button>
                     <Button
-                    x:Name="HeartBeatBtn"
-                    Height="100"
-                    Width="100"
-                    CornerRadius="16"
-                    VerticalAlignment="Top"
-                    HorizontalAlignment="Center"
-                    Margin="0,0,0,0"               
-                    Tapped="HeartBeatTapped">
+                        x:Name="HeartBeatBtn"
+                        Width="100"
+                        Height="100"
+                        Margin="0,0,0,0"
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Top"
+                        CornerRadius="16"
+                        Tapped="HeartBeatTapped">
                         <StackPanel>
                             <FontIcon
-                            x:Name="IconHeartBeat"
-                            FontSize="28"
-                            Glyph="&#xEB4F;" />
+                                x:Name="IconHeartBeat"
+                                FontSize="28"
+                                Glyph="&#xEB4F;" />
                             <TextBlock
-                            HorizontalAlignment="Center"
-                            VerticalAlignment="Top"
-                            Text="心动模式"
-                            FontWeight="Bold"
-                            Margin="0,8,0,0"
-                            FontSize="12" />
+                                Margin="0,8,0,0"
+                                HorizontalAlignment="Center"
+                                VerticalAlignment="Top"
+                                FontSize="12"
+                                FontWeight="Bold"
+                                Text="心动模式" />
 
                         </StackPanel>
                     </Button>
                     <Button
-                    x:Name="UserBtn"
-                    Height="100"
-                    Width="100"
-                    CornerRadius="16"
-                    VerticalAlignment="Top"
-                    HorizontalAlignment="Center"
-                    Margin="0,0,0,0"               
-                    Tapped="UserTapped" 
-                    BorderBrush="{x:Null}"
-                    Background="Transparent" >
+                        x:Name="UserBtn"
+                        Width="100"
+                        Height="100"
+                        Margin="0,0,0,0"
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Top"
+                        Background="Transparent"
+                        BorderBrush="{x:Null}"
+                        CornerRadius="16"
+                        Tapped="UserTapped">
                         <Grid>
-                            <Rectangle
-                            Margin="-27">
+                            <Rectangle Margin="-27">
                                 <Rectangle.Fill>
                                     <ImageBrush x:Name="UserImageRect" Stretch="UniformToFill">
                                         <ImageBrush.ImageSource>
@@ -171,13 +190,13 @@
                                 </Rectangle.Fill>
                             </Rectangle>
                             <TextBlock
-                            x:Name="UserName"
-                            HorizontalAlignment="Center"
-                            VerticalAlignment="Top"
-                            Text="我的歌单"
-                            FontWeight="Bold"
-                            Margin="0,35,0,0"
-                            FontSize="12" />
+                                x:Name="UserName"
+                                Margin="0,35,0,0"
+                                HorizontalAlignment="Center"
+                                VerticalAlignment="Top"
+                                FontSize="12"
+                                FontWeight="Bold"
+                                Text="我的歌单" />
                         </Grid>
                     </Button>
 
@@ -185,14 +204,18 @@
                 </StackPanel>
             </Grid>
             <StackPanel
-                Margin="0,220,0,0"
                 x:Name="MainContainer"
+                Margin="0,220,0,0"
                 Padding="15"
                 Orientation="Vertical"
                 Spacing="10">
                 <Border CornerRadius="8">
-                    <muxc:InfoBar Title="已开启旧版主题" Message="若出现问题，请点击下方开关以关闭（重启后生效）" Severity="Warning" IsOpen="{x:Bind hyplayer:Common.Setting.IsOldThemeEnabled}" >
-                        <ToggleSwitch Margin="0,0,0,24" IsOn="{x:Bind hyplayer:Common.Setting.IsOldThemeEnabled,Mode=TwoWay}"/>
+                    <muxc:InfoBar
+                        Title="已开启旧版主题"
+                        IsOpen="{x:Bind hyplayer:Common.Setting.IsOldThemeEnabled}"
+                        Message="若出现问题，请点击下方开关以关闭（重启后生效）"
+                        Severity="Warning">
+                        <ToggleSwitch Margin="0,0,0,24" IsOn="{x:Bind hyplayer:Common.Setting.IsOldThemeEnabled, Mode=TwoWay}" />
                     </muxc:InfoBar>
                 </Border>
 
@@ -214,7 +237,7 @@
                         <StackPanel x:Name="DailySongContainer" Orientation="Horizontal" Height="240" />
                     </ScrollViewer>
                 </StackPanel>
-                -->
+                    -->
                     <!--  功能按钮  -->
 
                     <!--  推荐歌单  -->
@@ -223,11 +246,12 @@
                         Background="#1A808080"
                         CornerRadius="8"
                         Orientation="Vertical">
-                        <StackPanel Orientation="Horizontal" Margin="20,20,0,0" Spacing="12">
-                            <FontIcon Glyph="&#xEB52;"/>
-                            <TextBlock 
-                                Text="推荐歌单"
-                                Style="{StaticResource SubtitleTextBlockStyle}" />  
+                        <StackPanel
+                            Margin="20,20,0,0"
+                            Orientation="Horizontal"
+                            Spacing="12">
+                            <FontIcon Glyph="&#xEB52;" />
+                            <TextBlock Style="{StaticResource SubtitleTextBlockStyle}" Text="推荐歌单" />
                         </StackPanel>
 
                         <ScrollViewer
@@ -245,15 +269,16 @@
 
                     <!--  榜单  -->
                     <StackPanel
+                        Margin="0,10,0,0"
                         Background="#1A808080"
                         CornerRadius="8"
-                        Orientation="Vertical"
-                        Margin="0,10,0,0">
-                        <StackPanel Orientation="Horizontal" Margin="20,20,0,0" Spacing="12">
-                            <FontIcon Glyph="&#xEA37;"/>
-                            <TextBlock                           
-                                Text="榜单"
-                                Style="{StaticResource SubtitleTextBlockStyle}" />
+                        Orientation="Vertical">
+                        <StackPanel
+                            Margin="20,20,0,0"
+                            Orientation="Horizontal"
+                            Spacing="12">
+                            <FontIcon Glyph="&#xEA37;" />
+                            <TextBlock Style="{StaticResource SubtitleTextBlockStyle}" Text="榜单" />
                         </StackPanel>
 
                         <ScrollViewer
@@ -308,9 +333,9 @@
                         <AdaptiveTrigger MinWindowWidth="1" />
                     </VisualState.StateTriggers>
                     <VisualState.Setters>
-                        <Setter Target="BtnsColm.Width" Value="480"/>
-                        <Setter Target="LikedSongListBtn.Visibility" Value="Collapsed"/>
-                        <Setter Target="HomeBtns.Margin" Value="0,35,20,0"/>
+                        <Setter Target="BtnsColm.Width" Value="480" />
+                        <Setter Target="LikedSongListBtn.Visibility" Value="Collapsed" />
+                        <Setter Target="HomeBtns.Margin" Value="0,35,20,0" />
                         <Setter Target="HomeBtns.Spacing" Value="20" />
                     </VisualState.Setters>
 
@@ -321,8 +346,8 @@
                         <AdaptiveTrigger MinWindowWidth="800" />
                     </VisualState.StateTriggers>
                     <VisualState.Setters>
-                        <Setter Target="BtnsColm.Width" Value="560"/>
-                        <Setter Target="HomeBtns.Margin" Value="-100,35,20,0"/>
+                        <Setter Target="BtnsColm.Width" Value="560" />
+                        <Setter Target="HomeBtns.Margin" Value="-100,35,20,0" />
                         <Setter Target="HomeBtns.Spacing" Value="10" />
                     </VisualState.Setters>
 
@@ -333,7 +358,7 @@
                     </VisualState.StateTriggers>
                     <VisualState.Setters>
                         <Setter Target="HomeBtns.Spacing" Value="10" />
-                        <Setter Target="BtnsColm.Width" Value="560"/>
+                        <Setter Target="BtnsColm.Width" Value="560" />
                     </VisualState.Setters>
 
                 </VisualState>
@@ -342,11 +367,9 @@
                     <VisualState.StateTriggers>
                         <AdaptiveTrigger MinWindowWidth="1300" />
                     </VisualState.StateTriggers>
-                    <VisualState.Setters>
-                    </VisualState.Setters>
+                    <VisualState.Setters />
                 </VisualState>
             </VisualStateGroup>
         </VisualStateManager.VisualStateGroups>
-
     </ScrollViewer>
 </Page>

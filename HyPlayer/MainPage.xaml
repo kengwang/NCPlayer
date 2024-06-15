@@ -6,55 +6,58 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:hyPlayerPage="using:HyPlayer.Pages"
     xmlns:hyplayer="using:HyPlayer"
-    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" xmlns:muxc="using:Microsoft.UI.Xaml.Controls" xmlns:media="using:Microsoft.Toolkit.Uwp.UI.Media"
-    mc:Ignorable="d"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:media="using:Microsoft.Toolkit.Uwp.UI.Media"
+    xmlns:muxc="using:Microsoft.UI.Xaml.Controls"
     PointerEntered="Page_PointerEntered"
-    PointerExited="Page_PointerExited">
+    PointerExited="Page_PointerExited"
+    mc:Ignorable="d">
     <Page.Resources>
         <LinearGradientBrush x:Key="OpacityGradientBrush" StartPoint="0,0" EndPoint="0,1">
-            <GradientStop Color="{Binding Source={ThemeResource GradientColor},Converter={StaticResource TransparentColorConverter}}" Offset="0"/>
-            <GradientStop Color="{ThemeResource GradientColor}" Offset="1"/>
+            <GradientStop Offset="0" Color="{Binding Source={ThemeResource GradientColor}, Converter={StaticResource TransparentColorConverter}}" />
+            <GradientStop Offset="1" Color="{ThemeResource GradientColor}" />
         </LinearGradientBrush>
-        <Storyboard x:FieldModifier="public" x:Name="ImageResetPositionAni" x:Key="ImageResetPositionAni">
+        <Storyboard
+            x:Key="ImageResetPositionAni"
+            x:Name="ImageResetPositionAni"
+            x:FieldModifier="public">
             <DoubleAnimation
-                To="0"
-                Duration="0:0:0.25"
                 Storyboard.TargetName="ExpandedPlayerPositionOffset"
-                Storyboard.TargetProperty="X">
-            </DoubleAnimation>
+                Storyboard.TargetProperty="X"
+                To="0"
+                Duration="0:0:0.25" />
             <DoubleAnimation
-                To="0"
-                Duration="0:0:0.25"
                 Storyboard.TargetName="ExpandedPlayerPositionOffset"
-                Storyboard.TargetProperty="Y">
-            </DoubleAnimation>
+                Storyboard.TargetProperty="Y"
+                To="0"
+                Duration="0:0:0.25" />
         </Storyboard>
         <Storyboard x:Name="PointerInAni">
             <DoubleAnimation
-                To="1"
-                Duration="00:00:00.55"
                 Storyboard.TargetName="GridPlayBar"
-                Storyboard.TargetProperty="Opacity">
-                <DoubleAnimation.EasingFunction>
-                    <CircleEase EasingMode="EaseOut"/>
-                </DoubleAnimation.EasingFunction>
-            </DoubleAnimation>
-            <DoubleAnimation
+                Storyboard.TargetProperty="Opacity"
                 To="1"
-                Duration="00:00:00.55"
-                Storyboard.TargetName="GridPlayBarMarginBlur"
-                Storyboard.TargetProperty="Opacity">
+                Duration="00:00:00.55">
                 <DoubleAnimation.EasingFunction>
-                    <CircleEase EasingMode="EaseOut"/>
+                    <CircleEase EasingMode="EaseOut" />
                 </DoubleAnimation.EasingFunction>
             </DoubleAnimation>
             <DoubleAnimation
-                To="0"
-               Duration="00:00:00.55"
-                Storyboard.TargetName="PlayBarTrans"
-                Storyboard.TargetProperty="Y">
+                Storyboard.TargetName="GridPlayBarMarginBlur"
+                Storyboard.TargetProperty="Opacity"
+                To="1"
+                Duration="00:00:00.55">
                 <DoubleAnimation.EasingFunction>
-                    <CircleEase EasingMode="EaseOut"/>
+                    <CircleEase EasingMode="EaseOut" />
+                </DoubleAnimation.EasingFunction>
+            </DoubleAnimation>
+            <DoubleAnimation
+                Storyboard.TargetName="PlayBarTrans"
+                Storyboard.TargetProperty="Y"
+                To="0"
+                Duration="00:00:00.55">
+                <DoubleAnimation.EasingFunction>
+                    <CircleEase EasingMode="EaseOut" />
                 </DoubleAnimation.EasingFunction>
             </DoubleAnimation>
 
@@ -107,6 +110,53 @@
         </Storyboard>-->
     </Page.Resources>
     <Grid>
+        <Frame
+            Name="MainFrame"
+            x:FieldModifier="public"
+            SourcePageType="hyPlayerPage:BasePage" />
+        <Frame
+            Name="ExpandedPlayer"
+            x:FieldModifier="public"
+            CacheSize="0"
+            IsNavigationStackEnabled="False"
+            SourcePageType="hyPlayerPage:BlankPage"
+            Visibility="Collapsed">
+            <Frame.RenderTransform>
+                <TranslateTransform x:Name="ExpandedPlayerPositionOffset" x:FieldModifier="public" />
+            </Frame.RenderTransform>
+        </Frame>
+        <Grid
+            Name="GridPlayBarMarginBlur"
+            Height="110"
+            Margin="0,10,0,0"
+            VerticalAlignment="Bottom"
+            x:FieldModifier="public"
+            Visibility="Visible">
+            <Grid.Background>
+                <media:BackdropBlurBrush Amount="12" />
+            </Grid.Background>
+            <Rectangle
+                x:Name="PlayBarMarginBackground"
+                Grid.Column="0"
+                Grid.ColumnSpan="4"
+                Fill="{ThemeResource OpacityGradientBrush}"
+                Opacity="1" />
+        </Grid>
+        <Grid
+            Name="GridPlayBar"
+            Height="110"
+            Margin="{x:Bind hyplayer:Common.Setting.playBarMargin, Mode=OneWay, Converter={StaticResource PlayBarMarginConverter}}"
+            VerticalAlignment="Bottom"
+            x:FieldModifier="public"
+            Background="{x:Bind hyplayer:Common.Setting.playbarBackgroundAcrylic, Mode=OneWay, Converter={StaticResource BooleanToGridPlayBarBrushesConverter}}"
+            CornerRadius="{x:Bind hyplayer:Common.Setting.playBarMargin, Mode=OneWay, Converter={StaticResource PlayBarCornerRadiusConverter}}"
+            Opacity="1"
+            Visibility="Visible">
+            <controls2:PlayBar />
+            <Grid.RenderTransform>
+                <TranslateTransform x:Name="PlayBarTrans" />
+            </Grid.RenderTransform>
+        </Grid>
         <VisualStateManager.VisualStateGroups>
             <VisualStateGroup>
                 <VisualState>
@@ -130,53 +180,5 @@
                 </VisualState>
             </VisualStateGroup>
         </VisualStateManager.VisualStateGroups>
-        <Frame
-            Name="MainFrame"
-            x:FieldModifier="public"
-            SourcePageType="hyPlayerPage:BasePage" />
-        <Frame
-            Name="ExpandedPlayer"
-            x:FieldModifier="public"
-            CacheSize="0"
-            IsNavigationStackEnabled="False"
-            SourcePageType="hyPlayerPage:BlankPage"
-            Visibility="Collapsed" >
-            <Frame.RenderTransform>
-                <TranslateTransform x:FieldModifier="public" x:Name="ExpandedPlayerPositionOffset" />
-            </Frame.RenderTransform>
-        </Frame>
-        <Grid
-            Name="GridPlayBarMarginBlur"
-            Height="110"
-            Margin="0,10,0,0"
-            x:FieldModifier="public"
-            VerticalAlignment="Bottom"
-            Visibility="Visible"
-            >
-            <Grid.Background>
-                <media:BackdropBlurBrush Amount="12"/>
-            </Grid.Background>
-            <Rectangle
-                x:Name="PlayBarMarginBackground"
-                Grid.Column="0"
-                Opacity="1"
-                Grid.ColumnSpan="4"
-                Fill="{ThemeResource OpacityGradientBrush}"/>
-        </Grid>
-        <Grid
-            Name="GridPlayBar"
-            Height="110"
-            Margin="{x:Bind hyplayer:Common.Setting.playBarMargin, Mode = OneWay , Converter={StaticResource PlayBarMarginConverter} }"
-            VerticalAlignment="Bottom"
-            x:FieldModifier="public"
-            Background="{x:Bind hyplayer:Common.Setting.playbarBackgroundAcrylic, Mode=OneWay, Converter={StaticResource BooleanToGridPlayBarBrushesConverter}}"
-            CornerRadius="{x:Bind hyplayer:Common.Setting.playBarMargin, Mode = OneWay , Converter={StaticResource PlayBarCornerRadiusConverter} }"
-            Visibility="Visible"
-            Opacity="1">
-            <controls2:PlayBar />
-            <Grid.RenderTransform>
-                <TranslateTransform x:Name="PlayBarTrans"/>
-            </Grid.RenderTransform>
-        </Grid>
     </Grid>
 </Page>

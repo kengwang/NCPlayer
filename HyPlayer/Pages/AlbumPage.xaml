@@ -38,9 +38,13 @@
                             </ImageBrush>
                         </Rectangle.Fill>
                     </Rectangle>
-                    <StackPanel x:Name="StackPanelUserInfo" Orientation="Vertical" VerticalAlignment="Center">
-                        <TextBlock IsTextSelectionEnabled="True"
+                    <StackPanel
+                        x:Name="StackPanelUserInfo"
+                        VerticalAlignment="Center"
+                        Orientation="Vertical">
+                        <TextBlock
                             x:Name="TextBoxAlbumName"
+                            IsTextSelectionEnabled="True"
                             Style="{ThemeResource TitleTextBlockStyle}"
                             TextWrapping="Wrap" />
                         <StackPanel Orientation="Horizontal">
@@ -53,47 +57,36 @@
                                 x:Name="TextBoxAuthor"
                                 Click="TextBoxAuthor_OnTapped"
                                 Content="歌手"
-                                FontSize="16" Style="{ThemeResource TextBlockButtonStyle}"/>
+                                FontSize="16"
+                                Style="{ThemeResource TextBlockButtonStyle}" />
                         </StackPanel>
-                        <StackPanel Orientation="Horizontal" Margin="0,0,0,12">
+                        <StackPanel Margin="0,0,0,12" Orientation="Horizontal">
                             <TextBlock
                                 FontSize="16"
                                 Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"
                                 Text="发行时间:" />
                             <TextBlock
-                                x:Name="TextBlockPublishTime"   
-                                Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"
-                                FontSize="16"/>
+                                x:Name="TextBlockPublishTime"
+                                FontSize="16"
+                                Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}" />
                         </StackPanel>
-                        <StackPanel
-                            Orientation="Horizontal"
-                            Spacing="15">
-                            <Button
-                                Style="{ThemeResource AccentButtonStyle}"
-                                Click="ButtonPlayAll_OnClick">
+                        <StackPanel Orientation="Horizontal" Spacing="15">
+                            <Button Click="ButtonPlayAll_OnClick" Style="{ThemeResource AccentButtonStyle}">
                                 <StackPanel Orientation="Horizontal">
                                     <FontIcon
                                         x:Name="IconPlay"
                                         FontSize="16"
                                         Glyph="&#xEDB5;" />
-                                    <TextBlock
-                                        Margin="4,0,0,0"
-                                        Text="播放" />
+                                    <TextBlock Margin="4,0,0,0" Text="播放" />
                                 </StackPanel>
                             </Button>
-                            <Button
-                                Click="BtnAddAll_Clicked"
-                                Content="添加全部"/>
-                            <Button
-                                Click="ButtonDownloadAll_OnClick"
-                                Content="下载全部"/>
+                            <Button Click="BtnAddAll_Clicked" Content="添加全部" />
+                            <Button Click="ButtonDownloadAll_OnClick" Content="下载全部" />
                             <ToggleButton
                                 x:Name="BtnSub"
                                 Click="BtnSub_Click"
                                 Content="收藏" />
-                            <Button
-                                Click="ButtonComment_OnClick"
-                                Content="评论"/>
+                            <Button Click="ButtonComment_OnClick" Content="评论" />
                         </StackPanel>
                         <controls1:ExpandableTextBox
                             x:Name="TextBlockDesc"

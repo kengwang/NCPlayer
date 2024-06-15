@@ -6,17 +6,17 @@
     xmlns:controls="using:Microsoft.Toolkit.Uwp.UI.Controls"
     xmlns:controls1="using:HyPlayer.Controls"
     xmlns:hyplayer="using:HyPlayer"
+    xmlns:lyricrenderer="using:HyPlayer.LyricRenderer"
     xmlns:media="using:Microsoft.Toolkit.Uwp.UI.Media"
     xmlns:muxc="using:Microsoft.UI.Xaml.Controls"
     xmlns:ui="using:Microsoft.Toolkit.Uwp.UI"
-    xmlns:lyricrenderer="using:HyPlayer.LyricRenderer"
     xmlns:win2d="using:Microsoft.Graphics.Canvas.UI.Xaml"
     muxc:BackdropMaterial.ApplyToRootOrPageBackground="True"
     Loaded="Page_Loaded"
     NavigationCacheMode="Disabled">
     <Page.Resources>
-        <!-- ReSharper disable once Xaml.RedundantResource -->
-        
+        <!--  ReSharper disable once Xaml.RedundantResource  -->
+
         <Storyboard x:Key="ImageAlbumAni" x:Name="ImageAlbumAni">
             <DoubleAnimation
                 x:Name="albumAniOpacity"
@@ -169,8 +169,8 @@
 
 
         <media:AttachedCardShadow
-            x:Name="AlbumCoverDropShadow"
             x:Key="AlbumShadow"
+            x:Name="AlbumCoverDropShadow"
             CornerRadius="12"
             Opacity="{x:Bind hyplayer:Common.Setting.expandedCoverShadowDepth, Converter={StaticResource ShadowConverter}}"
             Offset="0,4"
@@ -197,11 +197,11 @@
             Grid.RowSpan="3"
             HorizontalAlignment="Stretch"
             VerticalAlignment="Stretch"
-            Opacity="0"
-            Canvas.ZIndex="-1">
+            Canvas.ZIndex="-1"
+            Opacity="0">
             <Rectangle.Fill>
                 <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
-                    <GradientStop x:Name="ImmersiveTopStop" Offset="0.25"  />
+                    <GradientStop x:Name="ImmersiveTopStop" Offset="0.25" />
                     <GradientStop x:Name="ImmersiveCover" Offset="0.95" />
                 </LinearGradientBrush>
             </Rectangle.Fill>
@@ -211,14 +211,20 @@
             Grid.Row="0"
             Grid.Column="0"
             Background="Transparent" />
-        <Grid Grid.Row="0" x:Name="LuminousBackgroundContainer" Canvas.ZIndex="-1" Grid.Column="0" Grid.RowSpan="3">
-            <win2d:CanvasAnimatedControl x:Name="LuminousBackground" 
-                                         CreateResources="LuminousBackground_CreateResources"
-                                         Update="LuminousBackground_Update"
-                                         SizeChanged="LuminousBackground_SizeChanged"
-                                         Draw="LuminousBackground_Draw"
-                                         x:Load="{x:Bind hyplayer:Common.Setting.expandedPlayerBackgroundType, Converter={StaticResource ShaderConverter}}"
-                                         IsFixedTimeStep="True"/>
+        <Grid
+            x:Name="LuminousBackgroundContainer"
+            Grid.Row="0"
+            Grid.RowSpan="3"
+            Grid.Column="0"
+            Canvas.ZIndex="-1">
+            <win2d:CanvasAnimatedControl
+                x:Name="LuminousBackground"
+                x:Load="{x:Bind hyplayer:Common.Setting.expandedPlayerBackgroundType, Converter={StaticResource ShaderConverter}}"
+                CreateResources="LuminousBackground_CreateResources"
+                Draw="LuminousBackground_Draw"
+                IsFixedTimeStep="True"
+                SizeChanged="LuminousBackground_SizeChanged"
+                Update="LuminousBackground_Update" />
         </Grid>
         <Grid
             x:Name="MainGrid"
@@ -234,20 +240,20 @@
                 Canvas.ZIndex="0"
                 HorizontalScrollMode="Disabled"
                 VerticalScrollBarVisibility="Hidden"
-                VerticalScrollMode="Disabled"
-                SizeChanged="UIAugmentationSys_SizeChanged">
+                VerticalScrollMode="Disabled">
                 <Grid
                     x:Name="LeftPanel"
                     MaxWidth="600"
                     HorizontalAlignment="Stretch">
                     <Grid.RowDefinitions>
+                        <RowDefinition Height="*" />
                         <RowDefinition Height="Auto" />
-                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="10*" />
                     </Grid.RowDefinitions>
-                    <Border x:Name="ShadowTarget" Grid.Row="0" />
+                    <Border x:Name="ShadowTarget" Grid.Row="1" />
                     <controls:ImageEx
                         x:Name="ImageAlbum"
-                        Grid.Row="0"
+                        Grid.Row="1"
                         MaxWidth="600"
                         MaxHeight="600"
                         Margin="20"
@@ -304,103 +310,82 @@
                             <BitmapImage x:Name="ImageAlbumSource" UriSource="/Assets/icon.png" />
                         </controls:ImageEx.Source>
                     </controls:ImageEx>
-                    <Grid
-                        Grid.Row="1"
-                        Margin="20">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="Auto"/>
-                            <ColumnDefinition Width="*"/>
-                        </Grid.ColumnDefinitions>
+                    <StackPanel
+                        x:Name="SongInfo"
+                        Grid.Row="2"
+                        MaxWidth="600"
+                        Orientation="Horizontal"
+                        Spacing="5">
                         <controls:ImageEx
-                        x:Name="ImageAlbumImerssive"
-                        Width="200"
-                        Height="200"
-                        Grid.Row="0"
-                        Grid.Column="0"
-                        Visibility="Collapsed"
-                        HorizontalAlignment="Center"
-                        VerticalAlignment="Center"
-                        ui:Effects.Shadow="{StaticResource AlbumShadow}"
-                        ui:VisualExtensions.NormalizedCenterPoint="0.5"
-                        x:FieldModifier="public"
-                        BorderBrush="Black"
-                        CornerRadius="12"
-                        IsCacheEnabled="False"
-                        PlaceholderStretch="Uniform"
-                        Stretch="Uniform">
-                            <controls:ImageEx.Source>
-                                <BitmapImage x:Name="ImageAlbumImerssiveSource" UriSource="/Assets/icon.png" />
-                            </controls:ImageEx.Source>
-                        </controls:ImageEx>
-                        <Grid
-                            x:Name="SongInfo"
-                            Grid.Row="1"
-                            Grid.Column="1"
-                            MaxWidth="600"
-                            HorizontalAlignment="Stretch"
-                            CornerRadius="0">
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="Auto"/>
-                            <RowDefinition Height="Auto"/>
-                            <RowDefinition Height="Auto"/>
-                        </Grid.RowDefinitions>
-                        <controls1:SelectableTextBox
-                             x:Name="TextBlockSongTitle"
-                            Margin="0,-10,0,0"
-                            HorizontalAlignment="Stretch"
+                            x:Name="ImageAlbumImerssive"
+                            MaxWidth="250"
+                            MaxHeight="250"
+                            HorizontalAlignment="Center"
+                            VerticalAlignment="Center"
+                            ui:Effects.Shadow="{StaticResource AlbumShadow}"
+                            ui:VisualExtensions.NormalizedCenterPoint="0.5"
                             x:FieldModifier="public"
-                            FontSize="36"
-                            FontWeight="Bold"
-                            Text="歌曲名"
-                            TextWrapping="Wrap" 
-                            Grid.Row="0"/>
-                            <Grid 
-                            x:Name="SongInfoContainer"
-                            ColumnSpacing="4"
-                            Grid.Row="1">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="Auto"/>
-                                    <ColumnDefinition Width="*"/>
-                                </Grid.ColumnDefinitions>
+                            BorderBrush="Black"
+                            CornerRadius="12"
+                            IsCacheEnabled="False"
+                            PlaceholderStretch="Uniform"
+                            Source="{x:Bind ImageAlbumSource}"
+                            Stretch="Uniform"
+                            Visibility="Collapsed" />
+                        <Grid Margin="20" CornerRadius="0">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                            </Grid.RowDefinitions>
+                            <controls1:SelectableTextBox
+                                x:Name="TextBlockSongTitle"
+                                Grid.Row="0"
+                                Margin="0,-10,0,0"
+                                HorizontalAlignment="Stretch"
+                                x:FieldModifier="public"
+                                FontSize="36"
+                                FontWeight="Bold"
+                                Text="歌曲名"
+                                TextWrapping="Wrap" />
+                            <StackPanel
+                                x:Name="SongInfoContainer"
+                                Grid.Row="1"
+                                Orientation="Horizontal"
+                                Spacing="4">
                                 <TextBlock
                                     x:Name="TextBlockSingerNameTip"
                                     Padding="0,6,0,6"
-                                     Grid.Column="0"
-                                     FontSize="18"
+                                    FontSize="18"
                                     Foreground="{ThemeResource TextFillColorSecondaryBrush}"
                                     Text="歌手: "
                                     TextAlignment="Center" />
-                               <HyperlinkButton
+                                <HyperlinkButton
                                     Name="TextBlockSinger"
-                                     Grid.Column="1"
                                     Click="TextBlockSinger_OnTapped"
                                     FontSize="18"
                                     Style="{StaticResource TextBlockButtonStyle}" />
-                        </Grid>
-                        <Grid ColumnSpacing="4" Grid.Row="2">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="Auto"/>
-                                    <ColumnDefinition Width="*"/>
-                                </Grid.ColumnDefinitions>
+                            </StackPanel>
+                            <StackPanel
+                                Grid.Row="2"
+                                Orientation="Horizontal"
+                                Spacing="5">
                                 <TextBlock
-                                   x:Name="TextBlockAlbumNameTip"
-                                   Padding="0,6,0,6"
-                                   FontSize="18"
-                                   Foreground="{StaticResource SystemControlForegroundBaseMediumBrush}"
-                                   Text="专辑: "
-                                   Grid.Column="0" 
-                            />
-                        <HyperlinkButton
-                            Name="TextBlockAlbum"
-                            Click="TextBlockAlbum_OnTapped"
-                            FontSize="18"
-                            Style="{StaticResource TextBlockButtonStyle}"
-                            Grid.Column="1"/>
+                                    x:Name="TextBlockAlbumNameTip"
+                                    Padding="0,6,0,6"
+                                    FontSize="18"
+                                    Foreground="{StaticResource SystemControlForegroundBaseMediumBrush}"
+                                    Text="专辑: "
+                                    TextAlignment="Center" />
+                                <HyperlinkButton
+                                    Name="TextBlockAlbum"
+                                    Click="TextBlockAlbum_OnTapped"
+                                    FontSize="18"
+                                    Style="{StaticResource TextBlockButtonStyle}" />
+                            </StackPanel>
                         </Grid>
-                    </Grid>
-                    </Grid>
+                    </StackPanel>
                 </Grid>
-                
             </ScrollViewer>
             <Grid
                 x:Name="RightPanel"
@@ -410,7 +395,7 @@
                     <RowDefinition x:Name="DefaultRow" Height="25*" />
                     <RowDefinition x:Name="ImmersiveRow" Height="1*" />
                 </Grid.RowDefinitions>
-                <lyricrenderer:LyricRenderView RightTapped="LyricBoxContainer_RightTapped"  x:Name="LyricBox" />
+                <lyricrenderer:LyricRenderView x:Name="LyricBox" RightTapped="LyricBoxContainer_RightTapped" />
             </Grid>
             <Button
                 x:Name="MoreBtn"
@@ -502,12 +487,12 @@
                         </ToggleMenuFlyoutItem>
                         <MenuFlyoutSeparator />
                         <MenuFlyoutItem
-                            Click="BtnCopyLyricClicked"
                             HorizontalContentAlignment="Left"
+                            Click="BtnCopyLyricClicked"
                             Text="复制歌词" />
                         <MenuFlyoutItem
-                            Click="BtnLoadLocalLyric"
                             HorizontalContentAlignment="Left"
+                            Click="BtnLoadLocalLyric"
                             Text="加载本地歌词" />
                         <MenuFlyoutSeparator />
                         <MenuFlyoutItem

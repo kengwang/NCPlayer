@@ -40,9 +40,7 @@
             FontSize="40"
             FontWeight="Bold"
             Text="设置" />
-        <controls1:PivotView
-            Grid.Row="1"
-            FontFamily="Black">
+        <controls1:PivotView Grid.Row="1" FontFamily="Black">
             <controls1:PivotEx>
                 <PivotItem FontFamily="Thick" Header="歌词设置">
                     <ScrollViewer Margin="0,48,0,0" VerticalScrollMode="Enabled">
@@ -121,9 +119,7 @@
                                             ValueChanged="LyricSize_OnValueChanged"
                                             Value="{x:Bind hyplayer:Common.Setting.lyricSize, Mode=TwoWay}" />
                                     </controls3:SettingsCard>
-                                    <controls3:SettingsCard
-                                        Description="0为自动"
-                                        Header="翻译大小">
+                                    <controls3:SettingsCard Description="0为自动" Header="翻译大小">
                                         <controls:NumberBox
                                             MinWidth="100"
                                             HorizontalAlignment="Right"
@@ -134,8 +130,7 @@
                                             ValueChanged="LyricSize_OnValueChanged"
                                             Value="{x:Bind hyplayer:Common.Setting.translationSize, Mode=TwoWay}" />
                                     </controls3:SettingsCard>
-                                    <controls3:SettingsCard
-                                        Header="罗马字大小">
+                                    <controls3:SettingsCard Header="罗马字大小">
                                         <controls:NumberBox
                                             x:Name="RomajiSize"
                                             MinWidth="100"
@@ -147,7 +142,7 @@
                                             ValueChanged="LyricSize_OnValueChanged"
                                             Value="{x:Bind hyplayer:Common.Setting.romajiSize, Mode=TwoWay}" />
                                     </controls3:SettingsCard>
-                                    
+
                                 </controls3:SettingsExpander.Items>
                             </controls3:SettingsExpander>
 
@@ -268,8 +263,8 @@
                                     <controls3:SettingsCard Header="对齐方式">
                                         <ComboBox
                                             MinWidth="10"
-                                            SelectedIndex="{x:Bind hyplayer:Common.Setting.lyricAlignment, Mode=TwoWay}"
-                                            HorizontalAlignment="Right">
+                                            HorizontalAlignment="Right"
+                                            SelectedIndex="{x:Bind hyplayer:Common.Setting.lyricAlignment, Mode=TwoWay}">
                                             <ComboBoxItem Content="左对齐" />
                                             <ComboBoxItem Content="居中" />
                                             <ComboBoxItem Content="右对齐" />
@@ -279,21 +274,18 @@
                                         <ComboBox
                                             x:Name="FontBox"
                                             MinWidth="10"
+                                            HorizontalAlignment="Right"
                                             DisplayMemberPath="Name"
-                                            SelectedValuePath="Value"
                                             SelectedValue="{x:Bind hyplayer:Common.Setting.lyricFontFamily, Mode=TwoWay}"
-                                            HorizontalAlignment="Right">
-                                        </ComboBox>
+                                            SelectedValuePath="Value" />
                                     </controls3:SettingsCard>
-                                    <controls3:SettingsCard
-                                        Description="单位 %"
-                                        Header="歌词距离顶部百分比">
+                                    <controls3:SettingsCard Description="单位 %" Header="歌词距离顶部百分比">
                                         <controls:NumberBox
                                             MinWidth="100"
                                             HorizontalAlignment="Right"
                                             LargeChange="5"
-                                            Minimum="0"
                                             Maximum="100"
+                                            Minimum="0"
                                             SmallChange="1"
                                             SpinButtonPlacementMode="Compact"
                                             Value="{x:Bind hyplayer:Common.Setting.lyricPaddingTopRatio, Mode=TwoWay}" />
@@ -305,13 +297,12 @@
                                         <Slider
                                             MinWidth="200"
                                             HorizontalAlignment="Right"
-                                            Minimum="0"
                                             Maximum="99"
+                                            Minimum="0"
                                             Value="{x:Bind hyplayer:Common.Setting.lyricFadingRatio, Mode=TwoWay}" />
                                     </controls3:SettingsCard>
 
-                                    <controls3:SettingsCard
-                                        Header="歌词行间距">
+                                    <controls3:SettingsCard Header="歌词行间距">
                                         <controls:NumberBox
                                             MinWidth="100"
                                             HorizontalAlignment="Right"
@@ -399,9 +390,7 @@
                                     </controls3:SettingsCard>
 
                                     <controls3:SettingsCard Description="不同函数有不同的效果" Header="行滚动函数">
-                                        <ComboBox
-                                            HorizontalAlignment="Right"
-                                            SelectedIndex="{x:Bind hyplayer:Common.Setting.LineRollingCalculator, Mode=TwoWay}">
+                                        <ComboBox HorizontalAlignment="Right" SelectedIndex="{x:Bind hyplayer:Common.Setting.LineRollingCalculator, Mode=TwoWay}">
                                             <ComboBoxItem Content="弹簧函数" />
                                             <ComboBoxItem Content="三角函数" />
                                             <ComboBoxItem Content="Lyricify 函数" />
@@ -409,7 +398,7 @@
                                         </ComboBox>
                                     </controls3:SettingsCard>
                                 </controls3:SettingsExpander.Items>
-                                
+
                             </controls3:SettingsExpander>
                         </StackPanel>
                     </ScrollViewer>
@@ -651,16 +640,22 @@
                                     <controls3:SettingsCard>
                                         <Grid>
                                             <Grid.RowDefinitions>
-                                                <RowDefinition Height="Auto"/>
-                                                <RowDefinition Height="Auto"/>
+                                                <RowDefinition Height="Auto" />
+                                                <RowDefinition Height="Auto" />
                                             </Grid.RowDefinitions>
-                                            <Grid Visibility="{x:Bind hyplayer:Common.Setting.LastFMLogined, Mode=OneWay}" Grid.Row="0">
+                                            <Grid Grid.Row="0" Visibility="{x:Bind hyplayer:Common.Setting.LastFMLogined, Mode=OneWay}">
                                                 <Grid.ColumnDefinitions>
-                                                    <ColumnDefinition Width="Auto"/>
-                                                    <ColumnDefinition Width="Auto"/>
+                                                    <ColumnDefinition Width="Auto" />
+                                                    <ColumnDefinition Width="Auto" />
                                                 </Grid.ColumnDefinitions>
-                                                <TextBlock Text="已登录账号：" Visibility="{x:Bind hyplayer:Common.Setting.LastFMLogined, Mode=OneWay}" Grid.Column="0"/>
-                                                <TextBlock Text="{x:Bind hyplayer:Common.Setting.LastFMUserName, Mode=OneWay}" Visibility="{x:Bind hyplayer:Common.Setting.LastFMLogined, Mode=OneWay}" Grid.Column="1"/>
+                                                <TextBlock
+                                                    Grid.Column="0"
+                                                    Text="已登录账号："
+                                                    Visibility="{x:Bind hyplayer:Common.Setting.LastFMLogined, Mode=OneWay}" />
+                                                <TextBlock
+                                                    Grid.Column="1"
+                                                    Text="{x:Bind hyplayer:Common.Setting.LastFMUserName, Mode=OneWay}"
+                                                    Visibility="{x:Bind hyplayer:Common.Setting.LastFMLogined, Mode=OneWay}" />
                                             </Grid>
                                             <Grid Grid.Row="1">
                                                 <Button
@@ -1297,7 +1292,11 @@
                                 <CheckBox Margin="0,0,-100,0" IsChecked="{x:Bind hyplayer:Common.Setting.useAiDj, Mode=TwoWay}" />
                             </controls3:SettingsCard>
                             <controls3:SettingsCard Header="保持屏幕常亮">
-                                <CheckBox Margin="0,0,-100,0" IsChecked="{x:Bind hyplayer:Common.Setting.displayMaintain, Mode=TwoWay}" Unchecked="DisplayMaintain_OnUnchecked" Checked="DisplayMaintain_OnChecked" />
+                                <CheckBox
+                                    Margin="0,0,-100,0"
+                                    Checked="DisplayMaintain_OnChecked"
+                                    IsChecked="{x:Bind hyplayer:Common.Setting.displayMaintain, Mode=TwoWay}"
+                                    Unchecked="DisplayMaintain_OnUnchecked" />
                             </controls3:SettingsCard>
                             <controls3:SettingsCard Header="开启 UI 音效">
                                 <CheckBox
@@ -1401,15 +1400,15 @@
                                 <StackPanel
                                     HorizontalAlignment="Center"
                                     VerticalAlignment="Top"
-                                    Spacing="16"
-                                    Orientation="Horizontal">
+                                    Orientation="Horizontal"
+                                    Spacing="16">
                                     <Image
                                         Width="128"
                                         Height="128"
                                         Source="/Assets/icon.png" />
                                     <TextBlock
-                                        FontWeight="Bold"
                                         VerticalAlignment="Center"
+                                        FontWeight="Bold"
                                         Style="{StaticResource HeaderTextBlockStyle}"
                                         Text="HyPlayer" />
                                 </StackPanel>

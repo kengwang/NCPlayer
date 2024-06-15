@@ -244,10 +244,12 @@ public sealed partial class ExpandedPlayer : Page, IDisposable
                 : Common.Setting.lyricSize;
 
             lastwidth = nowwidth;
+            needRedesign += 2;
         }
         else if (lastheight != nowheight)
         {
             lastheight = nowheight;
+            needRedesign += 2;
         }
     }
 
@@ -308,26 +310,26 @@ public sealed partial class ExpandedPlayer : Page, IDisposable
         // 这个函数里面放无法用XAML实现的页面布局方式
 
 
-        if (750 > UIAugmentationSys.ActualHeight)
+        if (600 > Math.Min(LeftPanel.ActualHeight, MainGrid.ActualHeight))
         {
-            var width = UIAugmentationSys.ActualHeight - 80;
-            ImageAlbum.Height = width > 1 ? width : double.NaN;
-            if (ImageAlbum.Height < 400 || UIAugmentationSys.ActualWidth < 400)
+            /*
+            ImageAlbum.Width = Math.Max(Math.Min(MainGrid.ActualHeight, LeftPanel.ActualWidth) - 80, 1);
+            ImageAlbum.Height = ImageAlbum.Width;
+            */
+
+            /*
+            if (ImageAlbum.Width < 250 || iscompact)
                 SongInfo.Visibility = Visibility.Collapsed;
             else
-            {
                 SongInfo.Visibility = Visibility.Visible;
-                ImageAlbum.Height -= SongInfo.ActualHeight;
-                SongInfo.Width = UIAugmentationSys.ActualWidth;
-            }            
-            ImageAlbum.Width = ImageAlbum.Height;
+            */
+            SongInfo.Width = ImageAlbum.Width;
         }
         else
         {
             ImageAlbum.Width = double.NaN;
             ImageAlbum.Height = double.NaN;
             SongInfo.Width = double.NaN;
-            SongInfo.Visibility = Visibility.Visible;
         }
 
         BtnToggleFullScreen.IsChecked = ApplicationView.GetForCurrentView().IsFullScreenMode;
@@ -1259,7 +1261,6 @@ public sealed partial class ExpandedPlayer : Page, IDisposable
                     if (hashCode != HyPlayList.NowPlayingHashCode) return;
                     var isBright = await IsBrightAsync(stream);
                     await ImageAlbumSource.SetSourceAsync(stream);
-                    ImageAlbumImerssive.Source= (ImageSource)ImageAlbum.Source;
                     if (Common.Setting.expandedPlayerBackgroundType == 0 && Background?.GetType() != typeof(ImageBrush))
                     {
                         var brush = new ImageBrush
@@ -1384,11 +1385,9 @@ public sealed partial class ExpandedPlayer : Page, IDisposable
                 _ = Common.Invoke(() =>
                 {
                     ImageAlbum.Source = null;
-                    ImageAlbumImerssive.Source = null;
                     Background = null;
                 });
                 ImageAlbumSource = null;
-                ImageAlbumImerssiveSource = null;
                 LyricList.Clear();
             }
 
@@ -1409,7 +1408,7 @@ public sealed partial class ExpandedPlayer : Page, IDisposable
             {
                 ImageAlbumAni?.Stop();
             }
-            LuminousBackground.RemoveFromVisualTree();
+            LuminousBackground?.RemoveFromVisualTree();
             _shaderEffect?.Dispose();
             _shaderEffect = null;
             disposedValue = true;
@@ -1573,11 +1572,7 @@ public sealed partial class ExpandedPlayer : Page, IDisposable
         LeftPanel.VerticalAlignment = VerticalAlignment.Top;
         Common.IsInImmersiveMode = false;
     }
-
-    private void UIAugmentationSys_SizeChanged(object sender, SizeChangedEventArgs e)
-    {
-        needRedesign++;
-    }
+    
     private void LuminousBackground_SizeChanged(object sender, SizeChangedEventArgs e)
     {
         if (_shaderEffect != null)

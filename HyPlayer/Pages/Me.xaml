@@ -34,12 +34,12 @@
                                     x:Name="RectangleImageBack"
                                     Height="82"
                                     Margin="0"
+                                    x:Load="{x:Bind hyplayer:Common.Setting.itemOfListBackgroundAcrylicBlur}"
                                     CornerRadius="12"
                                     EnableLazyLoading="True"
                                     IsCacheEnabled="False"
                                     Stretch="UniformToFill"
-                                    Visibility="{x:Bind hyplayer:Common.Setting.itemOfListBackgroundAcrylicBlur}"
-                                    x:Load="{x:Bind hyplayer:Common.Setting.itemOfListBackgroundAcrylicBlur}">
+                                    Visibility="{x:Bind hyplayer:Common.Setting.itemOfListBackgroundAcrylicBlur}">
                                     <controls:ImageEx.Source>
                                         <BitmapImage UriSource="{x:Bind CoverUri, Mode=OneTime}" />
                                     </controls:ImageEx.Source>
@@ -47,11 +47,11 @@
                                 <Rectangle
                                     x:Name="RectangleImageAcrylic"
                                     Margin="0,-1,0,-1"
+                                    x:Load="{x:Bind hyplayer:Common.Setting.itemOfListBackgroundAcrylicBlur}"
                                     Fill="{ThemeResource SystemControlAcrylicElementBrush}"
                                     RadiusX="10"
                                     RadiusY="10"
-                                    Visibility="{x:Bind hyplayer:Common.Setting.itemOfListBackgroundAcrylicBlur}" 
-                                    x:Load="{x:Bind hyplayer:Common.Setting.itemOfListBackgroundAcrylicBlur}"/>
+                                    Visibility="{x:Bind hyplayer:Common.Setting.itemOfListBackgroundAcrylicBlur}" />
                                 <Grid
                                     Grid.Column="0"
                                     Background="Transparent"
@@ -120,7 +120,7 @@
                                         </Grid>
                                     </StackPanel>
                                 </Grid>
-                                <!-- ReSharper disable once Xaml.InvalidResourceType -->
+                                <!--  ReSharper disable once Xaml.InvalidResourceType  -->
                                 <Button
                                     x:Name="PlayBtn"
                                     Width="74"
@@ -157,16 +157,19 @@
                     <RowDefinition Height="*" />
                 </Grid.RowDefinitions>
                 <Grid Grid.Row="0">
-                    <Border x:Name="RectangleImageBack" Visibility="{x:Bind hyplayer:Common.Setting.listHeaderAcrylicBlur}" x:Load="{x:Bind hyplayer:Common.Setting.listHeaderAcrylicBlur}">
+                    <Border
+                        x:Name="RectangleImageBack"
+                        x:Load="{x:Bind hyplayer:Common.Setting.listHeaderAcrylicBlur}"
+                        Visibility="{x:Bind hyplayer:Common.Setting.listHeaderAcrylicBlur}">
                         <Border.Background>
                             <ImageBrush ImageSource="{x:Bind ImageRect.ImageSource, Mode=OneWay}" Stretch="UniformToFill" />
                         </Border.Background>
                     </Border>
                     <Border
                         x:Name="RectangleImageAcrylic"
+                        x:Load="{x:Bind hyplayer:Common.Setting.listHeaderAcrylicBlur}"
                         Background="{ThemeResource MePageAcrylicBrush}"
-                        Visibility="{x:Bind hyplayer:Common.Setting.listHeaderAcrylicBlur}" 
-                        x:Load="{x:Bind hyplayer:Common.Setting.listHeaderAcrylicBlur}" />
+                        Visibility="{x:Bind hyplayer:Common.Setting.listHeaderAcrylicBlur}" />
                     <controls:DockPanel
                         x:Name="GridPersonalInformation"
                         Margin="8"
@@ -177,9 +180,9 @@
                             Height="120"
                             Margin="20"
                             controls:DockPanel.Dock="Left"
-                            RightTapped="RectangleImage_OnRightTapped"
                             RadiusX="8"
-                            RadiusY="8">
+                            RadiusY="8"
+                            RightTapped="RectangleImage_OnRightTapped">
                             <Rectangle.Fill>
                                 <ImageBrush x:Name="ImageRect" Stretch="UniformToFill">
                                     <ImageBrush.ImageSource>
@@ -217,15 +220,14 @@
                                 Click="Logout_OnClick"
                                 Foreground="{ThemeResource SystemControlForegroundAccentBrush}">
                                 <StackPanel Orientation="Horizontal">
-                                    <!-- ReSharper disable once Xaml.InvalidResourceType -->
+                                    <!--  ReSharper disable once Xaml.InvalidResourceType  -->
                                     <FontIcon
                                         Margin="0,0,8,0"
                                         FontSize="14"
-                                        Glyph="&#xF3B1;"
-                                        Foreground="{ThemeResource SystemBaseMediumHighColor}"/>
-                                    <!-- ReSharper disable once Xaml.InvalidResourceType -->
-                                    <TextBlock Text="退出登录"
-                                               Foreground="{ThemeResource SystemBaseMediumHighColor}"/>
+                                        Foreground="{ThemeResource SystemBaseMediumHighColor}"
+                                        Glyph="&#xF3B1;" />
+                                    <!--  ReSharper disable once Xaml.InvalidResourceType  -->
+                                    <TextBlock Foreground="{ThemeResource SystemBaseMediumHighColor}" Text="退出登录" />
                                 </StackPanel>
                             </Button>
                         </StackPanel>

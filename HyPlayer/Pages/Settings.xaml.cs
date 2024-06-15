@@ -4,6 +4,7 @@ using HyPlayer.Classes;
 using HyPlayer.Controls;
 using Kawazu;
 using LyricParser.Abstraction;
+using Microsoft.Graphics.Canvas.Text;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media;
 using System;
@@ -29,7 +30,6 @@ using Windows.UI.Xaml.Controls.Primitives;
 using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media.Animation;
 using Windows.UI.Xaml.Navigation;
-using Microsoft.Graphics.Canvas.Text;
 using Point = Windows.Foundation.Point;
 
 #endregion
@@ -63,7 +63,7 @@ public sealed partial class Settings : Page, IDisposable
         isbyprogram = true;
         InitializeComponent();
     }
-    
+
     protected override void OnNavigatedTo(NavigationEventArgs e)
     {
 
@@ -125,7 +125,7 @@ public sealed partial class Settings : Page, IDisposable
             });
         }
 
-        return models.OrderBy(t=>t.Name).ToList();
+        return models.OrderBy(t => t.Name).ToList();
     }
 
     public class FontInfo

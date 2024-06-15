@@ -1,23 +1,26 @@
 ﻿#region
 
 #nullable enable
+using ALRC.Abstraction;
+using ALRC.Converters;
 using HyPlayer.Classes;
 using HyPlayer.Controls;
 using HyPlayer.HyPlayControl;
-using HyPlayer.LyricRenderer.Converters;
 using HyPlayer.LyricRenderer.RollingCalculators;
+using LyricParser.Abstraction;
+using Microsoft.Graphics.Canvas.Effects;
 using Microsoft.Toolkit.Uwp.UI.Animations;
 using Microsoft.Toolkit.Uwp.UI.Media;
-using NeteaseCloudMusicApi;
+using PaletteMixr;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using System.Text;
+using System.Numerics;
+using System.Runtime.InteropServices.WindowsRuntime;
 using System.Threading.Tasks;
 using Windows.ApplicationModel.DataTransfer;
 using Windows.Devices.Input;
-using Windows.Foundation;
 using Windows.Graphics.Imaging;
 using Windows.Storage;
 using Windows.Storage.FileProperties;
@@ -34,18 +37,9 @@ using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Media.Animation;
 using Windows.UI.Xaml.Navigation;
-using ALRC.Abstraction;
-using HyPlayer.LyricRenderer;
-using HyPlayer.LyricRenderer.LyricLineRenderers;
-using LyricParser.Abstraction;
 using Buffer = Windows.Storage.Streams.Buffer;
 using Color = System.Drawing.Color;
-using ALRC.Converters;
 using LrcConverter = HyPlayer.LyricRenderer.Converters.LrcConverter;
-using Microsoft.Graphics.Canvas.Effects;
-using System.Runtime.InteropServices.WindowsRuntime;
-using System.Numerics;
-using PaletteMixr;
 
 #endregion
 
@@ -454,7 +448,7 @@ public sealed partial class ExpandedPlayer : Page, IDisposable
             AcrylicCover.Fill = new BackdropBlurBrush { Amount = 50.0 };
         if (Common.Setting.expandedPlayerBackgroundType == 6)
         {
-           AcrylicCover.Fill = new BackdropBlurBrush { Amount = 0 }; // TintAmountChange
+            AcrylicCover.Fill = new BackdropBlurBrush { Amount = 0 }; // TintAmountChange
         }
 
         if (Common.Setting.expandedPlayerBackgroundType == 5)
@@ -523,7 +517,7 @@ public sealed partial class ExpandedPlayer : Page, IDisposable
             _lyricIsReadyToGo = true;
             if (_lyricIsCleaning) return;
             LyricBox.SetLyricLines(LrcConverter.Convert(ConvertToALRC(HyPlayList.Lyrics)));
-            LyricBox.ChangeAlignment(Common.Setting.lyricAlignment  switch
+            LyricBox.ChangeAlignment(Common.Setting.lyricAlignment switch
             {
                 1 => TextAlignment.Center,
                 2 => TextAlignment.Right,
@@ -534,7 +528,7 @@ public sealed partial class ExpandedPlayer : Page, IDisposable
             if (HyPlayList.NowPlayingItem == null) return;
             LyricBox.Width = LyricWidth;
             LyricBox.ChangeRenderColor(GetIdleBrush().Color, GetAccentBrush().Color);
-            LyricBox.ChangeRenderFontSize((float)showsize, (Common.Setting.translationSize > 0 ) ? Common.Setting.translationSize : (float)showsize / 2, Common.Setting.romajiSize);
+            LyricBox.ChangeRenderFontSize((float)showsize, (Common.Setting.translationSize > 0) ? Common.Setting.translationSize : (float)showsize / 2, Common.Setting.romajiSize);
         });
     }
 
@@ -578,7 +572,7 @@ public sealed partial class ExpandedPlayer : Page, IDisposable
         if (lines.LastOrDefault() is { End: null or <= 0 } last) last.End = (long)HyPlayList.Player.PlaybackSession.NaturalDuration.TotalMilliseconds;
         return alrc;
     }
-    
+
     private Windows.UI.Color GetKaraokAccentBrush()
     {
         if (Common.Setting.karaokLyricFocusingColor is not null)
@@ -745,17 +739,17 @@ public sealed partial class ExpandedPlayer : Page, IDisposable
         {
             LyricBox.EnableTranslation = Common.ShowLyricTrans;
         }
-        
+
     }
 
     private void ToggleButtonSound_OnClick(object sender, RoutedEventArgs e)
     {
         Common.ShowLyricSound = ToggleButtonSound.IsChecked;
-        if(LyricBox != null)
+        if (LyricBox != null)
         {
             LyricBox.EnableTransliteration = Common.ShowLyricSound;
         }
-        
+
     }
 
     private async void TextBlockAlbum_OnTapped(object sender, RoutedEventArgs e)
@@ -1129,7 +1123,7 @@ public sealed partial class ExpandedPlayer : Page, IDisposable
             if (Common.Setting.albumRotate)
                 //网易云音乐圆形唱片
                 if (HyPlayList.IsPlaying)
-                   _ = RotateAnimationSet.StartAsync();
+                    _ = RotateAnimationSet.StartAsync();
             if (Common.Setting.expandAlbumBreath)
             {
                 ImageAlbumAni.Begin();
@@ -1165,33 +1159,33 @@ public sealed partial class ExpandedPlayer : Page, IDisposable
                 ImagePositionOffset.X = e.Cumulative.Translation.X / 10;
                 break;
             case 0 when Math.Abs(e.Cumulative.Translation.Y) > Math.Abs(e.Cumulative.Translation.X):
-            {
-                // 竖直方向滑动
-                if (e.Cumulative.Translation.Y >= 0)
-                    Common.PageMain!.ExpandedPlayerPositionOffset.Y = e.Cumulative.Translation.Y;
-                else
                 {
-                    ImagePositionOffset.Y = e.Cumulative.Translation.Y / 10;
-                }
+                    // 竖直方向滑动
+                    if (e.Cumulative.Translation.Y >= 0)
+                        Common.PageMain!.ExpandedPlayerPositionOffset.Y = e.Cumulative.Translation.Y;
+                    else
+                    {
+                        ImagePositionOffset.Y = e.Cumulative.Translation.Y / 10;
+                    }
 
-                if (e.Cumulative.Translation.Y > 200)
-                {
-                    e.Complete();
-                    await Common.BarPlayBar!.CollapseExpandedPlayer();
-                }
+                    if (e.Cumulative.Translation.Y > 200)
+                    {
+                        e.Complete();
+                        await Common.BarPlayBar!.CollapseExpandedPlayer();
+                    }
 
-                break;
-            }
+                    break;
+                }
             case 0:
-            {
-                ImagePositionOffset.X = e.Cumulative.Translation.X / 10;
-                if (e.Cumulative.Translation.X > 400 || e.Cumulative.Translation.X < -400)
                 {
-                    e.Complete();
-                }
+                    ImagePositionOffset.X = e.Cumulative.Translation.X / 10;
+                    if (e.Cumulative.Translation.X > 400 || e.Cumulative.Translation.X < -400)
+                    {
+                        e.Complete();
+                    }
 
-                break;
-            }
+                    break;
+                }
         }
     }
 
@@ -1264,7 +1258,7 @@ public sealed partial class ExpandedPlayer : Page, IDisposable
                     if (Common.Setting.expandedPlayerBackgroundType == 0 && Background?.GetType() != typeof(ImageBrush))
                     {
                         var brush = new ImageBrush
-                            { Stretch = Stretch.UniformToFill };
+                        { Stretch = Stretch.UniformToFill };
                         Background = brush;
                         brush.ImageSource = (ImageSource)ImageAlbum.Source;
                     }
@@ -1278,7 +1272,7 @@ public sealed partial class ExpandedPlayer : Page, IDisposable
                     if (Common.Setting.expandedPlayerBackgroundType == 6 && isBright)
                         BlackCover.Fill = new SolidColorBrush(Windows.UI.Color.FromArgb(80, 255, 255, 255));
                     else if (Common.Setting.expandedPlayerBackgroundType == 6 && !isBright)
-                        BlackCover.Fill = new SolidColorBrush(Windows.UI.Color.FromArgb(80, 0,0, 0));
+                        BlackCover.Fill = new SolidColorBrush(Windows.UI.Color.FromArgb(80, 0, 0, 0));
                     //if (Common.Setting.expandedPlayerBackgroundType == 0 && isBright)
                     //{
                     //    var darkResource = new ResourceDictionary
@@ -1338,12 +1332,12 @@ public sealed partial class ExpandedPlayer : Page, IDisposable
                         }
                         else
                         {
-                                var AccentColor = AdjustBrightness((Windows.UI.Color)albumMainColor, -0.3f);
-                                ForegroundAccentTextBrush = new SolidColorBrush(AccentColor);
-                                var idleColor = AccentColor;
-                                idleColor.A = 150;
-                                ForegroundIdleTextBrush = new SolidColorBrush(idleColor);
-                                ImmersiveTopStop.Color = Windows.UI.Color.FromArgb(0, 255, 255, 255);
+                            var AccentColor = AdjustBrightness((Windows.UI.Color)albumMainColor, -0.3f);
+                            ForegroundAccentTextBrush = new SolidColorBrush(AccentColor);
+                            var idleColor = AccentColor;
+                            idleColor.A = 150;
+                            ForegroundIdleTextBrush = new SolidColorBrush(idleColor);
+                            ImmersiveTopStop.Color = Windows.UI.Color.FromArgb(0, 255, 255, 255);
                         }
                     }
 
@@ -1404,7 +1398,7 @@ public sealed partial class ExpandedPlayer : Page, IDisposable
                 Window.Current.SizeChanged -= Current_SizeChanged;
             if (Common.Setting.albumRotate)
                 RotateAnimationSet.Stop();
-            if (Common.Setting.expandAlbumBreath) 
+            if (Common.Setting.expandAlbumBreath)
             {
                 ImageAlbumAni?.Stop();
             }
@@ -1500,14 +1494,14 @@ public sealed partial class ExpandedPlayer : Page, IDisposable
     {
         //if (Common.Setting.expandedPlayerBackgroundType == 0)
         //{
-            if (BtnToggleImmersiveMode.IsChecked)
-            {
-                ImmersiveModeIn();
-            }
-            else
-            {
-                ImmersiveModeExit();
-            }
+        if (BtnToggleImmersiveMode.IsChecked)
+        {
+            ImmersiveModeIn();
+        }
+        else
+        {
+            ImmersiveModeExit();
+        }
         //}
         //else
         //{
@@ -1531,11 +1525,11 @@ public sealed partial class ExpandedPlayer : Page, IDisposable
         // if (Common.Setting.AutoHidePlaybar)
         MainGrid.Margin = new Thickness(0, 0, 0, 80);
         DefaultRow.Height = new GridLength(0, GridUnitType.Star);
-        LyricBox.Context.LyricPaddingTopRatio = (float)Map(Common.Setting.lyricPaddingTopRatio, 0, 100, 55, 100)/100f;
+        LyricBox.Context.LyricPaddingTopRatio = (float)Map(Common.Setting.lyricPaddingTopRatio, 0, 100, 55, 100) / 100f;
         LeftPanel.Margin = new Thickness(90, 0, 0, 100);
         // Clear Shadow
         AlbumCoverDropShadow.Opacity = 0;
-        ImageAlbumImerssive.Visibility= Visibility.Visible;
+        ImageAlbumImerssive.Visibility = Visibility.Visible;
         //MoreBtn.Margin = new Thickness(0,0,30,130);
         Grid.SetRow(LyricBox, 1);
         if (Common.Setting.albumRotate)
@@ -1555,7 +1549,7 @@ public sealed partial class ExpandedPlayer : Page, IDisposable
         //MoreBtn.Margin = new Thickness(0, 0, 30, 50);
         MainGrid.Margin = new Thickness(0, 0, 0, 80);
         DefaultRow.Height = new GridLength(25, GridUnitType.Star);
-        LyricBox.Context.LyricPaddingTopRatio = Common.Setting.lyricPaddingTopRatio/100f;
+        LyricBox.Context.LyricPaddingTopRatio = Common.Setting.lyricPaddingTopRatio / 100f;
         LeftPanel.Margin = new Thickness(0);
         ImageAlbumImerssive.Visibility = Visibility.Collapsed;
         if (!Common.Setting.albumRound)
@@ -1572,7 +1566,7 @@ public sealed partial class ExpandedPlayer : Page, IDisposable
         LeftPanel.VerticalAlignment = VerticalAlignment.Top;
         Common.IsInImmersiveMode = false;
     }
-    
+
     private void LuminousBackground_SizeChanged(object sender, SizeChangedEventArgs e)
     {
         if (_shaderEffect != null)
@@ -1582,7 +1576,7 @@ public sealed partial class ExpandedPlayer : Page, IDisposable
         }
     }
 
-    private async  void LuminousBackground_CreateResources(Microsoft.Graphics.Canvas.UI.Xaml.CanvasAnimatedControl sender, Microsoft.Graphics.Canvas.UI.CanvasCreateResourcesEventArgs args)
+    private async void LuminousBackground_CreateResources(Microsoft.Graphics.Canvas.UI.Xaml.CanvasAnimatedControl sender, Microsoft.Graphics.Canvas.UI.CanvasCreateResourcesEventArgs args)
     {
         if (_shaderEffect == null)
         {

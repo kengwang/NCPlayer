@@ -1,10 +1,6 @@
-﻿using HyPlayer.LyricRenderer.Abstraction.Render;
+﻿using HyPlayer.LyricRenderer.Abstraction;
+using HyPlayer.LyricRenderer.Abstraction.Render;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using HyPlayer.LyricRenderer.Abstraction;
 
 // Copyright WXRIW, in Lyricify
 
@@ -51,7 +47,7 @@ namespace HyPlayer.LyricRenderer.RollingCalculators
             }
             else
             {
-                progress = Math.Clamp((context.CurrentLyricTime - context.CurrentKeyframe)*1.0f / 300, 0, 1);
+                progress = Math.Clamp((context.CurrentLyricTime - context.CurrentKeyframe) * 1.0f / 300, 0, 1);
             }
             return fromY + (targetY - fromY) * progress;
         }

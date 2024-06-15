@@ -1,15 +1,15 @@
-﻿using System;
-using Windows.Foundation;
-using Windows.UI;
-using Windows.UI.Xaml;
-using Windows.UI.Xaml.Media.Animation;
-using HyPlayer.LyricRenderer.Abstraction;
+﻿using HyPlayer.LyricRenderer.Abstraction;
 using HyPlayer.LyricRenderer.Abstraction.Render;
 using HyPlayer.LyricRenderer.Animator;
 using HyPlayer.LyricRenderer.Animator.EaseFunctions;
 using Microsoft.Graphics.Canvas;
-using Microsoft.Graphics.Canvas.Geometry;
 using Microsoft.Graphics.Canvas.Effects;
+using Microsoft.Graphics.Canvas.Geometry;
+using System;
+using Windows.Foundation;
+using Windows.UI;
+using Windows.UI.Xaml;
+using Windows.UI.Xaml.Media.Animation;
 
 namespace HyPlayer.LyricRenderer.LyricLineRenderers;
 
@@ -32,7 +32,7 @@ public class ProgressBarRenderingLyricLine : RenderingLyricLine
     public override bool Render(CanvasDrawingSession session, LineRenderOffset offset, RenderContext context)
     {
         float actualX = offset.X;
-        switch (TypographySelector(t=>t?.Alignment, context)!.Value)
+        switch (TypographySelector(t => t?.Alignment, context)!.Value)
         {
             case TextAlignment.Left:
                 actualX += 8;
@@ -50,7 +50,7 @@ public class ProgressBarRenderingLyricLine : RenderingLyricLine
 
         //画个底
         var geometry = CanvasGeometry.CreateRoundedRectangle(session, new Rect(0, 0, Width, Height), 4, 4);
-        session.FillGeometry(geometry, actualX, offset.Y+Height, Color.FromArgb(64, 255, 255, 255));
+        session.FillGeometry(geometry, actualX, offset.Y + Height, Color.FromArgb(64, 255, 255, 255));
 
         //画进度
         CanvasGeometry geometryFill;
@@ -76,10 +76,10 @@ public class ProgressBarRenderingLyricLine : RenderingLyricLine
         //发光效果
         if (remain < AnimationDuration + ShineDuration)
         {
-            var surplus = ShiningEaseFunction.Ease(Math.Clamp(1.0f * (AnimationDuration + ShineDuration - remain) / AnimationDuration,0,1));
+            var surplus = ShiningEaseFunction.Ease(Math.Clamp(1.0f * (AnimationDuration + ShineDuration - remain) / AnimationDuration, 0, 1));
             if (remain < AnimationDuration)//结束动画
             {
-                surplus = Math.Clamp(1-(AnimationDuration - remain) * 1.0f / AnimationDuration,0,1);
+                surplus = Math.Clamp(1 - (AnimationDuration - remain) * 1.0f / AnimationDuration, 0, 1);
             }
             var blur = new GaussianBlurEffect
             {
@@ -89,7 +89,7 @@ public class ProgressBarRenderingLyricLine : RenderingLyricLine
             var opacity = new OpacityEffect
             {
                 Source = blur,
-                Opacity = ((float)surplus)*0.8F,
+                Opacity = ((float)surplus) * 0.8F,
             };
             session.DrawImage(opacity);
         }

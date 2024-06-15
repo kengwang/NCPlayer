@@ -1,9 +1,9 @@
-﻿using System;
-using Windows.UI;
-using Windows.UI.Xaml;
-using HyPlayer.LyricRenderer.Abstraction;
+﻿using HyPlayer.LyricRenderer.Abstraction;
 using HyPlayer.LyricRenderer.Abstraction.Render;
 using Microsoft.Graphics.Canvas;
+using System;
+using Windows.UI;
+using Windows.UI.Xaml;
 
 namespace HyPlayer.LyricRenderer.LyricLineRenderers;
 
@@ -22,7 +22,7 @@ public class BreathPointRenderingLyricLine : RenderingLyricLine
     public override bool Render(CanvasDrawingSession session, LineRenderOffset offset, RenderContext context)
     {
         float actualX = offset.X;
-        switch(context.PreferTypography.Alignment)
+        switch (context.PreferTypography.Alignment)
         {
             case TextAlignment.Left:
                 actualX += MaxRadius / 2;
@@ -33,7 +33,7 @@ public class BreathPointRenderingLyricLine : RenderingLyricLine
             case TextAlignment.Right:
                 actualX += RenderingWidth - MaxRadius * 2;
                 break;
-        }   
+        }
         if (context.CurrentLyricTime <= EndTime && context.CurrentLyricTime >= StartTime)
         {
             // bpm to animation duration

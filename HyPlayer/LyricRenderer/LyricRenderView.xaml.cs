@@ -1,4 +1,7 @@
-﻿using HyPlayer.LyricRenderer.Abstraction.Render;
+﻿using HyPlayer.LyricRenderer.Abstraction;
+using HyPlayer.LyricRenderer.Abstraction.Render;
+using HyPlayer.LyricRenderer.Animator.EaseFunctions;
+using Microsoft.Graphics.Canvas;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -6,12 +9,7 @@ using System.Timers;
 using Windows.UI;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
-using Microsoft.Graphics.Canvas;
-using System.Diagnostics;
 using Windows.UI.Xaml.Input;
-using HyPlayer.LyricRenderer.Abstraction;
-using HyPlayer.LyricRenderer.LyricLineRenderers;
-using HyPlayer.LyricRenderer.Animator.EaseFunctions;
 using Windows.UI.Xaml.Media.Animation;
 
 //https://go.microsoft.com/fwlink/?LinkId=234236 上介绍了“用户控件”项模板
@@ -52,7 +50,7 @@ namespace HyPlayer.LyricRenderer
 
         public bool EnableTransliteration
         {
-            get=> Context.EnableTransliteration;
+            get => Context.EnableTransliteration;
             set
             {
                 Context.EnableTransliteration = value;
@@ -188,8 +186,8 @@ namespace HyPlayer.LyricRenderer
                     renderingLyricLine.OnRenderSizeChanged(session, Context);
                 }
             }
-            catch 
-            { 
+            catch
+            {
                 //Ignore
             }
 
@@ -230,7 +228,7 @@ namespace HyPlayer.LyricRenderer
                         Math.Abs(theoryRenderAfterPosition - Context.RenderOffsets[currentLine.Id].Y) >
                         Epsilon)
                     {
-                        
+
                         renderedAfterStartPosition = Context.LineRollingEaseCalculator.CalculateCurrentY(
                             Context.SnapshotRenderOffsets[currentLine.Id].Y, theoryRenderAfterPosition,
                             currentLine, Context);
@@ -426,7 +424,7 @@ namespace HyPlayer.LyricRenderer
         {
             // 指针事件
             // 获取在指针范围的行
-            if(e.Pointer.PointerDeviceType == Windows.Devices.Input.PointerDeviceType.Mouse)
+            if (e.Pointer.PointerDeviceType == Windows.Devices.Input.PointerDeviceType.Mouse)
             {
                 var focusingLine = -1;
                 foreach (var renderOffsetsKey in Context.RenderOffsets.Keys)
@@ -451,11 +449,11 @@ namespace HyPlayer.LyricRenderer
                     Context.PointerFocusingIndex = focusingLine;
                 }
             }
-            else if(_pointerPressed == true && _lastPointerPressedYValue != null)
+            else if (_pointerPressed == true && _lastPointerPressedYValue != null)
             {
                 var yValue = e.GetCurrentPoint(this).Position.Y;
                 var delta = (long)(yValue - _lastPointerPressedYValue);
-                if(Math.Abs(delta) > 20)
+                if (Math.Abs(delta) > 20)
                 {
                     _lastPointerPressedYValue = yValue;
                     return;
@@ -471,7 +469,7 @@ namespace HyPlayer.LyricRenderer
                 _needRecalculate = true;
                 _lastPointerPressedYValue = yValue;
             }
-            else if(_lastPointerPressedYValue == null)
+            else if (_lastPointerPressedYValue == null)
             {
                 _lastPointerPressedYValue = e.GetCurrentPoint(this).Position.Y;
             }

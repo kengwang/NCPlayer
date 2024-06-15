@@ -1419,10 +1419,10 @@ public sealed partial class ExpandedPlayer : Page, IDisposable
                     {
                         if (_shaderEffect != null)
                         {
-                            _shaderEffect.Properties["color1"] = albumColors[0];
-                            _shaderEffect.Properties["color2"] = albumColors[1];
-                            _shaderEffect.Properties["color3"] = albumColors[2];
-                            _shaderEffect.Properties["color4"] = albumColors[3];
+                            _shaderEffect.Properties["color1"] = albumColorVectors[0];
+                            _shaderEffect.Properties["color2"] = albumColorVectors[1];
+                            _shaderEffect.Properties["color3"] = albumColorVectors[2];
+                            _shaderEffect.Properties["color4"] = albumColorVectors[3];
                         }
                     }
                 }
@@ -1650,10 +1650,10 @@ public sealed partial class ExpandedPlayer : Page, IDisposable
             _shaderEffect = effect;
             if (albumColors.Count != 0)
             {
-                _shaderEffect.Properties["color1"] = albumColors[0];
-                _shaderEffect.Properties["color2"] = albumColors[1];
-                _shaderEffect.Properties["color3"] = albumColors[2];
-                _shaderEffect.Properties["color4"] = albumColors[3];
+                _shaderEffect.Properties["color1"] = albumColorVectors[0];
+                _shaderEffect.Properties["color2"] = albumColorVectors[1];
+                _shaderEffect.Properties["color3"] = albumColorVectors[2];
+                _shaderEffect.Properties["color4"] = albumColorVectors[3];
             }
         }
         _shaderEffect.Properties["Width"] = Convert.ToSingle(LuminousBackground.ActualWidth);

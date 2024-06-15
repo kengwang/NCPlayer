@@ -181,6 +181,10 @@ public sealed partial class ExpandedPlayer : Page, IDisposable
                 {
                     ImageAlbumAni.Begin();
                 }
+                if (luminousColorsRotateStoryBoard.Children.Count > 0)
+                {
+                    luminousColorsRotateStoryBoard.Resume();
+                }
             }
         });
     }
@@ -1401,18 +1405,15 @@ public sealed partial class ExpandedPlayer : Page, IDisposable
                     RefreshLyricColor();
                     if (Common.Setting.expandedPlayerBackgroundType == 6)
                     {
-                        if (_shaderEffect != null)
-                        {
-                            BgRect00.Fill = new SolidColorBrush(albumColors[0]);
-                            BgRect01.Fill = new SolidColorBrush(albumColors[1]);
-                            BgRect02.Fill = new SolidColorBrush(albumColors[2]);
-                            BgRect10.Fill = new SolidColorBrush(albumColors[3]);
-                            BgRect11.Fill = new SolidColorBrush(albumColors[4]);
-                            BgRect12.Fill = new SolidColorBrush(albumColors[5]);
-                            BgRect20.Fill = new SolidColorBrush(albumColors[6]);
-                            BgRect21.Fill = new SolidColorBrush(albumColors[7]);
-                            BgRect22.Fill = new SolidColorBrush(albumColors[8]);
-                        }
+                        BgRect00.Fill = new SolidColorBrush(albumColors[0]);
+                        BgRect01.Fill = new SolidColorBrush(albumColors[1]);
+                        BgRect02.Fill = new SolidColorBrush(albumColors[2]);
+                        BgRect10.Fill = new SolidColorBrush(albumColors[3]);
+                        BgRect11.Fill = new SolidColorBrush(albumColors[4]);
+                        BgRect12.Fill = new SolidColorBrush(albumColors[5]);
+                        BgRect20.Fill = new SolidColorBrush(albumColors[6]);
+                        BgRect21.Fill = new SolidColorBrush(albumColors[7]);
+                        BgRect22.Fill = new SolidColorBrush(albumColors[8]); 
                     }
                     if (Common.Setting.expandedPlayerBackgroundType == 7)
                     {

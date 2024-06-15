@@ -230,7 +230,7 @@
             x:Name="LuminousBackgroundContainer"
             Grid.Row="0"
             Grid.RowSpan="3"
-            Grid.Column="0"
+            Grid.Column="0" 
             Canvas.ZIndex="-1">
             <Grid.RenderTransform>
                 <TransformGroup>

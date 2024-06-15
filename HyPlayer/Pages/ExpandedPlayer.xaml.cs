@@ -448,7 +448,7 @@ public sealed partial class ExpandedPlayer : Page, IDisposable
             AcrylicCover.Fill = new BackdropBlurBrush { Amount = 50.0 };
         if (Common.Setting.expandedPlayerBackgroundType == 6)
         {
-            AcrylicCover.Fill = new BackdropBlurBrush { Amount = 0 }; // TintAmountChange
+            AcrylicCover.Fill = new BackdropBlurBrush { Amount = 5 }; // TintAmountChange
         }
 
         if (Common.Setting.expandedPlayerBackgroundType == 5)
@@ -1600,7 +1600,7 @@ public sealed partial class ExpandedPlayer : Page, IDisposable
 
     private void LuminousBackground_Update(Microsoft.Graphics.Canvas.UI.Xaml.ICanvasAnimatedControl sender, Microsoft.Graphics.Canvas.UI.Xaml.CanvasAnimatedUpdateEventArgs args)
     {
-        var progress = Convert.ToSingle(HyPlayList.Player.PlaybackSession.Position.TotalSeconds);
+        var progress = Convert.ToSingle(HyPlayList.Player.PlaybackSession.Position.TotalSeconds) * 0.75f;
         if (_shaderEffect != null)
         {
             _shaderEffect.Properties["iTime"] = progress;

@@ -6,7 +6,9 @@
     xmlns:controls1="using:HyPlayer.Controls"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:hyplayer="using:HyPlayer"
-    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" xmlns:ui="using:Microsoft.Toolkit.Uwp.UI" xmlns:media="using:Microsoft.Toolkit.Uwp.UI.Media"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:media="using:Microsoft.Toolkit.Uwp.UI.Media"
+    xmlns:ui="using:Microsoft.Toolkit.Uwp.UI"
     NavigationCacheMode="Disabled"
     mc:Ignorable="d">
     <Page.Resources>
@@ -38,8 +40,8 @@
                         x:Name="RectangleImageBack"
                         Grid.RowSpan="2"
                         Margin="-32"
-                        Visibility="{x:Bind hyplayer:Common.Setting.listHeaderAcrylicBlur}"
-                        x:Load="{x:Bind hyplayer:Common.Setting.listHeaderAcrylicBlur}">
+                        x:Load="{x:Bind hyplayer:Common.Setting.listHeaderAcrylicBlur}"
+                        Visibility="{x:Bind hyplayer:Common.Setting.listHeaderAcrylicBlur}">
                         <Rectangle.Fill>
                             <ImageBrush x:Name="ImageRect1" Stretch="UniformToFill" />
                         </Rectangle.Fill>
@@ -48,9 +50,9 @@
                         x:Name="RectangleImageBackAcrylic"
                         Grid.RowSpan="2"
                         Margin="-32"
+                        x:Load="{x:Bind hyplayer:Common.Setting.listHeaderAcrylicBlur}"
                         Fill="{ThemeResource SystemControlAcrylicElementBrush}"
-                        Visibility="{x:Bind hyplayer:Common.Setting.listHeaderAcrylicBlur}"
-                        x:Load="{x:Bind hyplayer:Common.Setting.listHeaderAcrylicBlur}"/>
+                        Visibility="{x:Bind hyplayer:Common.Setting.listHeaderAcrylicBlur}" />
                     <controls:DockPanel
                         x:Name="GridPersonalInformation"
                         Grid.Row="0"
@@ -104,17 +106,17 @@
                         Grid.Row="1"
                         Margin="0,12,0,0"
                         FontSize="15"
-                        MaxLines="7"
                         Foreground="{StaticResource SystemControlForegroundBaseMediumBrush}"
-                        Text="歌手简介"
+                        MaxLines="7"
                         Selectable="True"
-                        TextWrapping="WrapWholeWords" >
+                        Text="歌手简介"
+                        TextWrapping="WrapWholeWords">
                         <controls1:ExpandableTextBox.RenderTransform>
-                            <ScaleTransform x:Name="DescScale"  CenterX="125" CenterY="0" />
+                            <ScaleTransform x:Name="DescScale" CenterX="125" CenterY="0" />
                         </controls1:ExpandableTextBox.RenderTransform>
                     </controls1:ExpandableTextBox>
                     <ui:Effects.Shadow>
-                        <media:AttachedCardShadow 
+                        <media:AttachedCardShadow
                             CornerRadius="0"
                             Opacity="0.5"
                             Offset="0,1,0"
@@ -157,7 +159,7 @@
                     </controls1:SongsList>
                 </PivotItem>
                 <PivotItem Header="专辑">
-                    <controls1:SimpleLinerList x:Name="AlbumContainer" >
+                    <controls1:SimpleLinerList x:Name="AlbumContainer">
                         <controls1:SimpleLinerList.ListHeader>
                             <Rectangle Height="{x:Bind PivotView.HeaderHeight, Mode=OneWay}" />
                         </controls1:SimpleLinerList.ListHeader>

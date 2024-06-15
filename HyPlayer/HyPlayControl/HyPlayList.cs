@@ -2608,7 +2608,7 @@ public static class Utils
         {
             var curElement = elements[i].Element;
             var curHiraNotation = elements[i].HiraNotation;
-parseOneChar:
+        parseOneChar:
             if (i + delta >= wordInfo.Count)
             {
                 if (!string.IsNullOrWhiteSpace(curHiraNotation))
@@ -2627,16 +2627,16 @@ parseOneChar:
                     if (idx >= 0)
                         curElement = curElement.Remove(idx, trimmedWord.Length);
                 }
-                
+
                 if (curElement.Trim().Length > 0)
                 {
-                    wordInfo[i + delta].Transliteration = Utilities.ToRawRomaji(curHiraNotation.Substring(0,1), RomajiSystem.Hepburn, true);
+                    wordInfo[i + delta].Transliteration = Utilities.ToRawRomaji(curHiraNotation.Substring(0, 1), RomajiSystem.Hepburn, true);
                     curHiraNotation = curHiraNotation.Substring(1);
                     delta++;
                     goto parseOneChar;
                 }
             }
-            
+
         }
     }
     public static async Task ConvertRomaji(PureLyricInfo pureLyricInfo, List<SongLyric> lyrics)

@@ -10,23 +10,20 @@
     xmlns:muxc="using:Microsoft.UI.Xaml.Controls"
     xmlns:ui="using:Microsoft.Toolkit.Uwp.UI"
     muxc:BackdropMaterial.ApplyToRootOrPageBackground="{x:Bind local:Common.Setting.acrylicBackgroundStatus, Mode=OneWay, Converter={StaticResource ReversedBooleanConverter}}"
+    ui:TitleBarExtensions.BackgroundColor="Transparent"
+    ui:TitleBarExtensions.ButtonBackgroundColor="Transparent"
+    ui:TitleBarExtensions.ButtonForegroundColor="{StaticResource CaptionButtonForegroundColor}"
+    ui:TitleBarExtensions.ButtonHoverBackgroundColor="{StaticResource CaptionButtonHoverColor}"
+    ui:TitleBarExtensions.ButtonHoverForegroundColor="{StaticResource CaptionButtonForegroundColor}"
+    ui:TitleBarExtensions.ButtonInactiveBackgroundColor="Transparent"
+    ui:TitleBarExtensions.ButtonPressedBackgroundColor="{StaticResource CaptionButtonPressedColor}"
+    ui:TitleBarExtensions.ButtonPressedForegroundColor="{StaticResource CaptionButtonForegroundColor}"
+    ui:TitleBarExtensions.ForegroundColor="{StaticResource CaptionButtonForegroundColor}"
+    ui:TitleBarExtensions.InactiveBackgroundColor="Transparent"
+    ui:TitleBarExtensions.InactiveForegroundColor="LightGray"
     Background="{x:Bind local:Common.Setting.acrylicBackgroundStatus, Mode=OneWay, Converter={StaticResource BooleanToWindowBrushesConverter}}"
     NavigationCacheMode="Disabled"
-    mc:Ignorable="d"
-    
-    ui:TitleBarExtensions.BackgroundColor="Transparent"
-    ui:TitleBarExtensions.InactiveBackgroundColor="Transparent"
-    
-    ui:TitleBarExtensions.ButtonBackgroundColor="Transparent" 
-    ui:TitleBarExtensions.ButtonHoverBackgroundColor="{StaticResource CaptionButtonHoverColor}"
-    ui:TitleBarExtensions.ButtonPressedBackgroundColor="{StaticResource CaptionButtonPressedColor}"
-    ui:TitleBarExtensions.ButtonInactiveBackgroundColor="Transparent"
-    
-    ui:TitleBarExtensions.ForegroundColor="{StaticResource CaptionButtonForegroundColor}"
-    ui:TitleBarExtensions.InactiveForegroundColor="LightGray"
-    ui:TitleBarExtensions.ButtonForegroundColor="{StaticResource CaptionButtonForegroundColor}"
-    ui:TitleBarExtensions.ButtonHoverForegroundColor="{StaticResource CaptionButtonForegroundColor}"
-    ui:TitleBarExtensions.ButtonPressedForegroundColor="{StaticResource CaptionButtonForegroundColor}">
+    mc:Ignorable="d">
     <Page.Resources>
 
         <ResourceDictionary>

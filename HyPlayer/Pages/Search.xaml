@@ -2,8 +2,8 @@
     x:Class="HyPlayer.Pages.Search"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:controls="using:Microsoft.UI.Xaml.Controls"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-    xmlns:controls="using:Microsoft.UI.Xaml.Controls" 
     xmlns:hycontrol="using:HyPlayer.Controls"
     xmlns:hyplayer="using:HyPlayer"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
@@ -20,9 +20,9 @@
         <TextBlock
             Grid.Row="0"
             Margin="0,-5,0,20"
+            CharacterSpacing="90"
             FontSize="40"
             FontWeight="Bold"
-            CharacterSpacing="90"
             Text="搜索歌曲" />
         <StackPanel
             Grid.Row="1"
@@ -35,20 +35,18 @@
                 PlaceholderText="搜索歌曲......"
                 QueryIcon="Find"
                 QuerySubmitted="SearchKeywordBox_QuerySubmitted"
+                SuggestionChosen="SearchKeywordBox_OnSuggestionChosen"
                 Tag="PageSearch"
-                Text="{x:Bind searchText,Mode=TwoWay}"
-                TextChanged="SearchKeywordBox_TextChanged" 
-                SuggestionChosen="SearchKeywordBox_OnSuggestionChosen"/>
+                Text="{x:Bind searchText, Mode=TwoWay}"
+                TextChanged="SearchKeywordBox_TextChanged" />
 
             <ComboBox
-                    x:Name="HistoryComboBox"
-                    PlaceholderText="展开搜索历史"
-                    HorizontalAlignment="Stretch"
-                    ItemsSource="{x:Bind hyplayer:HistoryManagement.GetSearchHistory()}"
-                    SelectionChanged="HistoryComboBox_SelectionChanged"
-                    Margin="15,0,15,5">
-
-            </ComboBox>
+                x:Name="HistoryComboBox"
+                Margin="15,0,15,5"
+                HorizontalAlignment="Stretch"
+                ItemsSource="{x:Bind hyplayer:HistoryManagement.GetSearchHistory()}"
+                PlaceholderText="展开搜索历史"
+                SelectionChanged="HistoryComboBox_SelectionChanged" />
         </StackPanel>
         <NavigationView
             x:Name="NavigationViewSelector"
@@ -71,7 +69,7 @@
                 <!-- <NavigationViewItem Content="综合" Tag="1018" /> -->
             </NavigationView.MenuItems>
             <Grid>
-                <Grid VerticalAlignment="Stretch" Margin="0,-30,0,0">
+                <Grid Margin="0,-30,0,0" VerticalAlignment="Stretch">
                     <hycontrol:SimpleLinerList x:Name="SearchResultContainer" Margin="0,30,0,0">
                         <hycontrol:SimpleLinerList.Footer>
                             <StackPanel

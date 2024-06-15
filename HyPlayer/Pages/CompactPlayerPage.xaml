@@ -4,11 +4,11 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:controls="using:Microsoft.Toolkit.Uwp.UI.Controls"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:hyplayer="using:HyPlayer"
+    xmlns:lyric="using:HyPlayer.Controls.LyricControl"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:muxc="using:Microsoft.UI.Xaml.Controls"
     xmlns:ui="using:Microsoft.Toolkit.Uwp.UI"
-    xmlns:hyplayer="using:HyPlayer"
-    xmlns:lyric="using:HyPlayer.Controls.LyricControl"
     d:Background="White"
     d:DesignHeight="350"
     d:DesignWidth="600"
@@ -17,7 +17,7 @@
     RightTapped="OnRightTapped"
     mc:Ignorable="d">
     <Page.Resources>
-        <!--    
+        <!--
          <Storyboard x:Name="EnterAnimation">
             <DoubleAnimation
                 Storyboard.TargetName="WordLyricContainer"
@@ -127,7 +127,7 @@
                     <CircleEase EasingMode="EaseOut" />
                 </DoubleAnimation.EasingFunction>
             </DoubleAnimation>
-        </Storyboard> -->
+        </Storyboard>-->
         <Storyboard x:Name="PointerInAni">
             <DoubleAnimation
                 Storyboard.TargetName="LikeButton"
@@ -135,7 +135,7 @@
                 To="0"
                 Duration="00:00:00.40">
                 <DoubleAnimation.EasingFunction>
-                    <CircleEase EasingMode="EaseOut"/>
+                    <CircleEase EasingMode="EaseOut" />
                 </DoubleAnimation.EasingFunction>
             </DoubleAnimation>
             <DoubleAnimation
@@ -144,7 +144,7 @@
                 To="1"
                 Duration="00:00:00.40">
                 <DoubleAnimation.EasingFunction>
-                    <CircleEase EasingMode="EaseOut"/>
+                    <CircleEase EasingMode="EaseOut" />
                 </DoubleAnimation.EasingFunction>
             </DoubleAnimation>
             <DoubleAnimation
@@ -153,7 +153,7 @@
                 To="0"
                 Duration="00:00:00.40">
                 <DoubleAnimation.EasingFunction>
-                    <CircleEase EasingMode="EaseOut"/>
+                    <CircleEase EasingMode="EaseOut" />
                 </DoubleAnimation.EasingFunction>
             </DoubleAnimation>
             <DoubleAnimation
@@ -162,7 +162,7 @@
                 To="1"
                 Duration="00:00:00.40">
                 <DoubleAnimation.EasingFunction>
-                    <CircleEase EasingMode="EaseOut"/>
+                    <CircleEase EasingMode="EaseOut" />
                 </DoubleAnimation.EasingFunction>
             </DoubleAnimation>
             <DoubleAnimation
@@ -171,7 +171,7 @@
                 To="1.2"
                 Duration="00:00:01.05">
                 <DoubleAnimation.EasingFunction>
-                    <CircleEase EasingMode="EaseOut"/>
+                    <CircleEase EasingMode="EaseOut" />
                 </DoubleAnimation.EasingFunction>
             </DoubleAnimation>
             <DoubleAnimation
@@ -180,7 +180,7 @@
                 To="1.2"
                 Duration="00:00:01.05">
                 <DoubleAnimation.EasingFunction>
-                    <CircleEase EasingMode="EaseOut"/>
+                    <CircleEase EasingMode="EaseOut" />
                 </DoubleAnimation.EasingFunction>
             </DoubleAnimation>
             <DoubleAnimation
@@ -189,7 +189,7 @@
                 To="1.2"
                 Duration="00:00:01.05">
                 <DoubleAnimation.EasingFunction>
-                    <CircleEase EasingMode="EaseOut"/>
+                    <CircleEase EasingMode="EaseOut" />
                 </DoubleAnimation.EasingFunction>
             </DoubleAnimation>
             <DoubleAnimation
@@ -198,7 +198,7 @@
                 To="1.2"
                 Duration="00:00:01.05">
                 <DoubleAnimation.EasingFunction>
-                    <CircleEase EasingMode="EaseOut"/>
+                    <CircleEase EasingMode="EaseOut" />
                 </DoubleAnimation.EasingFunction>
             </DoubleAnimation>
             <DoubleAnimation
@@ -207,7 +207,7 @@
                 To="1.2"
                 Duration="00:00:01.05">
                 <DoubleAnimation.EasingFunction>
-                    <CircleEase EasingMode="EaseOut"/>
+                    <CircleEase EasingMode="EaseOut" />
                 </DoubleAnimation.EasingFunction>
             </DoubleAnimation>
             <DoubleAnimation
@@ -216,7 +216,7 @@
                 To="1.2"
                 Duration="00:00:01.05">
                 <DoubleAnimation.EasingFunction>
-                    <CircleEase EasingMode="EaseOut"/>
+                    <CircleEase EasingMode="EaseOut" />
                 </DoubleAnimation.EasingFunction>
             </DoubleAnimation>
             <DoubleAnimation
@@ -225,7 +225,7 @@
                 To="1"
                 Duration="00:00:01.05">
                 <DoubleAnimation.EasingFunction>
-                    <CircleEase EasingMode="EaseOut"/>
+                    <CircleEase EasingMode="EaseOut" />
                 </DoubleAnimation.EasingFunction>
             </DoubleAnimation>
             <DoubleAnimation
@@ -234,7 +234,7 @@
                 To="1"
                 Duration="00:00:01.05">
                 <DoubleAnimation.EasingFunction>
-                    <CircleEase EasingMode="EaseOut"/>
+                    <CircleEase EasingMode="EaseOut" />
                 </DoubleAnimation.EasingFunction>
             </DoubleAnimation>
             <DoubleAnimation
@@ -243,7 +243,7 @@
                 To="1"
                 Duration="00:00:01.05">
                 <DoubleAnimation.EasingFunction>
-                    <CircleEase EasingMode="EaseOut"/>
+                    <CircleEase EasingMode="EaseOut" />
                 </DoubleAnimation.EasingFunction>
             </DoubleAnimation>
             <DoubleAnimation
@@ -252,7 +252,7 @@
                 To="1"
                 Duration="00:00:01.05">
                 <DoubleAnimation.EasingFunction>
-                    <CircleEase EasingMode="EaseOut"/>
+                    <CircleEase EasingMode="EaseOut" />
                 </DoubleAnimation.EasingFunction>
             </DoubleAnimation>
         </Storyboard>
@@ -263,7 +263,7 @@
                 To="10"
                 Duration="00:00:00.40">
                 <DoubleAnimation.EasingFunction>
-                    <CircleEase EasingMode="EaseOut"/>
+                    <CircleEase EasingMode="EaseOut" />
                 </DoubleAnimation.EasingFunction>
             </DoubleAnimation>
             <DoubleAnimation
@@ -272,7 +272,7 @@
                 To="0"
                 Duration="00:00:00.40">
                 <DoubleAnimation.EasingFunction>
-                    <CircleEase EasingMode="EaseOut"/>
+                    <CircleEase EasingMode="EaseOut" />
                 </DoubleAnimation.EasingFunction>
             </DoubleAnimation>
             <DoubleAnimation
@@ -281,7 +281,7 @@
                 To="10"
                 Duration="00:00:00.40">
                 <DoubleAnimation.EasingFunction>
-                    <CircleEase EasingMode="EaseOut"/>
+                    <CircleEase EasingMode="EaseOut" />
                 </DoubleAnimation.EasingFunction>
             </DoubleAnimation>
             <DoubleAnimation
@@ -290,7 +290,7 @@
                 To="0"
                 Duration="00:00:00.40">
                 <DoubleAnimation.EasingFunction>
-                    <CircleEase EasingMode="EaseOut"/>
+                    <CircleEase EasingMode="EaseOut" />
                 </DoubleAnimation.EasingFunction>
             </DoubleAnimation>
             <DoubleAnimation
@@ -299,7 +299,7 @@
                 To="1"
                 Duration="00:00:01.05">
                 <DoubleAnimation.EasingFunction>
-                    <CircleEase EasingMode="EaseOut"/>
+                    <CircleEase EasingMode="EaseOut" />
                 </DoubleAnimation.EasingFunction>
             </DoubleAnimation>
             <DoubleAnimation
@@ -308,7 +308,7 @@
                 To="1"
                 Duration="00:00:01.05">
                 <DoubleAnimation.EasingFunction>
-                    <CircleEase EasingMode="EaseOut"/>
+                    <CircleEase EasingMode="EaseOut" />
                 </DoubleAnimation.EasingFunction>
             </DoubleAnimation>
             <DoubleAnimation
@@ -317,7 +317,7 @@
                 To="1"
                 Duration="00:00:01.05">
                 <DoubleAnimation.EasingFunction>
-                    <CircleEase EasingMode="EaseOut"/>
+                    <CircleEase EasingMode="EaseOut" />
                 </DoubleAnimation.EasingFunction>
             </DoubleAnimation>
             <DoubleAnimation
@@ -326,7 +326,7 @@
                 To="1"
                 Duration="00:00:01.05">
                 <DoubleAnimation.EasingFunction>
-                    <CircleEase EasingMode="EaseOut"/>
+                    <CircleEase EasingMode="EaseOut" />
                 </DoubleAnimation.EasingFunction>
             </DoubleAnimation>
             <DoubleAnimation
@@ -335,7 +335,7 @@
                 To="1"
                 Duration="00:00:01.05">
                 <DoubleAnimation.EasingFunction>
-                    <CircleEase EasingMode="EaseOut"/>
+                    <CircleEase EasingMode="EaseOut" />
                 </DoubleAnimation.EasingFunction>
             </DoubleAnimation>
             <DoubleAnimation
@@ -344,7 +344,7 @@
                 To="1"
                 Duration="00:00:01.05">
                 <DoubleAnimation.EasingFunction>
-                    <CircleEase EasingMode="EaseOut"/>
+                    <CircleEase EasingMode="EaseOut" />
                 </DoubleAnimation.EasingFunction>
             </DoubleAnimation>
             <DoubleAnimation
@@ -353,7 +353,7 @@
                 To="0.6"
                 Duration="00:00:01.05">
                 <DoubleAnimation.EasingFunction>
-                    <CircleEase EasingMode="EaseOut"/>
+                    <CircleEase EasingMode="EaseOut" />
                 </DoubleAnimation.EasingFunction>
             </DoubleAnimation>
             <DoubleAnimation
@@ -362,7 +362,7 @@
                 To="0.6"
                 Duration="00:00:01.05">
                 <DoubleAnimation.EasingFunction>
-                    <CircleEase EasingMode="EaseOut"/>
+                    <CircleEase EasingMode="EaseOut" />
                 </DoubleAnimation.EasingFunction>
             </DoubleAnimation>
             <DoubleAnimation
@@ -371,7 +371,7 @@
                 To="0.6"
                 Duration="00:00:01.05">
                 <DoubleAnimation.EasingFunction>
-                    <CircleEase EasingMode="EaseOut"/>
+                    <CircleEase EasingMode="EaseOut" />
                 </DoubleAnimation.EasingFunction>
             </DoubleAnimation>
             <DoubleAnimation
@@ -380,15 +380,16 @@
                 To="0"
                 Duration="00:00:01.05">
                 <DoubleAnimation.EasingFunction>
-                    <CircleEase EasingMode="EaseOut"/>
+                    <CircleEase EasingMode="EaseOut" />
                 </DoubleAnimation.EasingFunction>
             </DoubleAnimation>
         </Storyboard>
 
     </Page.Resources>
-    <Grid Background="{ThemeResource GridPlayBarBackgroundBlur}"
-          PointerEntered="Grid_PointerEntered"
-          PointerExited="Grid_PointerExited">
+    <Grid
+        Background="{ThemeResource GridPlayBarBackgroundBlur}"
+        PointerEntered="Grid_PointerEntered"
+        PointerExited="Grid_PointerExited">
         <Grid.RowDefinitions>
             <RowDefinition Height="*" />
             <RowDefinition Height="Auto" />
@@ -400,8 +401,11 @@
                 <RowDefinition Height="32" />
                 <RowDefinition Height="*" />
             </Grid.RowDefinitions>
-            <Grid Background="Transparent" Grid.RowSpan="2" />
-            <Grid x:Name="TitleGrid" Background="Transparent" Opacity="1">
+            <Grid Grid.RowSpan="2" Background="Transparent" />
+            <Grid
+                x:Name="TitleGrid"
+                Background="Transparent"
+                Opacity="1">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto" />
                     <ColumnDefinition Width="Auto" />
@@ -411,8 +415,8 @@
                     Grid.Column="1"
                     Margin="12,0,0,0"
                     VerticalAlignment="Center"
-                    Text="{x:Bind NowPlayingName, Mode=OneWay}"
-                     Foreground="{StaticResource SystemControlForegroundBaseHighBrush}"/>
+                    Foreground="{StaticResource SystemControlForegroundBaseHighBrush}"
+                    Text="{x:Bind NowPlayingName, Mode=OneWay}" />
                 <TextBlock
                     Grid.Column="2"
                     Margin="4,0,64,0"
@@ -434,20 +438,26 @@
                     Grid.RowSpan="2"
                     HorizontalAlignment="Stretch"
                     VerticalAlignment="Stretch" />
-                <lyric:LyricControl x:Name="LyricControl" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Height="500" WordWrapping="NoWrap" />
+                <lyric:LyricControl
+                    x:Name="LyricControl"
+                    Height="500"
+                    HorizontalAlignment="Stretch"
+                    VerticalAlignment="Stretch"
+                    WordWrapping="NoWrap" />
 
-                <Viewbox Visibility="Collapsed"
+                <Viewbox
                     x:Name="LyricViewBox"
                     MaxHeight="71"
                     Margin="8,0"
-                    Stretch="Uniform">
+                    Stretch="Uniform"
+                    Visibility="Collapsed">
                     <StackPanel>
                         <TextBlock
                             x:Name="LyricSoundBlock"
-                            Text="{x:Bind LyricSound, Mode=OneWay}"
                             Grid.Row="2"
+                            Text="{x:Bind LyricSound, Mode=OneWay}"
                             TextAlignment="Center"
-                            TextWrapping="WrapWholeWords" >
+                            TextWrapping="WrapWholeWords">
                             <TextBlock.RenderTransform>
                                 <CompositeTransform />
                             </TextBlock.RenderTransform>
@@ -512,7 +522,7 @@
                     FontSize="14"
                     Glyph="&#xE00B;" />
                 <Button.RenderTransform>
-                    <CompositeTransform/>
+                    <CompositeTransform />
                 </Button.RenderTransform>
             </Button>
             <StackPanel HorizontalAlignment="Center" Orientation="Horizontal">
@@ -524,7 +534,7 @@
                     Opacity="0.6">
                     <FontIcon FontSize="14" Glyph="&#xF8AC;" />
                     <Button.RenderTransform>
-                        <ScaleTransform x:Name="preScale" CenterX="7" CenterY="14"/>
+                        <ScaleTransform x:Name="preScale" CenterX="7" CenterY="14" />
                     </Button.RenderTransform>
                 </Button>
                 <Button
@@ -536,7 +546,7 @@
                     Opacity="0.6">
                     <FontIcon x:Name="PlayStateIcon" Glyph="&#xEDB5;" />
                     <Button.RenderTransform>
-                        <ScaleTransform x:Name="stateScale" CenterX="7" CenterY="14"/>
+                        <ScaleTransform x:Name="stateScale" CenterX="7" CenterY="14" />
                     </Button.RenderTransform>
                 </Button>
                 <Button
@@ -547,7 +557,7 @@
                     Opacity="0.6">
                     <FontIcon FontSize="14" Glyph="&#xF8AD;" />
                     <Button.RenderTransform>
-                        <ScaleTransform x:Name="nextScale" CenterX="7" CenterY="14"/>
+                        <ScaleTransform x:Name="nextScale" CenterX="7" CenterY="14" />
                     </Button.RenderTransform>
                 </Button>
             </StackPanel>
@@ -560,16 +570,16 @@
                 Visibility="{x:Bind PlayProgress.Visibility, Mode=OneWay}">
                 <FontIcon FontSize="14" Glyph="&#xE78B;" />
                 <Button.RenderTransform>
-                    <CompositeTransform/>
+                    <CompositeTransform />
                 </Button.RenderTransform>
             </Button>
         </Grid>
         <muxc:ProgressBar
             x:Name="PlayProgress"
             Grid.Row="1"
-            Opacity="0"
             VerticalAlignment="Bottom"
             Maximum="{x:Bind Mode=OneWay, Path=TotalProgress}"
+            Opacity="0"
             Value="{x:Bind NowProgress, Mode=OneWay}" />
         <Rectangle
             x:Name="AlbumImage"
@@ -579,8 +589,8 @@
             Canvas.ZIndex="1">
             <Rectangle.Fill>
                 <ImageBrush x:Name="AlbumImageBrush" Stretch="UniformToFill">
-                    <ImageBrush.ImageSource >
-                        <BitmapImage x:Name="AlbumImageBrushSource"/>
+                    <ImageBrush.ImageSource>
+                        <BitmapImage x:Name="AlbumImageBrushSource" />
                     </ImageBrush.ImageSource>
                 </ImageBrush>
             </Rectangle.Fill>

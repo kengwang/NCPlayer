@@ -18,7 +18,6 @@ using Windows.Storage;
 using Windows.Storage.AccessCache;
 using Windows.System;
 using Windows.UI.StartScreen;
-using Windows.UI.ViewManagement;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Navigation;

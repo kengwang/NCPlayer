@@ -1,53 +1,53 @@
 ﻿<Page
-    mc:Ignorable="d"
     x:Class="HyPlayer.Pages.MVPage"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:classes="using:HyPlayer.Classes"
     xmlns:controls="using:Microsoft.Toolkit.Uwp.UI.Controls"
+    xmlns:controls1="using:HyPlayer.Controls"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     NavigationCacheMode="Disabled"
-    xmlns:controls1="using:HyPlayer.Controls">
+    mc:Ignorable="d">
 
     <ScrollViewer VerticalScrollBarVisibility="Auto">
         <ScrollViewer.Resources>
-            <DataTemplate x:DataType="classes:NCMlog" x:Key="RelativeTemplate">
+            <DataTemplate x:Key="RelativeTemplate" x:DataType="classes:NCMlog">
                 <Grid Margin="0,12,0,12" Tag="{x:Bind id}">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="150" />
                         <ColumnDefinition Width="*" />
                     </Grid.ColumnDefinitions>
                     <controls:ImageEx
-                        IsCacheEnabled="False"
                         MaxHeight="100"
+                        IsCacheEnabled="False"
                         Source="{x:Bind cover}"
                         Stretch="UniformToFill" />
 
                     <StackPanel Grid.Column="1" Margin="12,0,0,0">
                         <TextBlock
+                            Margin="0,0,0,6"
+                            HorizontalAlignment="Left"
                             FontSize="14"
                             FontWeight="SemiBold"
-                            HorizontalAlignment="Left"
-                            Margin="0,0,0,6"
                             Text="{x:Bind title}" />
                         <TextBlock
+                            Width="350"
                             FontWeight="Normal"
                             MaxLines="1"
-                            Text="{x:Bind description}"
-                            Width="350" />
+                            Text="{x:Bind description}" />
                     </StackPanel>
                 </Grid>
             </DataTemplate>
         </ScrollViewer.Resources>
         <StackPanel Orientation="Vertical">
-            <controls:Loading IsLoading="True" x:Name="LoadingControl">
-                <StackPanel Orientation="Horizontal" Padding="12">
-                    <ProgressRing IsActive="True" Margin="0,0,12,0" />
+            <controls:Loading x:Name="LoadingControl" IsLoading="True">
+                <StackPanel Padding="12" Orientation="Horizontal">
+                    <ProgressRing Margin="0,0,12,0" IsActive="True" />
                     <TextBlock
+                        VerticalAlignment="Center"
                         Foreground="White"
-                        Text="加载中"
-                        VerticalAlignment="Center" />
+                        Text="加载中" />
                 </StackPanel>
                 <controls:Loading.Background>
                     <AcrylicBrush
@@ -57,9 +57,9 @@
                 </controls:Loading.Background>
             </controls:Loading>
             <Grid
+                x:Name="MainGrid"
                 ColumnSpacing="10"
-                RowSpacing="10"
-                x:Name="MainGrid">
+                RowSpacing="10">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition />
                     <ColumnDefinition />
@@ -69,47 +69,47 @@
                     <RowDefinition />
                 </Grid.RowDefinitions>
                 <MediaPlayerElement
-                    AreTransportControlsEnabled="True"
+                    x:Name="MediaPlayerElement"
+                    Grid.Row="0"
                     Grid.Column="0"
-                    Grid.Row="0"
-                    HorizontalAlignment="Left"
                     Margin="15"
-                    x:Name="MediaPlayerElement" />
+                    HorizontalAlignment="Left"
+                    AreTransportControlsEnabled="True" />
                 <StackPanel
-                    Grid.Column="1"
+                    x:Name="SecondGrid"
                     Grid.Row="0"
+                    Grid.Column="1"
                     Margin="15"
                     Orientation="Vertical"
-                    Spacing="15"
-                    x:Name="SecondGrid">
+                    Spacing="15">
                     <controls1:SelectableTextBox
+                        x:Name="TextBoxVideoName"
                         FontSize="35"
                         FontWeight="Bold"
-                        TextWrapping="Wrap"
-                        x:Name="TextBoxVideoName" />
+                        TextWrapping="Wrap" />
                     <controls1:SelectableTextBox
+                        x:Name="TextBoxSinger"
                         FontSize="18"
-                        Foreground="{ThemeResource SystemControlPageTextBaseMediumBrush}"
-                        x:Name="TextBoxSinger" />
+                        Foreground="{ThemeResource SystemControlPageTextBaseMediumBrush}" />
                     <controls1:ExpandableTextBox
+                        x:Name="TextBoxDesc"
                         FontSize="15"
                         Foreground="{ThemeResource SystemControlPageTextBaseMediumBrush}"
-                        TextWrapping="Wrap"
-                        x:Name="TextBoxDesc" />
+                        TextWrapping="Wrap" />
                     <controls1:SelectableTextBox
+                        x:Name="TextBoxOtherInfo"
                         FontSize="15"
                         Foreground="{ThemeResource SystemControlPageTextBaseMediumBrush}"
-                        TextWrapping="Wrap"
-                        x:Name="TextBoxOtherInfo" />
+                        TextWrapping="Wrap" />
                     <ComboBox
+                        x:Name="VideoQualityBox"
                         Header="清晰度选择"
-                        SelectionChanged="VideoQualityBox_SelectionChanged"
-                        x:Name="VideoQualityBox" />
+                        SelectionChanged="VideoQualityBox_SelectionChanged" />
                     <ListView
-                        ItemTemplate="{StaticResource RelativeTemplate}"
+                        x:Name="RelativeList"
                         MaxHeight="400"
-                        SelectionChanged="RelativeList_OnSelectionChanged"
-                        x:Name="RelativeList" />
+                        ItemTemplate="{StaticResource RelativeTemplate}"
+                        SelectionChanged="RelativeList_OnSelectionChanged" />
                 </StackPanel>
             </Grid>
 

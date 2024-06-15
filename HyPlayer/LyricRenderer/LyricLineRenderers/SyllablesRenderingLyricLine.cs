@@ -1,4 +1,12 @@
 ﻿#nullable enable
+using HyPlayer.LyricRenderer.Abstraction;
+using HyPlayer.LyricRenderer.Abstraction.Render;
+using HyPlayer.LyricRenderer.Animator;
+using HyPlayer.LyricRenderer.Animator.EaseFunctions;
+using Microsoft.Graphics.Canvas;
+using Microsoft.Graphics.Canvas.Effects;
+using Microsoft.Graphics.Canvas.Geometry;
+using Microsoft.Graphics.Canvas.Text;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,16 +16,6 @@ using Windows.UI;
 using Windows.UI.Text;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Media.Animation;
-using HyPlayer.LyricRenderer.Abstraction;
-using HyPlayer.LyricRenderer.Abstraction.Render;
-using HyPlayer.LyricRenderer.Animator;
-using HyPlayer.LyricRenderer.Animator.EaseFunctions;
-using Microsoft.Graphics.Canvas;
-using Microsoft.Graphics.Canvas.Effects;
-using Microsoft.Graphics.Canvas.Geometry;
-using Microsoft.Graphics.Canvas.Text;
-using System.Diagnostics;
-using Microsoft.Toolkit.Uwp.UI.Media;
 
 namespace HyPlayer.LyricRenderer.LyricLineRenderers
 {
@@ -158,7 +156,7 @@ namespace HyPlayer.LyricRenderer.LyricLineRenderers
                             var matrix = Matrix3x2.CreateTranslation(actualX, textTop);
                             using (clds.CreateLayer(1, highlightGeometry.geo1, matrix))
                             {
-                                clds.DrawTextLayout (textLayout, actualX, textTop,
+                                clds.DrawTextLayout(textLayout, actualX, textTop,
                                     TypographySelector(t => t?.FocusingColor, context)!.Value);
                             }
                             if (highlightGeometry.geo2 is not null) //填充渐变矩形
@@ -255,14 +253,14 @@ namespace HyPlayer.LyricRenderer.LyricLineRenderers
                     };
                 }
 
-                
+
             }
-            
-            if (context.IsScrolling ||(!context.Effects.Blur && !Common.Setting.lyricRenderFade))
+
+            if (context.IsScrolling || (!context.Effects.Blur && !Common.Setting.lyricRenderFade))
             {
                 session.DrawImage(finalEffect, actualX, drawingTop);
             }
-            else if(context.Effects.Blur&& !Common.Setting.lyricRenderFade)
+            else if (context.Effects.Blur && !Common.Setting.lyricRenderFade)
             {
                 var blurEffect = new GaussianBlurEffect
                 {
@@ -271,12 +269,12 @@ namespace HyPlayer.LyricRenderer.LyricLineRenderers
                 };
                 session.DrawImage(blurEffect, actualX, drawingTop);
             }
-            else if (Common.Setting.lyricRenderFade&& !context.Effects.Blur)
+            else if (Common.Setting.lyricRenderFade && !context.Effects.Blur)
             {
                 var opacityEffect = new Microsoft.Graphics.Canvas.Effects.OpacityEffect
                 {
                     Source = finalEffect,
-                    Opacity = 1 - Math.Clamp(Math.Abs(gap)/(10f-(Common.Setting.lyricFadingRatio/10f)), 0, 0.9f),
+                    Opacity = 1 - Math.Clamp(Math.Abs(gap) / (10f - (Common.Setting.lyricFadingRatio / 10f)), 0, 0.9f),
                 };
                 session.DrawImage(opacityEffect, actualX, drawingTop);
             }
@@ -291,7 +289,7 @@ namespace HyPlayer.LyricRenderer.LyricLineRenderers
                 {
                     Source = blurEffect,
                     Opacity = 1 - Math.Clamp(Math.Abs(gap) / (10f - (Common.Setting.lyricFadingRatio / 10f)), 0, 0.9f),
-                }; 
+                };
                 session.DrawImage(opacityEffect, actualX, drawingTop);
             }
             if (context.Debug)
@@ -523,7 +521,7 @@ namespace HyPlayer.LyricRenderer.LyricLineRenderers
                     {
                         tll = null;
                     }
-                    if(transliterationFormat != null)
+                    if (transliterationFormat != null)
                     {
                         transliterationFormat = null;
                     }
@@ -548,11 +546,11 @@ namespace HyPlayer.LyricRenderer.LyricLineRenderers
                         FontFamily = TypographySelector(t => t?.Font, context),
                         FontWeight = FontWeights.Normal
                     };
-                    string trimmedText = Translation.ToString().TrimEnd();
+                    string? trimmedText = Translation?.ToString().TrimEnd();
                     tl = new CanvasTextLayout(session, trimmedText, translationFormat,
                         Math.Clamp(context.ItemWidth - 16, 0, int.MaxValue), _canvasHeight);
                     add += 30;
-                    
+
                 }
                 else
                 {
@@ -568,7 +566,7 @@ namespace HyPlayer.LyricRenderer.LyricLineRenderers
                 add += (float)(tll?.LayoutBounds.Height ?? 0f);
                 add += (float)(tl?.LayoutBounds.Height ?? 0);
             }
-            
+
 
             if (textLayout is null || _sizeChanged)
             {

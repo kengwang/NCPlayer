@@ -1,7 +1,6 @@
-using System;
-using System.Diagnostics;
 using HyPlayer.LyricRenderer.Abstraction;
 using HyPlayer.LyricRenderer.Abstraction.Render;
+using System;
 
 namespace HyPlayer.LyricRenderer.RollingCalculators;
 

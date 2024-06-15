@@ -352,7 +352,7 @@ namespace HyPlayer
 
     internal class Setting : INotifyPropertyChanged
     {
-        
+
         public int lyricPaddingTopRatio
         {
             get => GetSettings(nameof(lyricPaddingTopRatio), 10);
@@ -381,7 +381,7 @@ namespace HyPlayer
                 ApplicationData.Current.LocalSettings.Values[nameof(lyricFontFamily)] = value;
             }
         }
-        
+
         public int lyricLineSpacing
         {
             get => GetSettings(nameof(lyricLineSpacing), 0);
@@ -391,7 +391,7 @@ namespace HyPlayer
                 OnPropertyChanged();
             }
         }
-        
+
         public int lyricSize
         {
             get => GetSettings(nameof(lyricSize), 0);
@@ -642,7 +642,7 @@ namespace HyPlayer
                 OnPropertyChanged();
             }
         }
-        
+
         public bool localProgressiveLoad
         {
             get => GetSettings(nameof(localProgressiveLoad), false);
@@ -838,7 +838,7 @@ namespace HyPlayer
                 OnPropertyChanged();
             }
         }
-        
+
         public bool lyricRenderFocusHighlighting
         {
             get => GetSettings(nameof(lyricRenderFocusHighlighting), true);
@@ -848,7 +848,7 @@ namespace HyPlayer
                 OnPropertyChanged();
             }
         }
-        
+
         public bool lyricRenderTransliterationScanning
         {
             get => GetSettings(nameof(lyricRenderTransliterationScanning), true);
@@ -858,7 +858,7 @@ namespace HyPlayer
                 OnPropertyChanged();
             }
         }
-        
+
         public bool lyricRenderSimpleLineScanning
         {
             get => GetSettings(nameof(lyricRenderSimpleLineScanning), true);
@@ -868,7 +868,7 @@ namespace HyPlayer
                 OnPropertyChanged();
             }
         }
-        
+
         public bool lyricRenderScaleWhenFocusing
         {
             get => GetSettings(nameof(lyricRenderScaleWhenFocusing), true);
@@ -878,7 +878,7 @@ namespace HyPlayer
                 OnPropertyChanged();
             }
         }
-        
+
         public bool lyricRenderBlur
         {
             get => GetSettings(nameof(lyricRenderBlur), true);
@@ -1630,7 +1630,7 @@ namespace HyPlayer
                 OnPropertyChanged();
             }
         }
-        
+
         public int LineRollingCalculator
         {
             //  0 - 不进行转换  1 - 自动选择  2 - 网易云优先  3 - Kawazu 转换优先

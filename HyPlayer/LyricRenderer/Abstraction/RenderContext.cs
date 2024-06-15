@@ -1,5 +1,5 @@
-using System.Collections.Generic;
 using HyPlayer.LyricRenderer.Abstraction.Render;
+using System.Collections.Generic;
 
 namespace HyPlayer.LyricRenderer.Abstraction;
 
@@ -9,13 +9,13 @@ public class RenderContext
     /// 是否正在播放
     /// </summary>
     public bool IsPlaying { get; set; }
-    
+
     /// <summary>
     /// 是否显示调试信息
     /// 请合理使用
     /// </summary>
     public bool Debug { get; set; } = false;
-    
+
     /// <summary>
     /// 所有歌词
     /// </summary>
@@ -25,19 +25,19 @@ public class RenderContext
     /// 视图宽度
     /// </summary>
     public float ViewWidth { get; set; }
-    
+
     /// <summary>
     /// 视图高度
     /// </summary>
     public float ViewHeight { get; set; }
 
     public float ItemWidth { get; set; }
-    
+
     /// <summary>
     /// 播放时间 单位毫秒
     /// </summary>
     public long CurrentLyricTime { get; set; }
-    
+
     /// <summary>
     /// 渲染时间刻 单位微秒
     /// 精细动画时使用
@@ -48,7 +48,7 @@ public class RenderContext
     /// 当前主渲染的歌词行
     /// </summary>
     public RenderingLyricLine CurrentLyricLine { get; set; }
-    
+
     /// <summary>
     /// 当前主渲染的歌词行号
     /// </summary>
@@ -58,7 +58,7 @@ public class RenderContext
     /// 在视图范围内被渲染的歌词行
     /// </summary>
     public List<RenderingLyricLine> RenderingLyricLines { get; } = new();
-    
+
     /// <summary>
     /// 歌词的偏移
     /// </summary>
@@ -78,7 +78,7 @@ public class RenderContext
     /// 缺省的排版设置
     /// </summary>
     public RenderTypography PreferTypography { get; set; } = new();
-    
+
     /// <summary>
     /// 当前的关键帧
     /// </summary>
@@ -113,7 +113,7 @@ public class RenderContext
     /// 歌词的宽度比例
     /// </summary>
     public float LyricWidthRatio { get; set; }
-    
+
     /// <summary>
     /// 特殊效果设置
     /// </summary>

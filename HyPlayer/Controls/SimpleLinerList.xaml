@@ -5,18 +5,19 @@
     xmlns:behaviors="using:Microsoft.Toolkit.Uwp.UI.Behaviors"
     xmlns:classes="using:HyPlayer.Classes"
     xmlns:controls="using:Microsoft.Toolkit.Uwp.UI.Controls"
-    xmlns:interactivity="using:Microsoft.Xaml.Interactivity"
     xmlns:hyplayer="using:HyPlayer"
+    xmlns:interactivity="using:Microsoft.Xaml.Interactivity"
     x:Name="SongListRoot">
 
     <ListView
         Name="ItemList"
+        Margin="0,0,0,120"
         Padding="10"
         Header="{x:Bind ListHeader, Mode=OneWay}"
-        Margin="0,0,0,120"
+        ItemContainerStyle="{StaticResource ListViewItemStyle}"
         ItemsSource="{x:Bind ListItems}"
         SelectionChanged="ItemList_SelectionChanged"
-        ShowsScrollingPlaceholders="True" ItemContainerStyle="{StaticResource ListViewItemStyle}">
+        ShowsScrollingPlaceholders="True">
         <interactivity:Interaction.Behaviors>
             <behaviors:QuickReturnHeaderBehavior />
         </interactivity:Interaction.Behaviors>
@@ -24,49 +25,43 @@
             <ContentControl Content="{x:Bind Footer}" />
         </ListView.Footer>
         <ListView.ItemTemplate>
-            <DataTemplate
-                x:DataType="classes:SimpleListItem">
+            <DataTemplate x:DataType="classes:SimpleListItem">
                 <Border>
                     <Grid
                         Margin="0,15,0,15"
-                        Background="Transparent"
                         HorizontalAlignment="Stretch"
+                        Background="Transparent"
                         Tag="{x:Bind ResourceId}">
                         <Grid.ColumnDefinitions>
-                            <ColumnDefinition
-                                Width="*" />
-                            <ColumnDefinition
-                                Width="60" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="60" />
                         </Grid.ColumnDefinitions>
                         <controls:ImageEx
                             x:Name="RectangleImageBack"
-                            Visibility="{x:Bind hyplayer:Common.Setting.itemOfListBackgroundAcrylicBlur}"
-                            x:Load="{x:Bind hyplayer:Common.Setting.itemOfListBackgroundAcrylicBlur}"
                             Grid.ColumnSpan="2"
                             Height="85"
                             Margin="0,-10,0,-10"
+                            x:Load="{x:Bind hyplayer:Common.Setting.itemOfListBackgroundAcrylicBlur}"
                             x:Phase="4"
                             CornerRadius="10"
                             EnableLazyLoading="True"
                             IsCacheEnabled="False"
-                            Stretch="UniformToFill">
+                            Stretch="UniformToFill"
+                            Visibility="{x:Bind hyplayer:Common.Setting.itemOfListBackgroundAcrylicBlur}">
                             <controls:ImageEx.Source>
-                                <BitmapImage
-                                    UriSource="{x:Bind CoverUri}" />
+                                <BitmapImage UriSource="{x:Bind CoverUri}" />
                             </controls:ImageEx.Source>
                         </controls:ImageEx>
                         <Rectangle
                             x:Name="RectangleImageAcrylic"
-                            Visibility="{x:Bind hyplayer:Common.Setting.itemOfListBackgroundAcrylicBlur}"
-                            x:Load="{x:Bind hyplayer:Common.Setting.itemOfListBackgroundAcrylicBlur}"
                             Grid.ColumnSpan="2"
                             Margin="0,-10,0,-10"
+                            x:Load="{x:Bind hyplayer:Common.Setting.itemOfListBackgroundAcrylicBlur}"
                             Fill="{ThemeResource SystemControlAcrylicElementBrush}"
                             RadiusX="10"
-                            RadiusY="10" />
-                        <StackPanel
-                            Grid.Column="0"
-                            Orientation="Horizontal">
+                            RadiusY="10"
+                            Visibility="{x:Bind hyplayer:Common.Setting.itemOfListBackgroundAcrylicBlur}" />
+                        <StackPanel Grid.Column="0" Orientation="Horizontal">
                             <TextBlock
                                 x:Name="OrderId"
                                 Width="30"
@@ -85,12 +80,10 @@
                                 IsCacheEnabled="False"
                                 Stretch="UniformToFill">
                                 <controls:ImageEx.Source>
-                                    <BitmapImage
-                                        UriSource="{x:Bind CoverUri}" />
+                                    <BitmapImage UriSource="{x:Bind CoverUri}" />
                                 </controls:ImageEx.Source>
                             </controls:ImageEx>
-                            <Grid
-                                Padding="7,0,0,0">
+                            <Grid Padding="7,0,0,0">
                                 <Grid.RowDefinitions>
                                     <RowDefinition />
                                     <RowDefinition />
@@ -98,8 +91,7 @@
                                     <RowDefinition />
                                 </Grid.RowDefinitions>
                                 <Grid.ColumnDefinitions>
-                                    <ColumnDefinition
-                                        Width="Auto" />
+                                    <ColumnDefinition Width="Auto" />
                                 </Grid.ColumnDefinitions>
                                 <TextBlock
                                     Grid.Row="0"

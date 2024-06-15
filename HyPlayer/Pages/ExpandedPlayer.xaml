@@ -212,7 +212,7 @@
             Grid.Column="0"
             Background="Transparent" />
         <Grid
-            x:Name="LuminousBackgroundContainer"
+            x:Name="ShaderLuminousBackgroundContainer"
             Grid.Row="0"
             Grid.RowSpan="3"
             Grid.Column="0"
@@ -225,6 +225,65 @@
                 IsFixedTimeStep="True"
                 SizeChanged="LuminousBackground_SizeChanged"
                 Update="LuminousBackground_Update" />
+        </Grid>
+        <Grid
+            x:Name="LuminousBackgroundContainer"
+            Grid.Row="0"
+            Grid.RowSpan="3"
+            Grid.Column="0"
+            Canvas.ZIndex="-1">
+            <Grid.RenderTransform>
+                <TransformGroup>
+                    <RotateTransform x:Name="BgRotate" CenterX="{x:Bind BgScale.CenterX, Mode=OneWay}" CenterY="{x:Bind BgScale.CenterY, Mode=OneWay}" />
+                    <ScaleTransform x:Name="BgScale" />
+                </TransformGroup>
+            </Grid.RenderTransform>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition />
+                <ColumnDefinition />
+                <ColumnDefinition />
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition />
+                <RowDefinition />
+                <RowDefinition />
+            </Grid.RowDefinitions>
+            <Rectangle
+                x:Name="BgRect00"
+                Grid.Row="0"
+                Grid.Column="0" />
+            <Rectangle
+                x:Name="BgRect01"
+                Grid.Row="0"
+                Grid.Column="1" />
+            <Rectangle
+                x:Name="BgRect02"
+                Grid.Row="0"
+                Grid.Column="2" />
+            <Rectangle
+                x:Name="BgRect10"
+                Grid.Row="1"
+                Grid.Column="0" />
+            <Rectangle
+                x:Name="BgRect11"
+                Grid.Row="1"
+                Grid.Column="1" />
+            <Rectangle
+                x:Name="BgRect12"
+                Grid.Row="1"
+                Grid.Column="2" />
+            <Rectangle
+                x:Name="BgRect20"
+                Grid.Row="2"
+                Grid.Column="0" />
+            <Rectangle
+                x:Name="BgRect21"
+                Grid.Row="2"
+                Grid.Column="1" />
+            <Rectangle
+                x:Name="BgRect22"
+                Grid.Row="2"
+                Grid.Column="2" />
         </Grid>
         <Grid
             x:Name="MainGrid"

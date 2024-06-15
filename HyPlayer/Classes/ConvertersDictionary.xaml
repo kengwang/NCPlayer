@@ -21,4 +21,5 @@
     <classes:EmptyStringToVisibilityConverter x:Key="EmptyStringToVisibilityConverter" />
     <classes:PageToNavigationViewIndicatorConverter x:Key="PageToNavigationViewIndicatorConverter" />
     <classes:ShaderConverter x:Key="ShaderConverter" />
+    <classes:LuminousConverter x:Key="LuminousConverter" />
 </ResourceDictionary>

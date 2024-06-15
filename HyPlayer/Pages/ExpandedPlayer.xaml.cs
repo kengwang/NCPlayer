@@ -11,6 +11,7 @@ using LyricParser.Abstraction;
 using Microsoft.Graphics.Canvas.Effects;
 using Microsoft.Toolkit.Uwp.UI.Animations;
 using Microsoft.Toolkit.Uwp.UI.Media;
+using NeteaseCloudMusicApi;
 using PaletteMixr;
 using System;
 using System.Collections.Generic;
@@ -195,6 +196,15 @@ public sealed partial class ExpandedPlayer : Page, IDisposable
                 ImageAlbumAni.Pause();
             }
 
+            if (bpmAniStoryboard.Children.Count > 0)
+            {
+                bpmAniStoryboard.Pause();
+            }
+
+            if (luminousColorsRotateStoryBoard.Children.Count > 0)
+            {
+                luminousColorsRotateStoryBoard.Pause();
+            }
         });
     }
 
@@ -404,6 +414,12 @@ public sealed partial class ExpandedPlayer : Page, IDisposable
 
         ImageRotateTransform.CenterX = ImageAlbum.ActualSize.X / 2;
         ImageRotateTransform.CenterY = ImageAlbum.ActualSize.Y / 2;
+
+        BgScale.CenterY = LuminousBackgroundContainer.ActualHeight / 2;
+        BgScale.CenterX = LuminousBackgroundContainer.ActualWidth / 2;
+
+        BgRotate.CenterX = LuminousBackgroundContainer.ActualWidth / 2;
+        BgRotate.CenterY = LuminousBackgroundContainer.ActualHeight / 2;
     }
 
 
@@ -416,6 +432,9 @@ public sealed partial class ExpandedPlayer : Page, IDisposable
             ApplicationView.GetForCurrentView().ExitFullScreenMode();
         Common.PageExpandedPlayer = null;
     }
+
+    private Storyboard luminousColorsRotateStoryBoard = new Storyboard();
+    private DoubleAnimation luminousColorsRotateAnimation = new DoubleAnimation();
 
     protected override async void OnNavigatedTo(NavigationEventArgs e)
     {
@@ -448,9 +467,22 @@ public sealed partial class ExpandedPlayer : Page, IDisposable
             AcrylicCover.Fill = new BackdropBlurBrush { Amount = 50.0 };
         if (Common.Setting.expandedPlayerBackgroundType == 6)
         {
+            AcrylicCover.Fill = new BackdropBlurBrush { Amount = 250 }; // TintAmountChange
+            luminousColorsRotateAnimation = BgRotate.CreateDoubleAnimation(
+                "Angle",
+                360,
+                0,
+                TimeSpan.Zero,
+                TimeSpan.FromSeconds(12),
+                repeatBehavior: RepeatBehavior.Forever,
+                autoReverse: false);
+            luminousColorsRotateStoryBoard.Children.Add(luminousColorsRotateAnimation);
+            luminousColorsRotateStoryBoard.Begin();
+        }
+        if (Common.Setting.expandedPlayerBackgroundType == 7)
+        {
             AcrylicCover.Fill = new BackdropBlurBrush { Amount = 5 }; // TintAmountChange
         }
-
         if (Common.Setting.expandedPlayerBackgroundType == 5)
             PageContainer.Background =
                 (Brush)new BooleanToWindowBrushesConverter().Convert(
@@ -474,7 +506,7 @@ public sealed partial class ExpandedPlayer : Page, IDisposable
             AnimationDesired = false,
         };
 
-    /*
+
     private Storyboard bpmAniStoryboard = new Storyboard();
     public async void InitializeBPM()
     {
@@ -503,12 +535,11 @@ public sealed partial class ExpandedPlayer : Page, IDisposable
                 if (string.IsNullOrEmpty(bpmText)) continue;
                 if (double.TryParse(bpmText, out var bpm))
                 {
-                    
+
                 }
             }
         }
     }
-    */
 
     public void LoadLyricsBox()
     {
@@ -661,10 +692,8 @@ public sealed partial class ExpandedPlayer : Page, IDisposable
             }
 
             needRedesign++;
-            /*
             if (Common.Setting.animationAdaptBPM)
                 InitializeBPM();
-            */
         });
     }
 
@@ -929,7 +958,8 @@ public sealed partial class ExpandedPlayer : Page, IDisposable
         }
     }
 
-    private List<Vector3> albumColors = new();
+    private List<Vector3> albumColorVectors = new();
+    private List<Windows.UI.Color> albumColors = new();
     private SolidColorBrush? _pureIdleBrushCache;
     private Windows.UI.Color? _karaokAccentColorCache;
     private SolidColorBrush? _pureAccentBrushCache;
@@ -965,18 +995,23 @@ public sealed partial class ExpandedPlayer : Page, IDisposable
             //var c = GetPixel(bytes, 0, 0, decoder.PixelWidth, decoder.PixelHeight);
             lastSongForBrush = HyPlayList.NowPlayingItem.PlayItem;
             albumMainColor = Windows.UI.Color.FromArgb(color.Color.A, color.Color.R, color.Color.G, color.Color.B);
-            if (Common.Setting.expandedPlayerBackgroundType is 6)
+            if (Common.Setting.expandedPlayerBackgroundType is 7 or 6)
             {
-                var systemColor = Color.FromArgb(color.Color.A, color.Color.R, color.Color.G, color.Color.B);
-                var paletteGenerator = new PaletteGenerator(systemColor);
-                var result = paletteGenerator.GenerateHuePalette(PaletteSize.Small).Select(color => new Vector3((float)color.R / 0xFF, (float)color.G / 0xFF, (float)color.B / 0xFF)).ToList();
-                albumColors = new List<Vector3>
+                var palette = await Common.ColorThief.GetPalette(decoder, 12, 10, false);
+                albumColors = palette.OrderByDescending(t => t.Population)
+                    .Select(quantizedColor => Windows.UI.Color.FromArgb(quantizedColor.Color.A, quantizedColor.Color.R, quantizedColor.Color.G, quantizedColor.Color.B))
+                    .ToList();
+                if (Common.Setting.expandedPlayerBackgroundType is 7)
                 {
-                    new Vector3((float)color.Color.R / 0xFFf, (float)color.Color.G / 0xFF, (float)color.Color.B / 0xFF),
-                    result[0],
-                    result[1],
-                    result[2]
-                };
+                    var result = palette.Select(color => new Vector3((float)color.Color.R / 0xFF, (float)color.Color.G / 0xFF, (float)color.Color.B / 0xFF)).ToList();
+                    albumColorVectors = new List<Vector3>
+                    {
+                        result[0],
+                        result[1],
+                        result[2],
+                        result[3]
+                    };
+                }
             }
             if (Common.Setting.expandedPlayerBackgroundType is 1)
             {
@@ -1116,6 +1151,9 @@ public sealed partial class ExpandedPlayer : Page, IDisposable
             case 4: // Force Black
                 PageContainer.Background = new SolidColorBrush(Colors.Black);
                 break;
+            case 6:
+                BlackCover.Opacity = 1;
+                break;
         }
 
         if (!Common.IsInImmersiveMode)
@@ -1130,6 +1168,16 @@ public sealed partial class ExpandedPlayer : Page, IDisposable
             }
         }
 
+
+        if (bpmAniStoryboard.Children.Count > 0)
+        {
+            bpmAniStoryboard.Resume();
+        }
+
+        if (luminousColorsRotateStoryBoard.Children.Count > 0)
+        {
+            luminousColorsRotateStoryBoard.Resume();
+        }
 
         LoadLyricsBox();
     }
@@ -1351,8 +1399,22 @@ public sealed partial class ExpandedPlayer : Page, IDisposable
                         Common.BarPlayBar!.SetPlayBarIdleBackground(ForegroundIdleTextBrush);
                     //LoadLyricsBox();
                     RefreshLyricColor();
-
                     if (Common.Setting.expandedPlayerBackgroundType == 6)
+                    {
+                        if (_shaderEffect != null)
+                        {
+                            BgRect00.Fill = new SolidColorBrush(albumColors[0]);
+                            BgRect01.Fill = new SolidColorBrush(albumColors[1]);
+                            BgRect02.Fill = new SolidColorBrush(albumColors[2]);
+                            BgRect10.Fill = new SolidColorBrush(albumColors[3]);
+                            BgRect11.Fill = new SolidColorBrush(albumColors[4]);
+                            BgRect12.Fill = new SolidColorBrush(albumColors[5]);
+                            BgRect20.Fill = new SolidColorBrush(albumColors[6]);
+                            BgRect21.Fill = new SolidColorBrush(albumColors[7]);
+                            BgRect22.Fill = new SolidColorBrush(albumColors[8]);
+                        }
+                    }
+                    if (Common.Setting.expandedPlayerBackgroundType == 7)
                     {
                         if (_shaderEffect != null)
                         {

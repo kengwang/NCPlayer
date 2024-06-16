@@ -1171,9 +1171,8 @@ public sealed partial class ExpandedPlayer : Page, IDisposable
                 BlackCover.Opacity = 1;
                 break;
             case 7:
-                BlackCover.Fill = new SolidColorBrush(Colors.Transparent);
-                AcrylicCover.Fill = new SolidColorBrush(Colors.Transparent);
-                PageContainer.Background = new SolidColorBrush(Colors.Transparent);
+                BlackCover.Visibility = Visibility.Collapsed;
+                AcrylicCover.Visibility = Visibility.Collapsed;
                 break;
         }
 

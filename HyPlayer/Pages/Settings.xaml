@@ -752,6 +752,12 @@
                                             <ComboBoxItem Content="流光溢彩 (实验, Isolation)" />
                                         </ComboBox>
                                     </controls3:SettingsCard>
+                                    <controls3:SettingsCard Description="仅在背景设置为Isolation时生效" Header="停用Isolation帧率限制">
+                                        <ToggleSwitch
+                                            MinWidth="10"
+                                            HorizontalAlignment="Right"
+                                            IsOn="{x:Bind hyplayer:Common.Setting.IsolationFullThrottle, Mode=TwoWay}" />
+                                    </controls3:SettingsCard>
                                     <controls3:SettingsCard Description="0 为无边框" Header="唱片边框厚度">
                                         <Slider
                                             x:Name="SliderAlbumBorderLength"

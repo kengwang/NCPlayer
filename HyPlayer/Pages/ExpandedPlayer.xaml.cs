@@ -12,7 +12,6 @@ using Microsoft.Graphics.Canvas.Effects;
 using Microsoft.Toolkit.Uwp.UI.Animations;
 using Microsoft.Toolkit.Uwp.UI.Media;
 using NeteaseCloudMusicApi;
-using PaletteMixr;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -996,27 +995,32 @@ public sealed partial class ExpandedPlayer : Page, IDisposable
             //var c = GetPixel(bytes, 0, 0, decoder.PixelWidth, decoder.PixelHeight);
             lastSongForBrush = HyPlayList.NowPlayingItem.PlayItem;
             albumMainColor = Windows.UI.Color.FromArgb(color.Color.A, color.Color.R, color.Color.G, color.Color.B);
-            if (Common.Setting.expandedPlayerBackgroundType is 6)
+            bool luminousBackgroundIsDark = false;
+            if (Common.Setting.expandedPlayerBackgroundType is 6 or 7)
             {
-                var palette = await Common.ColorThief.GetPalette(decoder, 12, 10, false);
-                albumColors = palette.OrderByDescending(t => t.Population)
-                    .Select(quantizedColor => Windows.UI.Color.FromArgb(quantizedColor.Color.A, quantizedColor.Color.R, quantizedColor.Color.G, quantizedColor.Color.B))
+                var palette = (await Common.ColorThief.GetPalette(decoder, 12, 10, false)).OrderByDescending(t => t.Population).ToList();
+                albumColors = palette.Select(quantizedColor => Windows.UI.Color.FromArgb(quantizedColor.Color.A, quantizedColor.Color.R, quantizedColor.Color.G, quantizedColor.Color.B))
                     .ToList();
-            }
-            if (Common.Setting.expandedPlayerBackgroundType is 7)
-            {
-                var netColor = Color.FromArgb(color.Color.A, color.Color.R, color.Color.G, color.Color.B);
-                var paletteGenerator = new PaletteGenerator(netColor);
-                var palette = paletteGenerator.GenerateHuePalette(PaletteSize.Small);
-                var result = palette.Select(color => new Vector3((float)color.R / 0xFF, (float)color.G / 0xFF, (float)color.B / 0xFF)).ToList();
-                albumColorVectors = new List<Vector3>
+                luminousBackgroundIsDark = palette.Select(t => t.IsDark).Count() >= palette.Count / 2;
+                if (Common.Setting.expandedPlayerBackgroundType is 7)
+                {
+                    albumColorVectors = new List<Vector3>
                     {
-                        
-                        result[0],
+                        new Vector3(palette[1].Color.R / 255f, palette[1].Color.G / 255f, palette[1].Color.B / 255f),
                         new Vector3(color.Color.R / 255f, color.Color.G / 255f, color.Color.B / 255f),
-                        result[1],
-                        result[2]
+                        new Vector3(palette[2].Color.R / 255f, palette[2].Color.G / 255f, palette[2].Color.B / 255f),
+                        new Vector3(palette[3].Color.R / 255f, palette[3].Color.G / 255f, palette[3].Color.B / 255f),
                     };
+                    int sum = 0;
+                    for (var i = 0; i < 4; i++)
+                    {
+                        if (palette[i].IsDark)
+                        {
+                            sum++;
+                        }
+                    }
+                    luminousBackgroundIsDark = sum >= 2;
+                }
             }
             if (Common.Setting.expandedPlayerBackgroundType is 1)
             {
@@ -1024,7 +1028,14 @@ public sealed partial class ExpandedPlayer : Page, IDisposable
                     new SolidColorBrush(albumMainColor.Value);
             }
 
-            return !color.IsDark;
+            if (Common.Setting.expandedPlayerBackgroundType is not 6 or 7)
+            {
+                return !color.IsDark;
+            }
+            else
+            {
+                return luminousBackgroundIsDark;
+            }
         }
         catch
         {
@@ -1419,7 +1430,7 @@ public sealed partial class ExpandedPlayer : Page, IDisposable
                         BgRect12.Fill = new SolidColorBrush(albumColors[5]);
                         BgRect20.Fill = new SolidColorBrush(albumColors[6]);
                         BgRect21.Fill = new SolidColorBrush(albumColors[7]);
-                        BgRect22.Fill = new SolidColorBrush(albumColors[8]); 
+                        BgRect22.Fill = new SolidColorBrush(albumColors[8]);
                     }
                     if (Common.Setting.expandedPlayerBackgroundType == 7)
                     {
@@ -1656,7 +1667,7 @@ public sealed partial class ExpandedPlayer : Page, IDisposable
             var effect = new PixelShaderEffect(bytes);
             _shaderEffect = effect;
             _randomValue = new Random().Next(100);
-            if (albumColors.Count != 0)
+            if (albumColorVectors.Count != 0)
             {
                 _shaderEffect.Properties["color1"] = albumColorVectors[0];
                 _shaderEffect.Properties["color2"] = albumColorVectors[1];
@@ -1666,7 +1677,11 @@ public sealed partial class ExpandedPlayer : Page, IDisposable
         }
         _shaderEffect.Properties["Width"] = Convert.ToSingle(LuminousBackground.ActualWidth);
         _shaderEffect.Properties["Height"] = Convert.ToSingle(LuminousBackground.ActualHeight);
-        LuminousBackground.TargetElapsedTime = TimeSpan.FromMilliseconds(66.4);
+        if (!Common.Setting.IsolationFullThrottle)
+        {
+            LuminousBackground.IsFixedTimeStep = true;
+            LuminousBackground.TargetElapsedTime = TimeSpan.FromMilliseconds(66.4);
+        }
     }
 
     private void LuminousBackground_Update(Microsoft.Graphics.Canvas.UI.Xaml.ICanvasAnimatedControl sender, Microsoft.Graphics.Canvas.UI.Xaml.CanvasAnimatedUpdateEventArgs args)

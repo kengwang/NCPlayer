@@ -1712,6 +1712,15 @@ namespace HyPlayer
                 OnPropertyChanged();
             }
         }
+        public bool IsolationFullThrottle
+        {
+            get => GetSettings(nameof(IsolationFullThrottle), false);
+            set
+            {
+                ApplicationData.Current.LocalSettings.Values[nameof(IsolationFullThrottle)] = value;
+                OnPropertyChanged();
+            }
+        }
 
         public bool LastFMLogined => LastFMManager.LastfmLogined;
         public bool SaveCookies()

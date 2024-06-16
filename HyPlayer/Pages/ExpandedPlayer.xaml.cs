@@ -1483,8 +1483,11 @@ public sealed partial class ExpandedPlayer : Page, IDisposable
                 ImageAlbumAni?.Stop();
             }
             LuminousBackground?.RemoveFromVisualTree();
-            _shaderEffect?.Dispose();
+            LuminousBackground = null;
+            var shaderEffect = _shaderEffect;
             _shaderEffect = null;
+            shaderEffect?.Dispose();
+
             disposedValue = true;
         }
     }

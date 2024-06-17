@@ -18,7 +18,7 @@
                 Text="主页" />
             <Grid
                 Height="320"
-                Margin="0,70,0,0"
+                Margin="0,70,5,0"
                 VerticalAlignment="Top">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition />
@@ -205,7 +205,7 @@
             </Grid>
             <StackPanel
                 x:Name="MainContainer"
-                Margin="0,220,0,0"
+                Margin="0,220,10,0"
                 Padding="15"
                 Orientation="Vertical"
                 Spacing="10">

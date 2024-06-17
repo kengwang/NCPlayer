@@ -133,7 +133,7 @@
             x:FieldModifier="public"
             Visibility="Visible">
             <Grid.Background>
-                <media:BackdropBlurBrush Amount="12" />
+                <media:BackdropBlurBrush Amount="10" />
             </Grid.Background>
             <Rectangle
                 x:Name="PlayBarMarginBackground"

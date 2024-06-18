@@ -1910,6 +1910,7 @@
                                             Orientation="Horizontal"
                                             Tapped="UIElement_OnTapped">
                                             <HyperlinkButton Content="Github" NavigateUri="https://github.com/Clrs17" />
+                                            <HyperlinkButton Content="知乎" NavigateUri="https://www.zhihu.com/people/ClarisS01017" />
                                         </StackPanel>
                                     </Grid>
                                 </Border>

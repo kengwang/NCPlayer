@@ -1482,12 +1482,16 @@ public sealed partial class ExpandedPlayer : Page, IDisposable
             {
                 ImageAlbumAni?.Stop();
             }
-            LuminousBackground?.RemoveFromVisualTree();
-            LuminousBackground = null;
             _shaderEffect = null;
 
             disposedValue = true;
         }
+    }
+
+    private void LuminousBackground_OnUnloaded(object sender, RoutedEventArgs e)
+    {
+        LuminousBackground?.RemoveFromVisualTree();
+        LuminousBackground = null;
     }
 
     ~ExpandedPlayer()

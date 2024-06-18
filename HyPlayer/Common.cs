@@ -1728,7 +1728,7 @@ namespace HyPlayer
             get => GetSettings(nameof(IsolationFPS), 24d);
             set
             {
-                ApplicationData.Current.LocalSettings.Values[nameof(IsolationFullThrottle)] = value;
+                ApplicationData.Current.LocalSettings.Values[nameof(IsolationFPS)] = value;
                 OnPropertyChanged();
             }
         }

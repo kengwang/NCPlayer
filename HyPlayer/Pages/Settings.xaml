@@ -759,6 +759,13 @@
                                                 Minimum="15"
                                                 Value="{x:Bind hyplayer:Common.Setting.IsolationFPS, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"/>
                                     </controls3:SettingsCard>
+                                    <controls3:SettingsCard Description="仅在背景设置为Isolation时生效" Header="Isolation渲染倍率">
+                                        <controls:NumberBox
+                                                HorizontalAlignment="Right"
+                                                Minimum="0.1"
+                                                Maximum="1.5"
+                                                Value="{x:Bind hyplayer:Common.Setting.IsolationScale, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"/>
+                                    </controls3:SettingsCard>
                                     <controls3:SettingsCard Description="仅在背景设置为Isolation时生效" Header="停用Isolation帧率限制">
                                         <ToggleSwitch
                                             MinWidth="10"

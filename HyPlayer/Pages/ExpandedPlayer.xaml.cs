@@ -1682,6 +1682,7 @@ public sealed partial class ExpandedPlayer : Page, IDisposable
                 _shaderEffect.Properties["color4"] = albumColorVectors[3];
             }
         }
+        LuminousBackground.DpiScale = Common.Setting.IsolationScale;
         _shaderEffect.Properties["Width"] = (float)LuminousBackground.ConvertDipsToPixels((float)LuminousBackground.ActualWidth, Microsoft.Graphics.Canvas.CanvasDpiRounding.Round);
         _shaderEffect.Properties["Height"] = (float)LuminousBackground.ConvertDipsToPixels((float)LuminousBackground.ActualHeight, Microsoft.Graphics.Canvas.CanvasDpiRounding.Round);
         if (!Common.Setting.IsolationFullThrottle)
@@ -1689,7 +1690,6 @@ public sealed partial class ExpandedPlayer : Page, IDisposable
             LuminousBackground.IsFixedTimeStep = true;
             LuminousBackground.TargetElapsedTime = TimeSpan.FromMilliseconds(16.6 * (60d / Common.Setting.IsolationFPS));
         }
-        LuminousBackground.DpiScale = Common.Setting.IsolationScale;
     }
 
     private void LuminousBackground_Update(Microsoft.Graphics.Canvas.UI.Xaml.ICanvasAnimatedControl sender, Microsoft.Graphics.Canvas.UI.Xaml.CanvasAnimatedUpdateEventArgs args)

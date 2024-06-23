@@ -993,22 +993,28 @@ public sealed partial class ExpandedPlayer : Page, IDisposable
             BitmapDecoder decoder = await BitmapDecoder.CreateAsync(mime, stream);
             var colors = await ImageDecoder.GetPixelColor(decoder);
             ThemeColorResult themeColor;
-            themeColor = await Common.PaletteGenerator.CreateThemeColor(colors);
-            lastSongForBrush = HyPlayList.NowPlayingItem.PlayItem;
-            albumMainColor = Windows.UI.Color.FromArgb(255, (byte)themeColor.Color.X, (byte)themeColor.Color.Y, (byte)themeColor.Color.Z);
-            bool luminousBackgroundIsDark = false;
-            if (Common.Setting.expandedPlayerBackgroundType is 6 or 7)
+            PaletteResult palette;
+            var paletteIsDark = false;
+            if (Common.Setting.expandedPlayerBackgroundType != 6 && Common.Setting.expandedPlayerBackgroundType != 7)
             {
-                var palette = (await Common.PaletteGenerator.CreatePalette(colors, Common.Setting.expandedPlayerBackgroundType is 6 ? 9 : 4));
+                themeColor = await Common.PaletteGenerator.CreateThemeColor(colors, true);
+                albumMainColor = Windows.UI.Color.FromArgb(255, (byte)themeColor.Color.X, (byte)themeColor.Color.Y, (byte)themeColor.Color.Z);
+            }
+            else
+            {
+                palette = await Common.PaletteGenerator.CreatePalette(colors, Common.Setting.expandedPlayerBackgroundType is 6 ? 9 : 4, true);
+                themeColor = palette.ThemeColor;
                 albumColors = palette.Palette.Select(quantizedColor => Windows.UI.Color.FromArgb(255, (byte)quantizedColor.X, (byte)quantizedColor.Y, (byte)quantizedColor.Z))
                     .ToList();
-                luminousBackgroundIsDark = palette.PaletteIsDark;
+                albumMainColor = Windows.UI.Color.FromArgb(255, (byte)themeColor.Color.X, (byte)themeColor.Color.Y, (byte)themeColor.Color.Z);
                 albumColorVectors = palette.Palette.Select(t => t / 255).ToList();
+                paletteIsDark = palette.PaletteIsDark;
             }
+            lastSongForBrush = HyPlayList.NowPlayingItem.PlayItem;
             if (Common.Setting.expandedPlayerBackgroundType is 1)
             {
                 PageContainer.Background =
-                    new SolidColorBrush(albumMainColor.Value);
+                    new SolidColorBrush(albumMainColor!.Value);
             }
 
             if (Common.Setting.expandedPlayerBackgroundType is not 6 or 7)
@@ -1017,7 +1023,7 @@ public sealed partial class ExpandedPlayer : Page, IDisposable
             }
             else
             {
-                return luminousBackgroundIsDark;
+                return paletteIsDark;
             }
         }
         catch
@@ -1648,7 +1654,7 @@ public sealed partial class ExpandedPlayer : Page, IDisposable
     {
         if (_shaderEffect == null)
         {
-            if(Common.PixelShaderShareEffect == null)
+            if (Common.PixelShaderShareEffect == null)
             {
                 StorageFile file = await StorageFile.GetFileFromApplicationUriAsync(new Uri("ms-appx:///Shaders/BackgroundShader.bin"));
                 IBuffer buffer = await FileIO.ReadBufferAsync(file);

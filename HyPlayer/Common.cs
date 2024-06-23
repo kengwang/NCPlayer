@@ -66,7 +66,7 @@ namespace HyPlayer
         public static CloudMusicApi? ncapi;
         public static PixelShaderEffect? PixelShaderShareEffect;
 #nullable restore
-        public static KMeansPaletteGenerator PaletteGenerator= new();
+        public static KMeansPaletteGenerator PaletteGenerator = new();
         public static Setting Setting = new();
         public static bool ShowLyricSound = true;
         public static bool ShowLyricTrans = true;

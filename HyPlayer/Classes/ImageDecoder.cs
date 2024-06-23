@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Numerics;
-using System.Text;
 using System.Threading.Tasks;
 using Windows.Graphics.Imaging;
 
@@ -10,7 +8,7 @@ namespace HyPlayer.Classes
 {
     public static class ImageDecoder
     {
-        public static async Task<Dictionary<Vector3,int>> GetPixelColor(BitmapDecoder bitmapDecoder)
+        public static async Task<Dictionary<Vector3, int>> GetPixelColor(BitmapDecoder bitmapDecoder)
         {
             var pixelDataProvider = await bitmapDecoder.GetPixelDataAsync();
             var pixels = pixelDataProvider.DetachPixelData();

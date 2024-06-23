@@ -20,6 +20,8 @@ namespace HyPlayer.Classes
                 var b = pixels[offset];
                 var g = pixels[offset + 1];
                 var r = pixels[offset + 2];
+                var a = pixels[offset + 3];
+                if (a == 0) continue;
                 var color = new Vector3(r, g, b);
                 if (vector.ContainsKey(color))
                 {

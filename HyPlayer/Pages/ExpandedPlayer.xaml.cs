@@ -1465,14 +1465,16 @@ public sealed partial class ExpandedPlayer : Page, IDisposable
             {
                 ImageAlbumAni?.Stop();
             }
-            LuminousBackground?.RemoveFromVisualTree();
-            LuminousBackground = null;
-            var shaderEffect = _shaderEffect;
             _shaderEffect = null;
-            shaderEffect?.Dispose();
 
             disposedValue = true;
         }
+    }
+
+    private void LuminousBackground_OnUnloaded(object sender, RoutedEventArgs e)
+    {
+        LuminousBackground?.RemoveFromVisualTree();
+        LuminousBackground = null;
     }
 
     ~ExpandedPlayer()
@@ -1637,8 +1639,8 @@ public sealed partial class ExpandedPlayer : Page, IDisposable
     {
         if (_shaderEffect != null)
         {
-            _shaderEffect.Properties["Width"] = Convert.ToSingle(LuminousBackground.ActualWidth);
-            _shaderEffect.Properties["Height"] = Convert.ToSingle(LuminousBackground.ActualHeight);
+            _shaderEffect.Properties["Width"] = (float)LuminousBackground.ConvertDipsToPixels((float)LuminousBackground.ActualWidth, Microsoft.Graphics.Canvas.CanvasDpiRounding.Round);
+            _shaderEffect.Properties["Height"] = (float)LuminousBackground.ConvertDipsToPixels((float)LuminousBackground.ActualHeight, Microsoft.Graphics.Canvas.CanvasDpiRounding.Round);
         }
     }
 
@@ -1646,11 +1648,14 @@ public sealed partial class ExpandedPlayer : Page, IDisposable
     {
         if (_shaderEffect == null)
         {
-            StorageFile file = await StorageFile.GetFileFromApplicationUriAsync(new Uri("ms-appx:///Shaders/BackgroundShader.bin"));
-            IBuffer buffer = await FileIO.ReadBufferAsync(file);
-            var bytes = buffer.ToArray();
-            var effect = new PixelShaderEffect(bytes);
-            _shaderEffect = effect;
+            if(Common.PixelShaderShareEffect == null)
+            {
+                StorageFile file = await StorageFile.GetFileFromApplicationUriAsync(new Uri("ms-appx:///Shaders/BackgroundShader.bin"));
+                IBuffer buffer = await FileIO.ReadBufferAsync(file);
+                var bytes = buffer.ToArray();
+                Common.PixelShaderShareEffect = new PixelShaderEffect(bytes);
+            }
+            _shaderEffect = Common.PixelShaderShareEffect;
             _randomValue = new Random().Next(100);
             if (albumColorVectors.Count != 0)
             {
@@ -1660,12 +1665,13 @@ public sealed partial class ExpandedPlayer : Page, IDisposable
                 _shaderEffect.Properties["color4"] = albumColorVectors[3];
             }
         }
-        _shaderEffect.Properties["Width"] = Convert.ToSingle(LuminousBackground.ActualWidth);
-        _shaderEffect.Properties["Height"] = Convert.ToSingle(LuminousBackground.ActualHeight);
+        LuminousBackground.DpiScale = Common.Setting.IsolationScale;
+        _shaderEffect.Properties["Width"] = (float)LuminousBackground.ConvertDipsToPixels((float)LuminousBackground.ActualWidth, Microsoft.Graphics.Canvas.CanvasDpiRounding.Round);
+        _shaderEffect.Properties["Height"] = (float)LuminousBackground.ConvertDipsToPixels((float)LuminousBackground.ActualHeight, Microsoft.Graphics.Canvas.CanvasDpiRounding.Round);
         if (!Common.Setting.IsolationFullThrottle)
         {
             LuminousBackground.IsFixedTimeStep = true;
-            LuminousBackground.TargetElapsedTime = TimeSpan.FromMilliseconds(66.4);
+            LuminousBackground.TargetElapsedTime = TimeSpan.FromMilliseconds(16.6 * (60d / Common.Setting.IsolationFPS));
         }
     }
 

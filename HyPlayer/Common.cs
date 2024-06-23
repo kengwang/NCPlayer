@@ -7,6 +7,7 @@ using HyPlayer.HyPlayControl;
 using HyPlayer.Pages;
 using Impressionist.Shared.Implementations;
 using Kawazu;
+using Microsoft.Graphics.Canvas.Effects;
 using Microsoft.Toolkit.Uwp.UI;
 using Microsoft.UI.Xaml.Controls;
 using NeteaseCloudMusicApi;
@@ -63,6 +64,7 @@ namespace HyPlayer
         public static HttpBaseProtocolFilter? HttpBaseProtocolFilter;
         public static HttpClient? HttpClient;
         public static CloudMusicApi? ncapi;
+        public static PixelShaderEffect? PixelShaderShareEffect;
 #nullable restore
         public static KMeansPaletteGenerator PaletteGenerator= new();
         public static Setting Setting = new();
@@ -1718,6 +1720,24 @@ namespace HyPlayer
             set
             {
                 ApplicationData.Current.LocalSettings.Values[nameof(IsolationFullThrottle)] = value;
+                OnPropertyChanged();
+            }
+        }
+        public double IsolationFPS
+        {
+            get => GetSettings(nameof(IsolationFPS), 24d);
+            set
+            {
+                ApplicationData.Current.LocalSettings.Values[nameof(IsolationFPS)] = value;
+                OnPropertyChanged();
+            }
+        }
+        public float IsolationScale
+        {
+            get => GetSettings(nameof(IsolationScale), 1f);
+            set
+            {
+                ApplicationData.Current.LocalSettings.Values[nameof(IsolationScale)] = value;
                 OnPropertyChanged();
             }
         }

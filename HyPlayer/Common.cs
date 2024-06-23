@@ -1,11 +1,11 @@
 ﻿#region
 
 #nullable enable
-using ColorThiefDotNet;
 using HyPlayer.Classes;
 using HyPlayer.Controls;
 using HyPlayer.HyPlayControl;
 using HyPlayer.Pages;
+using Impressionist.Shared.Implementations;
 using Kawazu;
 using Microsoft.Toolkit.Uwp.UI;
 using Microsoft.UI.Xaml.Controls;
@@ -64,7 +64,7 @@ namespace HyPlayer
         public static HttpClient? HttpClient;
         public static CloudMusicApi? ncapi;
 #nullable restore
-        public static ColorThief ColorThief = new();
+        public static KMeansPaletteGenerator PaletteGenerator= new();
         public static Setting Setting = new();
         public static bool ShowLyricSound = true;
         public static bool ShowLyricTrans = true;

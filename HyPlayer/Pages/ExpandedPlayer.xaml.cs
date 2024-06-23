@@ -7,6 +7,7 @@ using HyPlayer.Classes;
 using HyPlayer.Controls;
 using HyPlayer.HyPlayControl;
 using HyPlayer.LyricRenderer.RollingCalculators;
+using Impressionist.Abstractions;
 using LyricParser.Abstraction;
 using Microsoft.Graphics.Canvas.Effects;
 using Microsoft.Toolkit.Uwp.UI.Animations;
@@ -990,37 +991,19 @@ public sealed partial class ExpandedPlayer : Page, IDisposable
             await stream.ReadAsync(buffer, MIMEHelper.PICTURE_FILE_HEADER_CAPACITY, InputStreamOptions.None);
             var mime = MIMEHelper.GetPictureCodecFromBuffer(buffer);
             BitmapDecoder decoder = await BitmapDecoder.CreateAsync(mime, stream);
-            var color = await Common.ColorThief.GetColor(decoder, ignoreWhite: false);
-
-            //var c = GetPixel(bytes, 0, 0, decoder.PixelWidth, decoder.PixelHeight);
+            var colors = await ImageDecoder.GetPixelColor(decoder);
+            ThemeColorResult themeColor;
+            themeColor = await Common.PaletteGenerator.CreateThemeColor(colors);
             lastSongForBrush = HyPlayList.NowPlayingItem.PlayItem;
-            albumMainColor = Windows.UI.Color.FromArgb(color.Color.A, color.Color.R, color.Color.G, color.Color.B);
+            albumMainColor = Windows.UI.Color.FromArgb(255, (byte)themeColor.Color.X, (byte)themeColor.Color.Y, (byte)themeColor.Color.Z);
             bool luminousBackgroundIsDark = false;
             if (Common.Setting.expandedPlayerBackgroundType is 6 or 7)
             {
-                var palette = (await Common.ColorThief.GetPalette(decoder, 12, 10, false)).OrderByDescending(t => t.Population).ToList();
-                albumColors = palette.Select(quantizedColor => Windows.UI.Color.FromArgb(quantizedColor.Color.A, quantizedColor.Color.R, quantizedColor.Color.G, quantizedColor.Color.B))
+                var palette = (await Common.PaletteGenerator.CreatePalette(colors, Common.Setting.expandedPlayerBackgroundType is 6 ? 9 : 4));
+                albumColors = palette.Palette.Select(quantizedColor => Windows.UI.Color.FromArgb(255, (byte)quantizedColor.X, (byte)quantizedColor.Y, (byte)quantizedColor.Z))
                     .ToList();
-                luminousBackgroundIsDark = palette.Select(t => t.IsDark).Count() >= palette.Count / 2;
-                if (Common.Setting.expandedPlayerBackgroundType is 7)
-                {
-                    albumColorVectors = new List<Vector3>
-                    {
-                        new Vector3(palette[1].Color.R / 255f, palette[1].Color.G / 255f, palette[1].Color.B / 255f),
-                        new Vector3(color.Color.R / 255f, color.Color.G / 255f, color.Color.B / 255f),
-                        new Vector3(palette[2].Color.R / 255f, palette[2].Color.G / 255f, palette[2].Color.B / 255f),
-                        new Vector3(palette[3].Color.R / 255f, palette[3].Color.G / 255f, palette[3].Color.B / 255f),
-                    };
-                    int sum = 0;
-                    for (var i = 0; i < 4; i++)
-                    {
-                        if (palette[i].IsDark)
-                        {
-                            sum++;
-                        }
-                    }
-                    luminousBackgroundIsDark = sum >= 2;
-                }
+                luminousBackgroundIsDark = palette.PaletteIsDark;
+                albumColorVectors = palette.Palette.Select(t => t / 255).ToList();
             }
             if (Common.Setting.expandedPlayerBackgroundType is 1)
             {
@@ -1030,7 +1013,7 @@ public sealed partial class ExpandedPlayer : Page, IDisposable
 
             if (Common.Setting.expandedPlayerBackgroundType is not 6 or 7)
             {
-                return !color.IsDark;
+                return !themeColor.ColorIsDark;
             }
             else
             {

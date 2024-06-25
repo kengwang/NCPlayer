@@ -553,5 +553,9 @@ namespace HyPlayer.LyricRenderer
                 Context.ScrollingDelta = 0;
             }
         }
+        public void PauseLyricRender(bool targetPauseMode)
+        {
+            LyricView.Paused = targetPauseMode;
+        }
     }
 }

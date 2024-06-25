@@ -5,7 +5,7 @@ using HyPlayer.Classes;
 using HyPlayer.Controls;
 using HyPlayer.HyPlayControl;
 using HyPlayer.Pages;
-using Impressionist.Shared.Implementations;
+using Impressionist.Implementations;
 using Kawazu;
 using Microsoft.Graphics.Canvas.Effects;
 using Microsoft.Toolkit.Uwp.UI;
@@ -1738,6 +1738,15 @@ namespace HyPlayer
             set
             {
                 ApplicationData.Current.LocalSettings.Values[nameof(IsolationScale)] = value;
+                OnPropertyChanged();
+            }
+        }
+        public bool ImpressionistLABSpace
+        {
+            get => GetSettings(nameof(ImpressionistLABSpace), true);
+            set
+            {
+                ApplicationData.Current.LocalSettings.Values[nameof(ImpressionistLABSpace)] = value;
                 OnPropertyChanged();
             }
         }

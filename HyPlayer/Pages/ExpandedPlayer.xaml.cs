@@ -187,6 +187,10 @@ public sealed partial class ExpandedPlayer : Page, IDisposable
                     luminousColorsRotateStoryBoard.Resume();
                 }
             }
+            if (LuminousBackground != null)
+            {
+                LuminousBackground.Paused = false;
+            }
         });
     }
 
@@ -209,6 +213,10 @@ public sealed partial class ExpandedPlayer : Page, IDisposable
             if (luminousColorsRotateStoryBoard.Children.Count > 0)
             {
                 luminousColorsRotateStoryBoard.Pause();
+            }
+            if(LuminousBackground != null)
+            {
+                LuminousBackground.Paused = true;
             }
         });
     }
@@ -271,6 +279,7 @@ public sealed partial class ExpandedPlayer : Page, IDisposable
                 BtnToggleAlbum.IsChecked = true;
                 BtnToggleLyric.IsChecked = true;
                 RightPanel.Visibility = Visibility.Visible;
+                LyricBox.PauseLyricRender(false);
                 UIAugmentationSys.Visibility = Visibility.Visible;
                 LyricBox.Margin = new Thickness(0);
                 UIAugmentationSys.SetValue(Grid.ColumnProperty, 0);
@@ -283,6 +292,7 @@ public sealed partial class ExpandedPlayer : Page, IDisposable
                 BtnToggleLyric.IsChecked = false;
                 UIAugmentationSys.Visibility = Visibility.Visible;
                 RightPanel.Visibility = Visibility.Collapsed;
+                LyricBox.PauseLyricRender(true);
                 UIAugmentationSys.SetValue(Grid.ColumnProperty, 0);
                 UIAugmentationSys.SetValue(Grid.ColumnSpanProperty, 2);
                 UIAugmentationSys.VerticalAlignment = VerticalAlignment.Stretch;
@@ -292,6 +302,7 @@ public sealed partial class ExpandedPlayer : Page, IDisposable
                 BtnToggleAlbum.IsChecked = false;
                 BtnToggleLyric.IsChecked = true;
                 RightPanel.Visibility = Visibility.Visible;
+                LyricBox.PauseLyricRender(false);
                 UIAugmentationSys.Visibility = Visibility.Collapsed;
                 RightPanel.SetValue(Grid.ColumnProperty, 0);
                 RightPanel.SetValue(Grid.ColumnSpanProperty, 2);
@@ -919,18 +930,21 @@ public sealed partial class ExpandedPlayer : Page, IDisposable
         picker.FileTypeFilter.Add(".yrc");
         picker.FileTypeFilter.Add(".alrc");
         var sf = await picker.PickSingleFileAsync();
-        var qrc = await FileIO.ReadTextAsync(sf);
-        ILyricConverter<string> converter = sf.FileType switch
+        if (sf != null)
         {
-            ".qrc" => new QQLyricConverter(),
-            ".yrc" => new NeteaseYrcConverter(),
-            ".lrc" => new ALRC.Converters.LrcConverter(),
-            ".alrc" => new ALRCConverter(),
-            ".ttml" => new AppleSyllableConverter(),
-            _ => new LyricifySyllableConverter()
-        };
-        var lrcs = LyricRenderer.Converters.LrcConverter.Convert(converter.Convert(qrc));
-        LyricBox.SetLyricLines(lrcs);
+            var qrc = await FileIO.ReadTextAsync(sf);
+            ILyricConverter<string> converter = sf.FileType switch
+            {
+                ".qrc" => new QQLyricConverter(),
+                ".yrc" => new NeteaseYrcConverter(),
+                ".lrc" => new ALRC.Converters.LrcConverter(),
+                ".alrc" => new ALRCConverter(),
+                ".ttml" => new AppleSyllableConverter(),
+                _ => new LyricifySyllableConverter()
+            };
+            var lrcs = LrcConverter.Convert(converter.Convert(qrc));
+            LyricBox.SetLyricLines(lrcs);
+        }
     }
 
     private void ImageAlbum_Tapped(object sender, TappedRoutedEventArgs e)
@@ -997,12 +1011,12 @@ public sealed partial class ExpandedPlayer : Page, IDisposable
             var paletteIsDark = false;
             if (Common.Setting.expandedPlayerBackgroundType != 6 && Common.Setting.expandedPlayerBackgroundType != 7)
             {
-                themeColor = await Common.PaletteGenerator.CreateThemeColor(colors);
+                themeColor = await Common.PaletteGenerator.CreateThemeColor(colors, toLab: Common.Setting.ImpressionistLABSpace);
                 albumMainColor = Windows.UI.Color.FromArgb(255, (byte)themeColor.Color.X, (byte)themeColor.Color.Y, (byte)themeColor.Color.Z);
             }
             else
             {
-                palette = await Common.PaletteGenerator.CreatePalette(colors, Common.Setting.expandedPlayerBackgroundType is 6 ? 9 : 4);
+                palette = await Common.PaletteGenerator.CreatePalette(colors, Common.Setting.expandedPlayerBackgroundType is 6 ? 9 : 4, toLab: Common.Setting.ImpressionistLABSpace);
                 themeColor = palette.ThemeColor;
                 albumColors = palette.Palette.Select(quantizedColor => Windows.UI.Color.FromArgb(255, (byte)quantizedColor.X, (byte)quantizedColor.Y, (byte)quantizedColor.Z))
                     .ToList();
@@ -1424,7 +1438,6 @@ public sealed partial class ExpandedPlayer : Page, IDisposable
                     {
                         if (_shaderEffect != null)
                         {
-                            _randomValue = _randomValue = new Random().Next(100);
                             _shaderEffect.Properties["color1"] = albumColorVectors[0];
                             _shaderEffect.Properties["color2"] = albumColorVectors[1];
                             _shaderEffect.Properties["color3"] = albumColorVectors[2];
@@ -1683,7 +1696,7 @@ public sealed partial class ExpandedPlayer : Page, IDisposable
 
     private void LuminousBackground_Update(Microsoft.Graphics.Canvas.UI.Xaml.ICanvasAnimatedControl sender, Microsoft.Graphics.Canvas.UI.Xaml.CanvasAnimatedUpdateEventArgs args)
     {
-        var progress = Convert.ToSingle(HyPlayList.Player.PlaybackSession.Position.TotalSeconds) + _randomValue;
+        var progress = (float)args.Timing.TotalTime.TotalSeconds + _randomValue;
         if (_shaderEffect != null)
         {
             _shaderEffect.Properties["iTime"] = progress;

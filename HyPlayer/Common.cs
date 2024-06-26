@@ -1750,6 +1750,15 @@ namespace HyPlayer
                 OnPropertyChanged();
             }
         }
+        public bool ImpressionistIgnoreWhite
+        {
+            get => GetSettings(nameof(ImpressionistIgnoreWhite), true);
+            set
+            {
+                ApplicationData.Current.LocalSettings.Values[nameof(ImpressionistIgnoreWhite)] = value;
+                OnPropertyChanged();
+            }
+        }
 
         public bool LastFMLogined => LastFMManager.LastfmLogined;
         public bool SaveCookies()

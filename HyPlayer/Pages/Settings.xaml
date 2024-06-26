@@ -758,6 +758,12 @@
                                                 HorizontalAlignment="Right"
                                                 IsOn="{x:Bind hyplayer:Common.Setting.ImpressionistLABSpace, Mode=TwoWay}" />
                                     </controls3:SettingsCard>
+                                    <controls3:SettingsCard Header="Impressionist (背景取色) 忽略白色">
+                                        <ToggleSwitch
+                                                MinWidth="10"
+                                                HorizontalAlignment="Right"
+                                                IsOn="{x:Bind hyplayer:Common.Setting.ImpressionistIgnoreWhite, Mode=TwoWay}" />
+                                    </controls3:SettingsCard>
                                     <controls3:SettingsCard Description="仅在背景设置为Isolation时生效" Header="Isolation目标帧率">
                                         <controls:NumberBox
                                                 Width="64"

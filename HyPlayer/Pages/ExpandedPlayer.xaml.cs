@@ -1011,12 +1011,12 @@ public sealed partial class ExpandedPlayer : Page, IDisposable
             var paletteIsDark = false;
             if (Common.Setting.expandedPlayerBackgroundType != 6 && Common.Setting.expandedPlayerBackgroundType != 7)
             {
-                themeColor = await Common.PaletteGenerator.CreateThemeColor(colors, toLab: Common.Setting.ImpressionistLABSpace);
+                themeColor = await Common.PaletteGenerator.CreateThemeColor(colors, Common.Setting.ImpressionistIgnoreWhite,Common.Setting.ImpressionistLABSpace);
                 albumMainColor = Windows.UI.Color.FromArgb(255, (byte)themeColor.Color.X, (byte)themeColor.Color.Y, (byte)themeColor.Color.Z);
             }
             else
             {
-                palette = await Common.PaletteGenerator.CreatePalette(colors, Common.Setting.expandedPlayerBackgroundType is 6 ? 9 : 4, toLab: Common.Setting.ImpressionistLABSpace);
+                palette = await Common.PaletteGenerator.CreatePalette(colors, Common.Setting.expandedPlayerBackgroundType is 6 ? 9 : 4, Common.Setting.ImpressionistIgnoreWhite, Common.Setting.ImpressionistLABSpace);
                 themeColor = palette.ThemeColor;
                 albumColors = palette.Palette.Select(quantizedColor => Windows.UI.Color.FromArgb(255, (byte)quantizedColor.X, (byte)quantizedColor.Y, (byte)quantizedColor.Z))
                     .ToList();

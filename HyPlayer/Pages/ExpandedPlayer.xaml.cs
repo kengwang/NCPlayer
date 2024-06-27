@@ -1707,6 +1707,7 @@ public sealed partial class ExpandedPlayer : Page, IDisposable
                 _shaderEffect.Properties["color4"] = albumColorVectors[3];
             }
         }
+        LuminousBackground.DpiScale = Common.Setting.IsolationScale;
         _shaderEffect.Properties["Width"] = (float)LuminousBackground.ConvertDipsToPixels((float)LuminousBackground.ActualWidth, Microsoft.Graphics.Canvas.CanvasDpiRounding.Round);
         _shaderEffect.Properties["Height"] = (float)LuminousBackground.ConvertDipsToPixels((float)LuminousBackground.ActualHeight, Microsoft.Graphics.Canvas.CanvasDpiRounding.Round);
         if (!Common.Setting.IsolationFullThrottle)

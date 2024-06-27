@@ -1732,6 +1732,15 @@ namespace HyPlayer
                 OnPropertyChanged();
             }
         }
+        public float IsolationScale
+        {
+            get => GetSettings(nameof(IsolationScale), 1f);
+            set
+            {
+                ApplicationData.Current.LocalSettings.Values[nameof(IsolationScale)] = value;
+                OnPropertyChanged();
+            }
+        }
 
         public bool LastFMLogined => LastFMManager.LastfmLogined;
         public bool SaveCookies()

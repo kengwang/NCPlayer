@@ -168,6 +168,15 @@ public sealed partial class ExpandedPlayer : Page, IDisposable
         set => SetValue(NowPlaybackSpeedProperty, value);
     }
 
+    public void SingleViewModeToggle()
+    {
+        if (WindowMode == ExpandedWindowMode.Both) return;
+        else
+        {
+            WindowMode = WindowMode == ExpandedWindowMode.LyricOnly ? ExpandedWindowMode.CoverOnly : ExpandedWindowMode.LyricOnly;
+            ChangeWindowMode();
+        }
+    }
     private void HyPlayList_OnPlay()
     {
         _ = Common.Invoke(() =>

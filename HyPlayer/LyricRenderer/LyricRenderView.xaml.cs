@@ -1,12 +1,15 @@
 ﻿using HyPlayer.LyricRenderer.Abstraction;
 using HyPlayer.LyricRenderer.Abstraction.Render;
 using HyPlayer.LyricRenderer.Animator.EaseFunctions;
+using HyPlayer.Pages;
 using Microsoft.Graphics.Canvas;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Timers;
 using Windows.UI;
+using Windows.UI.ViewManagement;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Input;
@@ -35,6 +38,7 @@ namespace HyPlayer.LyricRenderer
         private readonly CustomCircleEase _circleEase = new() { EasingMode = EasingMode.EaseOut };
 
         private bool _pointerPressed;
+        private bool _doubleTapped;
         private double? _lastPointerPressedYValue;
 
         public bool EnableTranslation
@@ -513,44 +517,35 @@ namespace HyPlayer.LyricRenderer
 
         private void LyricView_DoubleTapped(object sender, DoubleTappedRoutedEventArgs e)
         {
-            if (e.PointerDeviceType != Windows.Devices.Input.PointerDeviceType.Mouse)
+            _doubleTapped = true;
+
+            foreach (var renderOffsetsKey in Context.RenderOffsets.Keys)
             {
-                foreach (var renderOffsetsKey in Context.RenderOffsets.Keys)
+                if (Context.LyricLines[renderOffsetsKey].Hidden)
+                    continue;
+                if (Context.RenderOffsets[renderOffsetsKey].Y <= e.GetPosition(this).Y &&
+                    Context.RenderOffsets[renderOffsetsKey].Y + Context.LyricLines[renderOffsetsKey].RenderingHeight >=
+                    e.GetPosition(this).Y)
                 {
-                    if (Context.LyricLines[renderOffsetsKey].Hidden)
-                        continue;
-                    if (Context.RenderOffsets[renderOffsetsKey].Y <= e.GetPosition(this).Y &&
-                        Context.RenderOffsets[renderOffsetsKey].Y + Context.LyricLines[renderOffsetsKey].RenderingHeight >=
-                        e.GetPosition(this).Y)
-                    {
-                        Context.LyricLines[renderOffsetsKey].GoToReactionState(ReactionState.Press, Context);
-                        OnRequestSeek?.Invoke(Context.LyricLines[renderOffsetsKey].StartTime);
-                        break;
-                    }
+                    Context.LyricLines[renderOffsetsKey].GoToReactionState(ReactionState.Press, Context);
+                    OnRequestSeek?.Invoke(Context.LyricLines[renderOffsetsKey].StartTime);
+                    break;
                 }
-                Context.ScrollingDelta = 0;
             }
+            Context.ScrollingDelta = 0;
+
             _pointerPressed = true;
+
         }
 
-        private void LyricView_Tapped(object sender, TappedRoutedEventArgs e)
+        private async void LyricView_Tapped(object sender, TappedRoutedEventArgs e)
         {
-            if (e.PointerDeviceType == Windows.Devices.Input.PointerDeviceType.Mouse)
+            _doubleTapped = false;
+            UISettings _uiSettings = new UISettings();
+            await Task.Delay((int)(_uiSettings.DoubleClickTime + 55));
+            if (!_doubleTapped)
             {
-                foreach (var renderOffsetsKey in Context.RenderOffsets.Keys)
-                {
-                    if (Context.LyricLines[renderOffsetsKey].Hidden)
-                        continue;
-                    if (Context.RenderOffsets[renderOffsetsKey].Y <= e.GetPosition(this).Y &&
-                        Context.RenderOffsets[renderOffsetsKey].Y + Context.LyricLines[renderOffsetsKey].RenderingHeight >=
-                        e.GetPosition(this).Y)
-                    {
-                        Context.LyricLines[renderOffsetsKey].GoToReactionState(ReactionState.Press, Context);
-                        OnRequestSeek?.Invoke(Context.LyricLines[renderOffsetsKey].StartTime);
-                        break;
-                    }
-                }
-                Context.ScrollingDelta = 0;
+                Common.PageExpandedPlayer.SingleViewModeToggle();
             }
         }
     }

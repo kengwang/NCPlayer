@@ -374,8 +374,6 @@
                         Grid.Row="2"
                         MaxWidth="600"
                         Orientation="Horizontal"
-                        Tapped="SongInfo_Tapped"
-                        VerticalAlignment="Center"
                         Spacing="5">
                         <controls:ImageEx
                             x:Name="ImageAlbumImerssive"

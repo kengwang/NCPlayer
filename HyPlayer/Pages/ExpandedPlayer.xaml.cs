@@ -140,6 +140,7 @@ public sealed partial class ExpandedPlayer : Page, IDisposable
 
     private void LyricBoxOnOnRequestSeek(long time)
     {
+        jumpedLyrics = true;
         HyPlayList.Player.PlaybackSession.Position = TimeSpan.FromMilliseconds(time);
     }
 
@@ -947,20 +948,11 @@ public sealed partial class ExpandedPlayer : Page, IDisposable
         }
     }
 
-    private void ImageAlbum_Tapped(object sender, TappedRoutedEventArgs e)
-    {
-        if (WindowMode == ExpandedWindowMode.CoverOnly)
-        {
-            WindowMode = ExpandedWindowMode.LyricOnly;
-            ChangeWindowMode();
-        }
-    }
-
     private async void LyricBox_Tapped(object sender, TappedRoutedEventArgs e)
     {
         if (WindowMode == ExpandedWindowMode.LyricOnly)
         {
-            await Task.Delay(1000);
+            await Task.Delay(750);
             if (!jumpedLyrics)
             {
                 WindowMode = ExpandedWindowMode.CoverOnly;
@@ -1711,6 +1703,16 @@ public sealed partial class ExpandedPlayer : Page, IDisposable
             {
                 session.DrawImage(_shaderEffect);
             }
+        }
+    }
+
+    private void LeftPanel_Tapped(object sender, TappedRoutedEventArgs e)
+    {
+        if (WindowMode == ExpandedWindowMode.Both) return;
+        else
+        {
+            WindowMode = WindowMode == ExpandedWindowMode.LyricOnly ? ExpandedWindowMode.CoverOnly : ExpandedWindowMode.LyricOnly;
+            ChangeWindowMode();
         }
     }
 }

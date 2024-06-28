@@ -303,7 +303,8 @@
                 <Grid
                     x:Name="LeftPanel"
                     MaxWidth="600"
-                    HorizontalAlignment="Stretch">
+                    HorizontalAlignment="Stretch"
+                    Tapped="LeftPanel_Tapped">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="*" />
                         <RowDefinition Height="Auto" />
@@ -330,8 +331,7 @@
                         ManipulationMode="Rotate,TranslateX,TranslateY"
                         PlaceholderStretch="Uniform"
                         RightTapped="{x:Bind hyplayer:Common.UIElement_RightTapped}"
-                        Stretch="Uniform"
-                        Tapped="ImageAlbum_Tapped">
+                        Stretch="Uniform" >
                         <ani:Explicit.Animations>
                             <ani:AnimationSet x:Name="RotateAnimationSet">
                                 <ani:RotationInDegreesAnimation
@@ -459,7 +459,9 @@
                     <RowDefinition x:Name="DefaultRow" Height="25*" />
                     <RowDefinition x:Name="ImmersiveRow" Height="1*" />
                 </Grid.RowDefinitions>
-                <lyricrenderer:LyricRenderView x:Name="LyricBox" RightTapped="LyricBoxContainer_RightTapped" />
+                <lyricrenderer:LyricRenderView x:Name="LyricBox" 
+                                               RightTapped="LyricBoxContainer_RightTapped"
+                                               Tapped="LyricBox_Tapped"/>
             </Grid>
             <Button
                 x:Name="MoreBtn"

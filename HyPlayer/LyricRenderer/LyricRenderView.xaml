@@ -21,6 +21,5 @@
         PointerPressed="LyricView_OnPointerPressed"
         PointerReleased="LyricView_PointerReleased"
         PointerWheelChanged="LyricView_OnPointerWheelChanged"
-        SizeChanged="LyricView_OnSizeChanged"
-        Tapped="LyricView_Tapped" />
+        SizeChanged="LyricView_OnSizeChanged" />
 </UserControl>

@@ -472,7 +472,7 @@
                     <RowDefinition x:Name="DefaultRow" Height="25*" />
                     <RowDefinition x:Name="ImmersiveRow" Height="1*" />
                 </Grid.RowDefinitions>
-                <lyricrenderer:LyricRenderView x:Name="LyricBox" RightTapped="LyricBoxContainer_RightTapped" />
+                <lyricrenderer:LyricRenderView x:Name="LyricBox" RightTapped="LyricBoxContainer_RightTapped" Tapped="LyricBox_Tapped"/>
             </Grid>
             <Button
                 x:Name="MoreBtn"

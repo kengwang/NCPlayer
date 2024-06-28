@@ -979,15 +979,12 @@ public sealed partial class ExpandedPlayer : Page, IDisposable
     {
         if (WindowMode == ExpandedWindowMode.LyricOnly)
         {
-            await Task.Delay(1000);
-            if (!jumpedLyrics)
+            UISettings _uiSettings = new UISettings();
+            await Task.Delay((int)(_uiSettings.DoubleClickTime + 55));
+            if (!LyricBox.HasJumpedLyrics)
             {
                 WindowMode = ExpandedWindowMode.CoverOnly;
                 ChangeWindowMode();
-            }
-            else
-            {
-                jumpedLyrics = false;
             }
         }
     }
@@ -1755,6 +1752,7 @@ public sealed partial class ExpandedPlayer : Page, IDisposable
             Redesign();
         }
     }
+
 }
 
 internal enum ExpandedWindowMode

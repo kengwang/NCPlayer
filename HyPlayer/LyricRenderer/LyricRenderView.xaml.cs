@@ -38,7 +38,7 @@ namespace HyPlayer.LyricRenderer
         private readonly CustomCircleEase _circleEase = new() { EasingMode = EasingMode.EaseOut };
 
         private bool _pointerPressed;
-        private bool _doubleTapped;
+        private bool _jumpedLyrics = false;
         private double? _lastPointerPressedYValue;
 
         public bool EnableTranslation
@@ -61,6 +61,10 @@ namespace HyPlayer.LyricRenderer
                 _isTypographyChanged = true;
                 _needRecalculate = true;
             }
+        }
+        public bool HasJumpedLyrics
+        {
+            get => _jumpedLyrics;
         }
 
         public LyricRenderView()
@@ -517,8 +521,6 @@ namespace HyPlayer.LyricRenderer
 
         private void LyricView_DoubleTapped(object sender, DoubleTappedRoutedEventArgs e)
         {
-            _doubleTapped = true;
-
             foreach (var renderOffsetsKey in Context.RenderOffsets.Keys)
             {
                 if (Context.LyricLines[renderOffsetsKey].Hidden)
@@ -529,6 +531,7 @@ namespace HyPlayer.LyricRenderer
                 {
                     Context.LyricLines[renderOffsetsKey].GoToReactionState(ReactionState.Press, Context);
                     OnRequestSeek?.Invoke(Context.LyricLines[renderOffsetsKey].StartTime);
+                    _jumpedLyrics = true;
                     break;
                 }
             }
@@ -538,15 +541,9 @@ namespace HyPlayer.LyricRenderer
 
         }
 
-        private async void LyricView_Tapped(object sender, TappedRoutedEventArgs e)
+        private void LyricView_Tapped(object sender, TappedRoutedEventArgs e)
         {
-            _doubleTapped = false;
-            UISettings _uiSettings = new UISettings();
-            await Task.Delay((int)(_uiSettings.DoubleClickTime + 55));
-            if (!_doubleTapped)
-            {
-                Common.PageExpandedPlayer.SingleViewModeToggle();
-            }
+            _jumpedLyrics = false;
         }
     }
 }

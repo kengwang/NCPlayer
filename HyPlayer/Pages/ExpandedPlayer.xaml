@@ -224,7 +224,8 @@
                 CreateResources="LuminousBackground_CreateResources"
                 Draw="LuminousBackground_Draw"
                 SizeChanged="LuminousBackground_SizeChanged"
-                Update="LuminousBackground_Update"/>
+                Update="LuminousBackground_Update"
+                Paused="True"/>
         </Grid>
         <Grid
             x:Name="LuminousBackgroundContainer"

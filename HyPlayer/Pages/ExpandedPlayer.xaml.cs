@@ -1193,7 +1193,10 @@ public sealed partial class ExpandedPlayer : Page, IDisposable
         {
             luminousColorsRotateStoryBoard.Resume();
         }
-
+        if (HyPlayList.IsPlaying && LuminousBackground!= null)
+        {
+            LuminousBackground.Paused = false;
+        }
         LoadLyricsBox();
     }
 

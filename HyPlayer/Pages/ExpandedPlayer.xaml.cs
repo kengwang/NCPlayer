@@ -265,8 +265,19 @@ public sealed partial class ExpandedPlayer : Page, IDisposable
         }
         else if (lastheight != nowheight)
         {
+            if (nowheight < 700)
+            {
+                if (SongInfo.Visibility == ImageAlbum.Visibility)
+                    SongInfo.Visibility = Visibility.Collapsed;
+            }
+            else
+            {
+                ImageAlbum.Visibility = Visibility.Visible;
+                SongInfo.Visibility = Visibility.Visible;
+            }
             lastheight = nowheight;
             needRedesign += 2;
+            Redesign();
         }
     }
 
@@ -373,8 +384,16 @@ public sealed partial class ExpandedPlayer : Page, IDisposable
         float sizex = 1;
         if (WindowMode != ExpandedWindowMode.LyricOnly)
         {
-            if (SongInfo.ActualOffset.Y + SongInfo.ActualHeight > MainGrid.ActualHeight)
-                sizey = (float)(MainGrid.ActualHeight / (SongInfo.ActualOffset.Y + SongInfo.ActualHeight));
+            if(SongInfo.Visibility==Visibility.Visible)
+            {
+                if (SongInfo.ActualOffset.Y + SongInfo.ActualHeight > MainGrid.ActualHeight)
+                    sizey = (float)(MainGrid.ActualHeight / (SongInfo.ActualOffset.Y + SongInfo.ActualHeight));
+            }
+            else
+            {
+                if (ImageAlbum.ActualOffset.Y + ImageAlbum.ActualHeight > MainGrid.ActualHeight)
+                    sizey = (float)(MainGrid.ActualHeight / (ImageAlbum.ActualOffset.Y + ImageAlbum.ActualHeight));
+            }
 
             if (ImageAlbum.ActualOffset.X + ImageAlbum.ActualWidth > LeftPanel.ActualWidth)
                 sizex = (float)(LeftPanel.ActualWidth / (ImageAlbum.ActualOffset.X + ImageAlbum.ActualWidth));
@@ -953,6 +972,12 @@ public sealed partial class ExpandedPlayer : Page, IDisposable
         {
             WindowMode = ExpandedWindowMode.LyricOnly;
             ChangeWindowMode();
+        }
+        else if (SongInfo.Visibility == Visibility.Collapsed)
+        {
+            ImageAlbum.Visibility = Visibility.Collapsed;
+            SongInfo.Visibility = Visibility.Visible;
+            Redesign();
         }
     }
 
@@ -1711,6 +1736,16 @@ public sealed partial class ExpandedPlayer : Page, IDisposable
             {
                 session.DrawImage(_shaderEffect);
             }
+        }
+    }
+
+    private void SongInfo_Tapped(object sender, TappedRoutedEventArgs e)
+    {
+        if (ImageAlbum.Visibility == Visibility.Collapsed)
+        {
+            ImageAlbum.Visibility = Visibility.Visible;
+            SongInfo.Visibility = Visibility.Collapsed;
+            Redesign();
         }
     }
 }

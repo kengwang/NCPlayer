@@ -3,12 +3,21 @@
 using HyPlayer.Classes;
 using HyPlayer.HyPlayControl;
 using HyPlayer.Pages;
+using Microsoft.Graphics.Canvas.Effects;
 using System;
+using System.Numerics;
 using System.Threading.Tasks;
+using Windows.UI;
+using Windows.UI.Composition;
+using ColorStop = (float offset, Windows.UI.Color color);
 using Windows.UI.ViewManagement;
 using Windows.UI.Xaml;
+using Windows.UI.Xaml.Hosting;
 using Windows.UI.Xaml.Media.Animation;
 using Windows.UI.Xaml.Navigation;
+using Windows.UI.Xaml.Controls;
+using Windows.UI.Xaml.Shapes;
+using Windows.UI.Xaml.Media;
 
 #endregion
 
@@ -41,6 +50,8 @@ public sealed partial class MainPage
 
         NavigationCacheMode = NavigationCacheMode.Required;
         InitializeComponent();
+        UIElement PlayBarMarginRect = PlayBarMarginBackground as UIElement;
+        SetPlayBarMarginBlurEffect(PlayBarMarginRect);
         _ = HyPlayList.OnAudioRenderDeviceChangedOrInitialized();
         ActualThemeChanged += MainPage_ActualThemeChanged;
         Common.OnPlaybarVisibilityChanged += OnPlaybarVisibilityChanged;
@@ -210,5 +221,176 @@ public sealed partial class MainPage
     private void Page_PointerExited(object sender, Windows.UI.Xaml.Input.PointerRoutedEventArgs e)
     {
         Common.PointerIsInMainPage = false;
+    }
+
+    private void SetPlayBarMarginBlurEffect(UIElement sender)
+    {
+        var helper = new LinearGradientBlurVisualHelper(Window.Current.Compositor);
+        ElementCompositionPreview.SetElementChildVisual(sender, helper.RootVisual);
+    }
+
+    internal class LinearGradientBlurVisualHelper : IDisposable
+    {
+        private readonly Compositor compositor;
+        private bool disposeValue;
+
+        private Color tintColor;
+        private float maxBlurAmount = 64f;
+        private SpriteVisual[] visuals;
+        private ColorStop[][] colorStops;
+        private SpriteVisual rootVisual;
+        private SpriteVisual tintColorVisual;
+
+        public LinearGradientBlurVisualHelper(Compositor compositor)
+        {
+            this.compositor = compositor;
+
+            tintColor = Color.FromArgb(0, 0, 0, 0);
+
+            var dColor = Color.FromArgb(255, 0, 0, 0);
+            var hColor = Color.FromArgb(0, 0, 0, 0);
+
+            visuals = new SpriteVisual[8];
+            colorStops = new[]
+            {
+                new []{ (0f, dColor), (0.125f, hColor) },
+                new []{ (0f, dColor), (0.125f, dColor), (0.25f, hColor) },
+                new []{ (0f, hColor), (0.125f, dColor), (0.25f, dColor), (0.375f, hColor) },
+                new []{ (0.125f, dColor), (0.25f, hColor), (0.375f, dColor), (0.5f, hColor) },
+                new []{ (0.25f, dColor), (0.375f, hColor), (0.5f, dColor), (0.625f, hColor) },
+                new []{ (0.375f, dColor), (0.5f, hColor), (0.625f, dColor), (0.75f, hColor) },
+                new []{ (0.5f, dColor), (0.625f, hColor), (0.75f, dColor), (0.875f, hColor) },
+                new []{ (0.625f, dColor), (0.75f, hColor), (0.875f, dColor), (1, hColor) },
+            };
+
+            rootVisual = compositor.CreateSpriteVisual();
+            rootVisual.RelativeSizeAdjustment = Vector2.One;
+
+            for (int i = 0; i < visuals.Length; i++)
+            {
+                var blurAmount = maxBlurAmount;
+                for (int j = 0; j < i; j++)
+                {
+                    blurAmount /= 2;
+                }
+                rootVisual.Children.InsertAtTop(visuals[i] = CreateVisual(compositor, blurAmount, colorStops[i]));
+            }
+
+            rootVisual.Children.InsertAtTop(tintColorVisual = CreateTintColorVisual(compositor, tintColor));
+        }
+
+        public Visual RootVisual => rootVisual;
+
+        public Color TintColor
+        {
+            get => tintColor;
+            set
+            {
+
+                if (tintColor != value)
+                {
+                    tintColor = value;
+                    if (tintColorVisual.Brush is CompositionLinearGradientBrush brush
+                        && brush.ColorStops.Count == 2)
+                    {
+                        brush.ColorStops[0].Color = value;
+                        brush.ColorStops[1].Color = MakeTransparent(value);
+
+                    }
+                }
+            }
+        }
+
+        public float MaxBlurAmount
+        {
+            get => maxBlurAmount;
+            set
+            {
+
+                if (maxBlurAmount != value)
+                {
+                    for (int i = 0; i < visuals.Length; i++)
+                    {
+                        var blurAmount = maxBlurAmount;
+                        for (int j = 0; j < i; j++)
+                        {
+                            blurAmount /= 2;
+                        }
+                        visuals[i].Brush.Properties.InsertScalar("BlurEffect.BlurAmount", blurAmount);
+                    }
+                }
+            }
+        }
+
+        private static Color MakeTransparent(Color color) => Color.FromArgb(0, color.R, color.G, color.B);
+
+        private static SpriteVisual CreateTintColorVisual(Compositor compositor, Color tintColor)
+        {
+            var visual = compositor.CreateSpriteVisual();
+
+            var tintColorBrush = compositor.CreateLinearGradientBrush();
+            tintColorBrush.StartPoint = new Vector2(0, 1);
+            tintColorBrush.EndPoint = new Vector2(0, 0);
+            tintColorBrush.MappingMode = CompositionMappingMode.Relative;
+
+            var color1 = tintColor;
+            var color2 = MakeTransparent(color1);
+
+            tintColorBrush.ColorStops.Add(compositor.CreateColorGradientStop(0f, color1));
+            tintColorBrush.ColorStops.Add(compositor.CreateColorGradientStop(1f, color2));
+
+            visual.Brush = tintColorBrush;
+            visual.RelativeSizeAdjustment = Vector2.One;
+
+            return visual;
+        }
+
+        private static SpriteVisual CreateVisual(Compositor compositor, float blurAmount, params (float offset, Color color)[] stops)
+        {
+            var effect = new AlphaMaskEffect()
+            {
+                AlphaMask = new CompositionEffectSourceParameter("mask"),
+                Source = new GaussianBlurEffect()
+                {
+                    Name = "BlurEffect",
+                    BlurAmount = blurAmount,
+                    BorderMode = EffectBorderMode.Soft,
+                    Source = new CompositionEffectSourceParameter("source")
+                }
+            };
+
+            var brush = compositor.CreateEffectFactory(effect, new[] { "BlurEffect.BlurAmount" })
+                .CreateBrush();
+
+            var maskBrush = compositor.CreateLinearGradientBrush();
+
+            maskBrush.StartPoint = new System.Numerics.Vector2(0, 1);
+            maskBrush.EndPoint = new System.Numerics.Vector2(0, 0);
+            maskBrush.MappingMode = CompositionMappingMode.Relative;
+
+            for (int i = 0; i < stops.Length; i++)
+            {
+                maskBrush.ColorStops.Add(compositor.CreateColorGradientStop(stops[i].offset, stops[i].color));
+            }
+
+            brush.SetSourceParameter("source", compositor.CreateBackdropBrush());
+            brush.SetSourceParameter("mask", maskBrush);
+
+            var visual = compositor.CreateSpriteVisual();
+            visual.RelativeSizeAdjustment = Vector2.One;
+            visual.Brush = brush;
+            return visual;
+        }
+
+
+        public void Dispose()
+        {
+            if (!disposeValue)
+            {
+                disposeValue = true;
+
+                GC.SuppressFinalize(this);
+            }
+        }
     }
 }

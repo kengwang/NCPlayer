@@ -1,11 +1,11 @@
 ﻿#region
 
 #nullable enable
-using ColorThiefDotNet;
 using HyPlayer.Classes;
 using HyPlayer.Controls;
 using HyPlayer.HyPlayControl;
 using HyPlayer.Pages;
+using Impressionist.Implementations;
 using Kawazu;
 using Microsoft.Graphics.Canvas.Effects;
 using Microsoft.Toolkit.Uwp.UI;
@@ -66,7 +66,7 @@ namespace HyPlayer
         public static CloudMusicApi? ncapi;
         public static PixelShaderEffect? PixelShaderShareEffect;
 #nullable restore
-        public static ColorThief ColorThief = new();
+        public static KMeansPaletteGenerator PaletteGenerator = new();
         public static Setting Setting = new();
         public static bool ShowLyricSound = true;
         public static bool ShowLyricTrans = true;
@@ -1738,6 +1738,33 @@ namespace HyPlayer
             set
             {
                 ApplicationData.Current.LocalSettings.Values[nameof(IsolationScale)] = value;
+                OnPropertyChanged();
+            }
+        }
+        public bool ImpressionistLABSpace
+        {
+            get => GetSettings(nameof(ImpressionistLABSpace), true);
+            set
+            {
+                ApplicationData.Current.LocalSettings.Values[nameof(ImpressionistLABSpace)] = value;
+                OnPropertyChanged();
+            }
+        }
+        public bool ImpressionistIgnoreWhite
+        {
+            get => GetSettings(nameof(ImpressionistIgnoreWhite), true);
+            set
+            {
+                ApplicationData.Current.LocalSettings.Values[nameof(ImpressionistIgnoreWhite)] = value;
+                OnPropertyChanged();
+            }
+        }
+        public bool ImpressionistUseKMeansPP
+        {
+            get => GetSettings(nameof(ImpressionistUseKMeansPP), true);
+            set
+            {
+                ApplicationData.Current.LocalSettings.Values[nameof(ImpressionistUseKMeansPP)] = value;
                 OnPropertyChanged();
             }
         }

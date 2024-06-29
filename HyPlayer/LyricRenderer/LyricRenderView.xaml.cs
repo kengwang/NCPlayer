@@ -513,8 +513,7 @@ namespace HyPlayer.LyricRenderer
 
         private void LyricView_DoubleTapped(object sender, DoubleTappedRoutedEventArgs e)
         {
-            if (e.PointerDeviceType != Windows.Devices.Input.PointerDeviceType.Mouse)
-            {
+            
                 foreach (var renderOffsetsKey in Context.RenderOffsets.Keys)
                 {
                     if (Context.LyricLines[renderOffsetsKey].Hidden)
@@ -529,29 +528,13 @@ namespace HyPlayer.LyricRenderer
                     }
                 }
                 Context.ScrollingDelta = 0;
-            }
+            
             _pointerPressed = true;
         }
 
-        private void LyricView_Tapped(object sender, TappedRoutedEventArgs e)
+        public void PauseLyricRender(bool targetPauseMode)
         {
-            if (e.PointerDeviceType == Windows.Devices.Input.PointerDeviceType.Mouse)
-            {
-                foreach (var renderOffsetsKey in Context.RenderOffsets.Keys)
-                {
-                    if (Context.LyricLines[renderOffsetsKey].Hidden)
-                        continue;
-                    if (Context.RenderOffsets[renderOffsetsKey].Y <= e.GetPosition(this).Y &&
-                        Context.RenderOffsets[renderOffsetsKey].Y + Context.LyricLines[renderOffsetsKey].RenderingHeight >=
-                        e.GetPosition(this).Y)
-                    {
-                        Context.LyricLines[renderOffsetsKey].GoToReactionState(ReactionState.Press, Context);
-                        OnRequestSeek?.Invoke(Context.LyricLines[renderOffsetsKey].StartTime);
-                        break;
-                    }
-                }
-                Context.ScrollingDelta = 0;
-            }
+            LyricView.Paused = targetPauseMode;
         }
     }
 }

@@ -752,19 +752,38 @@
                                             <ComboBoxItem Content="流光溢彩 (实验, Isolation)" />
                                         </ComboBox>
                                     </controls3:SettingsCard>
+                                    <controls3:SettingsCard Description="关闭则为RGB空间" Header="Impressionist (背景取色) 使用LAB空间">
+                                        <ToggleSwitch
+                                            MinWidth="10"
+                                            HorizontalAlignment="Right"
+                                            IsOn="{x:Bind hyplayer:Common.Setting.ImpressionistLABSpace, Mode=TwoWay}" />
+                                    </controls3:SettingsCard>
+                                    <controls3:SettingsCard Header="Impressionist (背景取色) 忽略白色">
+                                        <ToggleSwitch
+                                            MinWidth="10"
+                                            HorizontalAlignment="Right"
+                                            IsOn="{x:Bind hyplayer:Common.Setting.ImpressionistIgnoreWhite, Mode=TwoWay}" />
+                                    </controls3:SettingsCard>
+                                    <controls3:SettingsCard Description="关闭则随机颜色进行初始化" Header="Impressionist (背景取色) 使用KMeans++算法初始化颜色">
+                                        <ToggleSwitch
+                                            MinWidth="10"
+                                            HorizontalAlignment="Right"
+                                            IsOn="{x:Bind hyplayer:Common.Setting.ImpressionistUseKMeansPP, Mode=TwoWay}" />
+                                    </controls3:SettingsCard>
                                     <controls3:SettingsCard Description="仅在背景设置为Isolation时生效" Header="Isolation目标帧率">
                                         <controls:NumberBox
-                                                Width="256"
-                                                HorizontalAlignment="Right"
-                                                Minimum="15"
-                                                Value="{x:Bind hyplayer:Common.Setting.IsolationFPS, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"/>
+                                            Width="64"
+                                            HorizontalAlignment="Right"
+                                            Minimum="15"
+                                            Value="{x:Bind hyplayer:Common.Setting.IsolationFPS, Mode=TwoWay, UpdateSourceTrigger=LostFocus}" />
                                     </controls3:SettingsCard>
                                     <controls3:SettingsCard Description="仅在背景设置为Isolation时生效" Header="Isolation渲染倍率">
                                         <controls:NumberBox
-                                                HorizontalAlignment="Right"
-                                                Minimum="0.1"
-                                                Maximum="1.5"
-                                                Value="{x:Bind hyplayer:Common.Setting.IsolationScale, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"/>
+                                            Width="64"
+                                            HorizontalAlignment="Right"
+                                            Maximum="1.5"
+                                            Minimum="0.1"
+                                            Value="{x:Bind hyplayer:Common.Setting.IsolationScale, Mode=TwoWay, UpdateSourceTrigger=LostFocus}" />
                                     </controls3:SettingsCard>
                                     <controls3:SettingsCard Description="仅在背景设置为Isolation时生效" Header="停用Isolation帧率限制">
                                         <ToggleSwitch

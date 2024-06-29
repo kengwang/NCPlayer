@@ -41,7 +41,7 @@ public sealed partial class WidgetPage : Page
     protected override void OnNavigatedTo(NavigationEventArgs e)
     {
         base.OnNavigatedTo(e);
-        HyPlayList.OnPlayItemChange += OnSongChanged;
+        HyPlayList.OnLyricLoaded += OnPlaylistLyricLoaded;
         _widget = e.Parameter as XboxGameBarWidget;
         _widget.WindowBoundsChanged += OnResized;       
         
@@ -53,7 +53,10 @@ public sealed partial class WidgetPage : Page
         LoadLyrics();
     }
 
-
+    private void OnPlaylistLyricLoaded()
+    {
+        LoadLyrics();
+    }
 
     private void OnResized(XboxGameBarWidget sender, object args)
     {
@@ -67,11 +70,6 @@ public sealed partial class WidgetPage : Page
             if (HyPlayList.IsPlaying) await HyPlayList.SongFadeRequest(HyPlayList.SongFadeEffectType.PauseFadeOut);
             else await HyPlayList.SongFadeRequest(HyPlayList.SongFadeEffectType.PlayFadeIn);
         }
-    }
-
-    private void OnSongChanged(Classes.HyPlayItem playItem)
-    {
-        LoadLyrics();
     }
 
     private void InitializeLyricView()
@@ -107,7 +105,7 @@ public sealed partial class WidgetPage : Page
         var lyricSize = Common.Setting.lyricSize <= 0
             ? Math.Max(_widget.WindowBounds.Width / 20, 40)
             : Common.Setting.lyricSize;
-        var translationSize = (Common.Setting.translationSize > 0) ? Common.Setting.translationSize : lyricSize / 1.6;
+        var translationSize = (Common.Setting.translationSize > 0) ? Common.Setting.translationSize : lyricSize / 1.8;
         LyricView.ChangeRenderFontSize((float)lyricSize, (float)translationSize, Common.Setting.romajiSize);
         LyricView.ChangeAlignment(Common.Setting.lyricAlignment switch
         {

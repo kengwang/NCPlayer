@@ -17,112 +17,126 @@ using Windows.UI.Xaml.Navigation;
 using HyPlayer.LyricRenderer.Converters;
 using Microsoft.Gaming.XboxGameBar;
 using Windows.UI;
+using Microsoft.Gaming.XboxGameBar.Input;
+using Windows.System;
 
 // https://go.microsoft.com/fwlink/?LinkId=234238 上介绍了“空白页”项模板
 
-namespace HyPlayer.Pages
+namespace HyPlayer.Pages;
+
+public sealed partial class WidgetPage : Page
 {
-    /// <summary>
-    /// 可用于自身或导航至 Frame 内部的空白页。
-    /// </summary>
-    public sealed partial class WidgetPage : Page
+
+    private XboxGameBarWidget _widget;
+    private XboxGameBarHotkeyWatcher _hotkeyWatcher;
+
+    public WidgetPage()
     {
+        this.InitializeComponent();
+    }
 
-        private XboxGameBarWidget _widget;
-        public WidgetPage()
+    private bool _positionChangedBySeeking = false;
+
+    protected override void OnNavigatedTo(NavigationEventArgs e)
+    {
+        base.OnNavigatedTo(e);
+        HyPlayList.OnPlayItemChange += OnSongChanged;
+        _widget = e.Parameter as XboxGameBarWidget;
+        _hotkeyWatcher = XboxGameBarHotkeyWatcher.CreateWatcher(_widget, [VirtualKey.Control, VirtualKey.LeftMenu, VirtualKey.A]);
+
+        _hotkeyWatcher.Start();
+        _hotkeyWatcher.HotkeySetStateChanged += OnHotkeySetStateChanged;
+        InitializeLyricView();
+        LoadLyrics();
+    }
+
+    private async void OnHotkeySetStateChanged(XboxGameBarHotkeyWatcher sender, HotkeySetStateChangedArgs args)
+    {
+        if (args.HotkeySetDown)
         {
-            this.InitializeComponent();
+            if (HyPlayList.IsPlaying) await HyPlayList.SongFadeRequest(HyPlayList.SongFadeEffectType.PauseFadeOut);
+            else await HyPlayList.SongFadeRequest(HyPlayList.SongFadeEffectType.PlayFadeIn);
         }
+    }
 
-        private bool _positionChangedBySeeking = false;
+    private void OnSongChanged(Classes.HyPlayItem playItem)
+    {
+        LoadLyrics();
+    }
 
-        protected override void OnNavigatedTo(NavigationEventArgs e)
+    public void InitializeLyricView()
+    {
+        LyricView.Context.LineRollingEaseCalculator = new ElasticEaseRollingCalculator();
+        LyricView.OnBeforeRender += LyricView_OnBeforeRender;
+        LyricView.OnRequestSeek += LyricView_OnRequestSeek;
+        LyricView.Context.LyricWidthRatio = 1;
+        LyricView.Context.LyricPaddingTopRatio = Common.Setting.lyricPaddingTopRatio / 100f;
+        LyricView.Context.CurrentLyricTime = 0;
+        LyricView.Context.Debug = Common.Setting.LyricRendererDebugMode;
+        LyricView.Context.Effects.Blur = Common.Setting.lyricRenderBlur;
+        LyricView.Context.LineRollingEaseCalculator = Common.Setting.LineRollingCalculator switch
         {
-            base.OnNavigatedTo(e);
-            HyPlayList.OnPlayItemChange += OnSongChanged;
-            _widget = e.Parameter as XboxGameBarWidget;
-            InitializeLyricView();
-            LoadLyrics();
-        }
+            1 => new SinRollingCalculator(),
+            2 => new LyricifyRollingCalculator(),
+            3 => new SyncRollingCalculator(),
+            _ => new ElasticEaseRollingCalculator()
+        };
+        LyricView.Context.Effects.ScaleWhenFocusing = Common.Setting.lyricRenderScaleWhenFocusing;
+        LyricView.Context.Effects.FocusHighlighting = Common.Setting.lyricRenderFocusHighlighting;
+        LyricView.Context.Effects.TransliterationScanning = Common.Setting.lyricRenderTransliterationScanning;
+        LyricView.Context.Effects.SimpleLineScanning = Common.Setting.lyricRenderSimpleLineScanning;
+        LyricView.Context.PreferTypography.Font = Common.Setting.lyricFontFamily;
+        LyricView.Context.LineSpacing = Common.Setting.lyricLineSpacing;
+    }
 
-        private void OnSongChanged(Classes.HyPlayItem playItem)
-        {
-            LoadLyrics();
-        }
+    private void LyricView_OnRequestSeek(long time)
+    {
+        HyPlayList.Player.PlaybackSession.Position = TimeSpan.FromMilliseconds(time);
+    }
 
-        public void InitializeLyricView()
+    private void LyricView_OnBeforeRender(LyricRenderer.LyricRenderView view)
+    {
+        view.Context.IsPlaying = HyPlayList.Player.PlaybackSession.PlaybackState == Windows.Media.Playback.MediaPlaybackState.Playing;
+        if (HyPlayList.Player.PlaybackSession.Position.TotalMilliseconds < view.Context.CurrentLyricTime)
         {
-            LyricView.Context.LineRollingEaseCalculator = new ElasticEaseRollingCalculator();
-            LyricView.OnBeforeRender += LyricView_OnBeforeRender;
-            LyricView.OnRequestSeek += LyricView_OnRequestSeek;
-            LyricView.Context.LyricWidthRatio = 1;
-            LyricView.Context.LyricPaddingTopRatio = Common.Setting.lyricPaddingTopRatio / 100f;
-            LyricView.Context.CurrentLyricTime = 0;
-            LyricView.Context.Debug = Common.Setting.LyricRendererDebugMode;
-            LyricView.Context.Effects.Blur = Common.Setting.lyricRenderBlur;
-            LyricView.Context.LineRollingEaseCalculator = Common.Setting.LineRollingCalculator switch
-            {
-                1 => new SinRollingCalculator(),
-                2 => new LyricifyRollingCalculator(),
-                3 => new SyncRollingCalculator(),
-                _ => new ElasticEaseRollingCalculator()
-            };
-            LyricView.Context.Effects.ScaleWhenFocusing = Common.Setting.lyricRenderScaleWhenFocusing;
-            LyricView.Context.Effects.FocusHighlighting = Common.Setting.lyricRenderFocusHighlighting;
-            LyricView.Context.Effects.TransliterationScanning = Common.Setting.lyricRenderTransliterationScanning;
-            LyricView.Context.Effects.SimpleLineScanning = Common.Setting.lyricRenderSimpleLineScanning;
-            LyricView.Context.PreferTypography.Font = Common.Setting.lyricFontFamily;
-            LyricView.Context.LineSpacing = Common.Setting.lyricLineSpacing;
-        }
-
-        private void LyricView_OnRequestSeek(long time)
-        {
-            HyPlayList.Player.PlaybackSession.Position = TimeSpan.FromMilliseconds(time);
-        }
-
-        private void LyricView_OnBeforeRender(LyricRenderer.LyricRenderView view)
-        {
-            view.Context.IsPlaying = HyPlayList.Player.PlaybackSession.PlaybackState == Windows.Media.Playback.MediaPlaybackState.Playing;
-            if (HyPlayList.Player.PlaybackSession.Position.TotalMilliseconds < view.Context.CurrentLyricTime)
-            {
-                view.Context.CurrentLyricTime = (long)HyPlayList.Player.PlaybackSession.Position.TotalMilliseconds;
-                LyricView.ReflowTime(0);
-            }
-            else
-            {
-                view.Context.CurrentLyricTime = (long)HyPlayList.Player.PlaybackSession.Position.TotalMilliseconds;
-            }
-            view.Context.IsSeek = _positionChangedBySeeking;
-            _positionChangedBySeeking = false;
-        }
-        public void LoadLyrics()
-        {
-            //_lyricIsReadyToGo = true;
-            //if (_lyricIsCleaning) return;
-            LyricView.SetLyricLines(LrcConverter.Convert(ExpandedPlayer.ConvertToALRC(HyPlayList.Lyrics)));
-            LyricView.ChangeAlignment(Common.Setting.lyricAlignment switch
-            {
-                1 => TextAlignment.Center,
-                2 => TextAlignment.Right,
-                _ => TextAlignment.Left
-            });
+            view.Context.CurrentLyricTime = (long)HyPlayList.Player.PlaybackSession.Position.TotalMilliseconds;
             LyricView.ReflowTime(0);
-            //lastlrcid = HyPlayList.NowPlayingHashCode;
-            if (HyPlayList.NowPlayingItem == null) return;
-            LyricView.Width = _widget.WindowBounds.Width;
-            LyricView.ChangeRenderColor(Colors.Gray, Colors.White);
-            LyricView.ChangeRenderFontSize(32, (Common.Setting.translationSize > 0) ? Common.Setting.translationSize : (float)Common.Setting.lyricSize / 2, Common.Setting.romajiSize);
         }
-        private SolidColorBrush GetAccentBrush()
+        else
         {
-            return Application.Current.Resources["SystemControlPageTextBaseHighBrush"] as SolidColorBrush;
+            view.Context.CurrentLyricTime = (long)HyPlayList.Player.PlaybackSession.Position.TotalMilliseconds;
         }
+        view.Context.IsSeek = _positionChangedBySeeking;
+        _positionChangedBySeeking = false;
+    }
 
-        private SolidColorBrush GetIdleBrush()
+    public void LoadLyrics()
+    {
+        //_lyricIsReadyToGo = true;
+        //if (_lyricIsCleaning) return;
+        LyricView.SetLyricLines(LrcConverter.Convert(ExpandedPlayer.ConvertToALRC(HyPlayList.Lyrics)));
+        LyricView.ChangeAlignment(Common.Setting.lyricAlignment switch
         {
-            return Application.Current.Resources["TextFillColorTertiaryBrush"] as SolidColorBrush;
-        }
+            1 => TextAlignment.Center,
+            2 => TextAlignment.Right,
+            _ => TextAlignment.Left
+        });
+        LyricView.ReflowTime(0);
+        //lastlrcid = HyPlayList.NowPlayingHashCode;
+        if (HyPlayList.NowPlayingItem == null) return;
+        LyricView.Width = _widget.WindowBounds.Width;
+        LyricView.ChangeRenderColor(GetIdleBrush().Color, GetAccentBrush().Color);
+        LyricView.ChangeRenderFontSize(32, (Common.Setting.translationSize > 0) ? Common.Setting.translationSize : (float)Common.Setting.lyricSize / 2, Common.Setting.romajiSize);
+    }
 
+    private SolidColorBrush GetAccentBrush()
+    {
+        return Application.Current.Resources["SystemControlPageTextBaseHighBrush"] as SolidColorBrush;
+    }
+
+    private SolidColorBrush GetIdleBrush()
+    {
+        return Application.Current.Resources["TextFillColorTertiaryBrush"] as SolidColorBrush;
     }
 
 }

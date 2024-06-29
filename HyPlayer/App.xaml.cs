@@ -184,7 +184,6 @@ sealed partial class App : Application
                 widgetFrame.Navigate(typeof(WidgetPage),widget);
 
                 Window.Current.Closed += WidgetWindowClosed;
-                Common.BarPlayBar.InitializeDesktopLyric();
                 OnLaunchedOrActivatedAsync(args);
                 Window.Current.Activate();
             }

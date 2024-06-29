@@ -23,7 +23,13 @@
             BorderThickness="1" />
 
         <renderer:LyricRenderView x:Name="LyricView" Grid.Row="0" />
-
+        <Grid x:Name="TipContent">
+            <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="12">
+                <TextBlock Text="HyPlayer 桌面歌词小部件" Style="{ThemeResource SubtitleTextBlockStyle}"/>
+                <TextBlock HorizontalAlignment="Center" Text="无歌曲。启动应用并播放歌曲后点击“重试”按钮以继续" />
+                <Button x:Name="FindLyricButton" HorizontalAlignment="Center" Content="重试"/>
+            </StackPanel>
+        </Grid>
         <!--这个透明Border用于触发鼠标事件-->
         <Border Grid.Row="1" Background="Transparent"/>
         <Grid x:Name="PlayBar"
@@ -46,7 +52,7 @@
                 <!--  暂停/继续  -->
                 <Button
                     x:Name="ChangePlayStateButton"
-                    Background="Transparent" Height="36" Width="42"
+                    Background="Transparent" Height="36" Width="45"
                     BorderBrush="Transparent">
                     <FontIcon  x:Name="PlayStateIcon" Glyph="&#xE769;" />
                 </Button>

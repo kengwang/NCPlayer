@@ -46,11 +46,23 @@ public sealed partial class WidgetPage : Page
     {
         base.OnNavigatedTo(e);
 
-
-        HyPlayList.OnLyricLoaded += OnPlaylistLyricLoaded;
+        FindLyricButton.Click += FindLyricButton_Click;
         _widget = e.Parameter as XboxGameBarWidget;
-        _widget.WindowBoundsChanged += OnResized;       
-        
+        if (HyPlayList.NowPlayingItem.PlayItem is null) return;
+        Initialize();
+    }
+
+    private void FindLyricButton_Click(object sender, RoutedEventArgs e)
+    {
+        if (HyPlayList.NowPlayingItem.PlayItem is null) return;
+        Initialize();
+    }
+
+    public void Initialize()
+    {
+        HyPlayList.OnLyricLoaded += OnPlaylistLyricLoaded;
+
+        _widget.WindowBoundsChanged += OnResized;
         _hotkeyWatcher = XboxGameBarHotkeyWatcher.CreateWatcher(_widget, [VirtualKey.Control, VirtualKey.LeftMenu, VirtualKey.A]);//全局热键
         _hotkeyWatcher.Start();
         _hotkeyWatcher.HotkeySetStateChanged += OnHotkeySetStateChanged;
@@ -62,10 +74,10 @@ public sealed partial class WidgetPage : Page
         HyPlayList.OnPlayItemChange += HyPlayList_OnPlayItemChange;
         HyPlayList.OnPlayPositionChange += HyPlayList_OnPlayPositionChange;
         ChangePlayStateButton.Click += ChangePlayStateButton_Click;
-        MoveNextButton.Click += MoveNextButton_Click; 
+        MoveNextButton.Click += MoveNextButton_Click;
         MovePreviousButton.Click += MovePreviousButton_Click;
+        TipContent.Visibility = Visibility.Collapsed;
     }
-
 
     private void HyPlayList_OnPlayPositionChange(TimeSpan position)
     {

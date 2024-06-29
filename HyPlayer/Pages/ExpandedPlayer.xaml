@@ -213,19 +213,19 @@
             Background="Transparent" />
         <Grid
             x:Name="ShaderLuminousBackgroundContainer"
-            x:Load="{x:Bind hyplayer:Common.Setting.expandedPlayerBackgroundType, Converter={StaticResource ShaderConverter}}"
-            Unloaded="LuminousBackground_OnUnloaded"
             Grid.Row="0"
             Grid.RowSpan="3"
             Grid.Column="0"
-            Canvas.ZIndex="-1">
+            x:Load="{x:Bind hyplayer:Common.Setting.expandedPlayerBackgroundType, Converter={StaticResource ShaderConverter}}"
+            Canvas.ZIndex="-1"
+            Unloaded="LuminousBackground_OnUnloaded">
             <win2d:CanvasAnimatedControl
                 x:Name="LuminousBackground"
                 CreateResources="LuminousBackground_CreateResources"
                 Draw="LuminousBackground_Draw"
+                Paused="True"
                 SizeChanged="LuminousBackground_SizeChanged"
-                Update="LuminousBackground_Update"
-                Paused="True"/>
+                Update="LuminousBackground_Update" />
         </Grid>
         <Grid
             x:Name="LuminousBackgroundContainer"
@@ -332,7 +332,7 @@
                         ManipulationMode="Rotate,TranslateX,TranslateY"
                         PlaceholderStretch="Uniform"
                         RightTapped="{x:Bind hyplayer:Common.UIElement_RightTapped}"
-                        Stretch="Uniform" >
+                        Stretch="Uniform">
                         <ani:Explicit.Animations>
                             <ani:AnimationSet x:Name="RotateAnimationSet">
                                 <ani:RotationInDegreesAnimation
@@ -460,9 +460,10 @@
                     <RowDefinition x:Name="DefaultRow" Height="25*" />
                     <RowDefinition x:Name="ImmersiveRow" Height="1*" />
                 </Grid.RowDefinitions>
-                <lyricrenderer:LyricRenderView x:Name="LyricBox" 
-                                               RightTapped="LyricBoxContainer_RightTapped"
-                                               Tapped="LyricBox_Tapped"/>
+                <lyricrenderer:LyricRenderView
+                    x:Name="LyricBox"
+                    RightTapped="LyricBoxContainer_RightTapped"
+                    Tapped="LyricBox_Tapped" />
             </Grid>
             <Button
                 x:Name="MoreBtn"

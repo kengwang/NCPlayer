@@ -1759,6 +1759,15 @@ namespace HyPlayer
                 OnPropertyChanged();
             }
         }
+        public bool ImpressionistUseKMeansPP
+        {
+            get => GetSettings(nameof(ImpressionistUseKMeansPP), true);
+            set
+            {
+                ApplicationData.Current.LocalSettings.Values[nameof(ImpressionistUseKMeansPP)] = value;
+                OnPropertyChanged();
+            }
+        }
 
         public bool LastFMLogined => LastFMManager.LastfmLogined;
         public bool SaveCookies()

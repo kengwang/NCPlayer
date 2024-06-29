@@ -20,6 +20,13 @@ using Microsoft.Gaming.XboxGameBar;
 using Windows.UI;
 using Microsoft.Gaming.XboxGameBar.Input;
 using Windows.System;
+using Windows.ApplicationModel.Core;
+using Windows.UI.Core;
+using HyPlayer.Classes;
+using System.Diagnostics;
+using System.Threading;
+using System.Threading.Tasks;
+using Microsoft.Toolkit.Uwp.Helpers;
 
 // https://go.microsoft.com/fwlink/?LinkId=234238 上介绍了“空白页”项模板
 
@@ -27,7 +34,6 @@ namespace HyPlayer.Pages;
 
 public sealed partial class WidgetPage : Page
 {
-
     private XboxGameBarWidget _widget;
     private XboxGameBarHotkeyWatcher _hotkeyWatcher;
 
@@ -36,21 +42,78 @@ public sealed partial class WidgetPage : Page
         this.InitializeComponent();
     }
 
-    private bool _positionChangedBySeeking = false;
-
     protected override void OnNavigatedTo(NavigationEventArgs e)
     {
         base.OnNavigatedTo(e);
+
+
         HyPlayList.OnLyricLoaded += OnPlaylistLyricLoaded;
         _widget = e.Parameter as XboxGameBarWidget;
         _widget.WindowBoundsChanged += OnResized;       
         
-        _hotkeyWatcher = XboxGameBarHotkeyWatcher.CreateWatcher(_widget, [VirtualKey.Control, VirtualKey.LeftMenu, VirtualKey.A]);
-
+        _hotkeyWatcher = XboxGameBarHotkeyWatcher.CreateWatcher(_widget, [VirtualKey.Control, VirtualKey.LeftMenu, VirtualKey.A]);//全局热键
         _hotkeyWatcher.Start();
         _hotkeyWatcher.HotkeySetStateChanged += OnHotkeySetStateChanged;
         InitializeLyricView();
         LoadLyrics();
+
+        this.PointerEntered += WidgetPage_PointerEntered;
+        this.PointerExited += WidgetPage_PointerExited;
+        HyPlayList.OnPlayItemChange += HyPlayList_OnPlayItemChange;
+        HyPlayList.OnPlayPositionChange += HyPlayList_OnPlayPositionChange;
+        ChangePlayStateButton.Click += ChangePlayStateButton_Click;
+        MoveNextButton.Click += MoveNextButton_Click; 
+        MovePreviousButton.Click += MovePreviousButton_Click;
+    }
+
+
+    private void HyPlayList_OnPlayPositionChange(TimeSpan position)
+    {
+        var view = CoreApplication.Views[0];
+
+        view.ExecuteOnUIThreadAsync(() =>
+        {
+            var txt = HyPlayList.NowPlayingItem.PlayItem.Name;
+            PositionProgressBar.Value = position.TotalMilliseconds / HyPlayList.NowPlayingItem.PlayItem.LengthInMilliseconds * 100;
+            CurrentPositionText.Text = $"{position.ToString(@"mm\:ss")}/{TimeSpan.FromMilliseconds(HyPlayList.NowPlayingItem.PlayItem.LengthInMilliseconds).ToString(@"mm\:ss")}";
+        });
+    }
+
+    private void HyPlayList_OnPlayItemChange(HyPlayItem playItem)
+    {
+        var view = CoreApplication.Views[0];
+
+        view.ExecuteOnUIThreadAsync(() =>
+        {
+            var txt = HyPlayList.NowPlayingItem.PlayItem.Name;
+            SongNameText.Text = HyPlayList.NowPlayingItem.PlayItem.Name;
+            ArtistText.Text = HyPlayList.NowPlayingItem.PlayItem.ArtistString;
+        });
+    }
+
+    private async void MovePreviousButton_Click(object sender, RoutedEventArgs e)
+    {
+        await HyPlayList.SongFadeRequest(HyPlayList.SongFadeEffectType.UserNextFadeOut, HyPlayList.SongChangeType.Previous);
+    }
+
+    private async void MoveNextButton_Click(object sender, RoutedEventArgs e)
+    {
+        await HyPlayList.SongFadeRequest(HyPlayList.SongFadeEffectType.UserNextFadeOut, HyPlayList.SongChangeType.Next);
+    }
+
+    private async void ChangePlayStateButton_Click(object sender, RoutedEventArgs e)
+    {
+        await ChangePlayState();
+    }
+
+    private void WidgetPage_PointerExited(object sender, PointerRoutedEventArgs e)
+    {
+        BorderBackground.Visibility = PlayBar.Visibility = Visibility.Collapsed;
+    }
+
+    private void WidgetPage_PointerEntered(object sender, PointerRoutedEventArgs e)
+    {
+        BorderBackground.Visibility = PlayBar.Visibility = Visibility.Visible;
     }
 
     private void OnPlaylistLyricLoaded()
@@ -67,9 +130,18 @@ public sealed partial class WidgetPage : Page
     {
         if (args.HotkeySetDown)
         {
-            if (HyPlayList.IsPlaying) await HyPlayList.SongFadeRequest(HyPlayList.SongFadeEffectType.PauseFadeOut);
-            else await HyPlayList.SongFadeRequest(HyPlayList.SongFadeEffectType.PlayFadeIn);
+            await ChangePlayState();
         }
+    }
+    public async Task ChangePlayState()
+    {
+        if (HyPlayList.IsPlaying) await HyPlayList.SongFadeRequest(HyPlayList.SongFadeEffectType.PauseFadeOut);
+        else await HyPlayList.SongFadeRequest(HyPlayList.SongFadeEffectType.PlayFadeIn);
+        var view = CoreApplication.Views[0];
+        view.ExecuteOnUIThreadAsync(() =>
+        {
+            PlayStateIcon.Glyph = HyPlayList.IsPlaying ? "\uEDB4" : "\uEDB5";
+        });
     }
 
     private void InitializeLyricView()
@@ -97,6 +169,7 @@ public sealed partial class WidgetPage : Page
         LyricView.Context.LineSpacing = Common.Setting.lyricLineSpacing;
         LyricView.ChangeRenderColor(GetIdleBrush().Color, GetAccentBrush().Color);
         UpdateLyricSize();
+        HyPlayList_OnPlayItemChange(null);
     }
 
     private void UpdateLyricSize()
@@ -132,8 +205,6 @@ public sealed partial class WidgetPage : Page
         {
             view.Context.CurrentLyricTime = (long)HyPlayList.Player.PlaybackSession.Position.TotalMilliseconds;
         }
-        view.Context.IsSeek = _positionChangedBySeeking;
-        _positionChangedBySeeking = false;
     }
 
     private void LoadLyrics()

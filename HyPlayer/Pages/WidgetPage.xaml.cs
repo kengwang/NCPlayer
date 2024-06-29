@@ -42,12 +42,26 @@ public sealed partial class WidgetPage : Page
         base.OnNavigatedTo(e);
         HyPlayList.OnPlayItemChange += OnSongChanged;
         _widget = e.Parameter as XboxGameBarWidget;
+        _widget.WindowBoundsChanged += OnResized;       
+        
         _hotkeyWatcher = XboxGameBarHotkeyWatcher.CreateWatcher(_widget, [VirtualKey.Control, VirtualKey.LeftMenu, VirtualKey.A]);
 
         _hotkeyWatcher.Start();
         _hotkeyWatcher.HotkeySetStateChanged += OnHotkeySetStateChanged;
         InitializeLyricView();
         LoadLyrics();
+    }
+
+
+
+    private void OnResized(XboxGameBarWidget sender, object args)
+    {
+        if (HyPlayList.NowPlayingItem == null) return;
+        var lyricSize = Common.Setting.lyricSize <= 0
+            ? Math.Clamp(_widget.WindowBounds.Width / 20, 20,40)
+            : Common.Setting.lyricSize;
+        LyricView.ChangeRenderFontSize((float)lyricSize, (Common.Setting.translationSize > 0) ? Common.Setting.translationSize : (float)Common.Setting.lyricSize / 2, Common.Setting.romajiSize);
+
     }
 
     private async void OnHotkeySetStateChanged(XboxGameBarHotkeyWatcher sender, HotkeySetStateChangedArgs args)
@@ -87,6 +101,18 @@ public sealed partial class WidgetPage : Page
         LyricView.Context.Effects.SimpleLineScanning = Common.Setting.lyricRenderSimpleLineScanning;
         LyricView.Context.PreferTypography.Font = Common.Setting.lyricFontFamily;
         LyricView.Context.LineSpacing = Common.Setting.lyricLineSpacing;
+        if (HyPlayList.NowPlayingItem == null) return;
+        LyricView.ChangeRenderColor(GetIdleBrush().Color, GetAccentBrush().Color);
+        var lyricSize = Common.Setting.lyricSize <= 0
+            ? Math.Max(_widget.WindowBounds.Width / 10, 40)
+            : Common.Setting.lyricSize;
+        LyricView.ChangeRenderFontSize((float)lyricSize, (Common.Setting.translationSize > 0) ? Common.Setting.translationSize : (float)Common.Setting.lyricSize / 2, Common.Setting.romajiSize);
+        LyricView.ChangeAlignment(Common.Setting.lyricAlignment switch
+        {
+            1 => TextAlignment.Center,
+            2 => TextAlignment.Right,
+            _ => TextAlignment.Left
+        });
     }
 
     private void LyricView_OnRequestSeek(long time)
@@ -115,18 +141,9 @@ public sealed partial class WidgetPage : Page
         //_lyricIsReadyToGo = true;
         //if (_lyricIsCleaning) return;
         LyricView.SetLyricLines(LrcConverter.Convert(ExpandedPlayer.ConvertToALRC(HyPlayList.Lyrics)));
-        LyricView.ChangeAlignment(Common.Setting.lyricAlignment switch
-        {
-            1 => TextAlignment.Center,
-            2 => TextAlignment.Right,
-            _ => TextAlignment.Left
-        });
         LyricView.ReflowTime(0);
         //lastlrcid = HyPlayList.NowPlayingHashCode;
-        if (HyPlayList.NowPlayingItem == null) return;
-        LyricView.Width = _widget.WindowBounds.Width;
-        LyricView.ChangeRenderColor(GetIdleBrush().Color, GetAccentBrush().Color);
-        LyricView.ChangeRenderFontSize(32, (Common.Setting.translationSize > 0) ? Common.Setting.translationSize : (float)Common.Setting.lyricSize / 2, Common.Setting.romajiSize);
+
     }
 
     private SolidColorBrush GetAccentBrush()

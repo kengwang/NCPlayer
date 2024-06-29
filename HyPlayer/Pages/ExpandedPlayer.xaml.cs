@@ -1420,8 +1420,7 @@ public sealed partial class ExpandedPlayer : Page, IDisposable
 
 
                     TextBlockSongTitle.Foreground = ForegroundAccentTextBrush;
-                    TextBlockSingerNameTip.Foreground = ForegroundIdleTextBrush;
-                    TextBlockAlbumNameTip.Foreground = ForegroundIdleTextBrush;
+
                     TextBlockSinger.Foreground = ForegroundAccentTextBrush;
                     TextBlockAlbum.Foreground = ForegroundAccentTextBrush;
                     if (Common.Setting.playbarBackgroundElay)

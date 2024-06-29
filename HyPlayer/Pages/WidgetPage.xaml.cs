@@ -1,4 +1,5 @@
 ﻿using HyPlayer.HyPlayControl;
+using HyPlayer.HyPlayControl;
 using HyPlayer.LyricRenderer.RollingCalculators;
 using System;
 using System.Collections.Generic;
@@ -56,12 +57,7 @@ public sealed partial class WidgetPage : Page
 
     private void OnResized(XboxGameBarWidget sender, object args)
     {
-        if (HyPlayList.NowPlayingItem == null) return;
-        var lyricSize = Common.Setting.lyricSize <= 0
-            ? Math.Clamp(_widget.WindowBounds.Width / 20, 20,40)
-            : Common.Setting.lyricSize;
-        LyricView.ChangeRenderFontSize((float)lyricSize, (Common.Setting.translationSize > 0) ? Common.Setting.translationSize : (float)Common.Setting.lyricSize / 2, Common.Setting.romajiSize);
-
+        UpdateLyricSize();
     }
 
     private async void OnHotkeySetStateChanged(XboxGameBarHotkeyWatcher sender, HotkeySetStateChangedArgs args)
@@ -78,7 +74,7 @@ public sealed partial class WidgetPage : Page
         LoadLyrics();
     }
 
-    public void InitializeLyricView()
+    private void InitializeLyricView()
     {
         LyricView.Context.LineRollingEaseCalculator = new ElasticEaseRollingCalculator();
         LyricView.OnBeforeRender += LyricView_OnBeforeRender;
@@ -101,12 +97,18 @@ public sealed partial class WidgetPage : Page
         LyricView.Context.Effects.SimpleLineScanning = Common.Setting.lyricRenderSimpleLineScanning;
         LyricView.Context.PreferTypography.Font = Common.Setting.lyricFontFamily;
         LyricView.Context.LineSpacing = Common.Setting.lyricLineSpacing;
-        if (HyPlayList.NowPlayingItem == null) return;
         LyricView.ChangeRenderColor(GetIdleBrush().Color, GetAccentBrush().Color);
+        UpdateLyricSize();
+    }
+
+    private void UpdateLyricSize()
+    {
+        if (HyPlayList.NowPlayingItem == null) return;
         var lyricSize = Common.Setting.lyricSize <= 0
-            ? Math.Max(_widget.WindowBounds.Width / 10, 40)
+            ? Math.Max(_widget.WindowBounds.Width / 20, 40)
             : Common.Setting.lyricSize;
-        LyricView.ChangeRenderFontSize((float)lyricSize, (Common.Setting.translationSize > 0) ? Common.Setting.translationSize : (float)Common.Setting.lyricSize / 2, Common.Setting.romajiSize);
+        var translationSize = (Common.Setting.translationSize > 0) ? Common.Setting.translationSize : lyricSize / 1.6;
+        LyricView.ChangeRenderFontSize((float)lyricSize, (float)translationSize, Common.Setting.romajiSize);
         LyricView.ChangeAlignment(Common.Setting.lyricAlignment switch
         {
             1 => TextAlignment.Center,
@@ -136,7 +138,7 @@ public sealed partial class WidgetPage : Page
         _positionChangedBySeeking = false;
     }
 
-    public void LoadLyrics()
+    private void LoadLyrics()
     {
         //_lyricIsReadyToGo = true;
         //if (_lyricIsCleaning) return;

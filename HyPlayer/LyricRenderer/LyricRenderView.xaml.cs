@@ -521,6 +521,7 @@ namespace HyPlayer.LyricRenderer
 
         private void LyricView_DoubleTapped(object sender, DoubleTappedRoutedEventArgs e)
         {
+
             foreach (var renderOffsetsKey in Context.RenderOffsets.Keys)
             {
                 if (Context.LyricLines[renderOffsetsKey].Hidden)
@@ -534,16 +535,19 @@ namespace HyPlayer.LyricRenderer
                     _jumpedLyrics = true;
                     break;
                 }
+
             }
             Context.ScrollingDelta = 0;
-
             _pointerPressed = true;
 
         }
-
         private void LyricView_Tapped(object sender, TappedRoutedEventArgs e)
         {
             _jumpedLyrics = false;
+        }
+        public void PauseLyricRender(bool targetPauseMode)
+        {
+            LyricView.Paused = targetPauseMode;
         }
     }
 }

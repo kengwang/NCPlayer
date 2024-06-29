@@ -678,7 +678,8 @@ public sealed partial class ExpandedPlayer : Page, IDisposable
         _lyricHasBeenLoaded = lyricIsReady;
         _ = Common.Invoke(() =>
         {
-            TextBlockSinger.Content = mpi?.PlayItem?.ArtistString;
+            var artistText = mpi?.PlayItem?.ArtistString;
+            TextBlockSinger.Content = artistText;
             TextBlockSongTitle.Text = mpi?.PlayItem?.Name;
             TextBlockAlbum.Content = mpi?.PlayItem?.AlbumString;
             if (mpi?.PlayItem == null)
@@ -1729,6 +1730,10 @@ public sealed partial class ExpandedPlayer : Page, IDisposable
         }
     }
 
+    private void SongInfo_Tapped(object sender, TappedRoutedEventArgs e)
+    {
+
+    }
 }
 
 internal enum ExpandedWindowMode

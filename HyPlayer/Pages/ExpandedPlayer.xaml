@@ -370,24 +370,21 @@
                             <BitmapImage x:Name="ImageAlbumSource" UriSource="/Assets/icon.png" />
                         </controls:ImageEx.Source>
                     </controls:ImageEx>
-                    <Rectangle 
-                        Canvas.ZIndex="0"  
-                        Grid.Row="2" 
-                        VerticalAlignment="Center" 
-                        HorizontalAlignment="Stretch"
+                    <Rectangle
                         x:Name="TapArea"
+                        Grid.Row="2"
+                        HorizontalAlignment="Stretch"
+                        VerticalAlignment="Top"
+                        Canvas.ZIndex="0"
                         Fill="Transparent"
-                        Tapped="SongInfo_Tapped"
-                        MinHeight="330">
-                        
-                    </Rectangle>
+                        Tapped="SongInfo_Tapped" />
                     <StackPanel
                         x:Name="SongInfo"
                         Grid.Row="2"
                         MaxWidth="600"
-                        Orientation="Horizontal"
+                        VerticalAlignment="Top"
                         IsTapEnabled="True"
-                        VerticalAlignment="Center"
+                        Orientation="Horizontal"
                         Spacing="5">
                         <controls:ImageEx
                             x:Name="ImageAlbumImerssive"
@@ -405,17 +402,43 @@
                             Source="{x:Bind ImageAlbumSource}"
                             Stretch="Uniform"
                             Visibility="Collapsed" />
-                        <Grid
+                        <Grid 
                             MaxWidth="600"
-                            Margin="20"
+                            Margin="20,0,20,20"
                             CornerRadius="0">
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="Auto" />
                                 <RowDefinition Height="Auto" />
                                 <RowDefinition Height="Auto" />
                             </Grid.RowDefinitions>
-                            <controls1:SelectableTextBox
-                                x:Name="TextBlockSongTitle"
+                            <StackPanel x:Name="SongInfoContainer">
+                                <TextBlock
+                                    x:Name="TextBlockSongTitle"
+                                    FontSize="40" IsTextSelectionEnabled="True"
+                                    FontWeight="SemiBold"
+                                    TextWrapping="Wrap" />
+
+  
+                                <StackPanel Orientation="Horizontal" Spacing="12">
+                                    <controls1:AutoScrollView MaxWidth="300" IsPlaying="True">
+                                        <HyperlinkButton
+                                            Name="TextBlockSinger"
+                                            Click="TextBlockSinger_OnTapped"
+                                            FontSize="18"
+                                            Style="{StaticResource TextBlockButtonStyle}" />
+                                    </controls1:AutoScrollView>
+                                    <controls1:AutoScrollView MaxWidth="250" IsPlaying="True">
+                                        <HyperlinkButton
+                                            Name="TextBlockAlbum"
+                                            Click="TextBlockAlbum_OnTapped"
+                                            FontSize="18"
+                                            Style="{StaticResource TextBlockButtonStyle}" />
+                                    </controls1:AutoScrollView>
+
+                                </StackPanel>
+
+                            </StackPanel>
+                            <!--<controls1:SelectableTextBox
                                 Grid.Row="0"
                                 Margin="0,-10,0,0"
                                 HorizontalAlignment="Left"
@@ -423,13 +446,14 @@
                                 FontSize="36"
                                 FontWeight="Bold"
                                 Text="歌曲名"
-                                TextWrapping="Wrap" />
+                                TextWrapping="Wrap"
+                                Visibility="Collapsed" />
                             <StackPanel
-                                x:Name="SongInfoContainer"
                                 Grid.Row="1"
                                 MaxWidth="600"
                                 Orientation="Horizontal"
-                                Spacing="4">
+                                Spacing="4"
+                                Visibility="Collapsed">
                                 <TextBlock
                                     x:Name="TextBlockSingerNameTip"
                                     Padding="0,6,0,6"
@@ -438,7 +462,6 @@
                                     Text="歌手: "
                                     TextAlignment="Center" />
                                 <HyperlinkButton
-                                    Name="TextBlockSinger"
                                     Click="TextBlockSinger_OnTapped"
                                     FontSize="18"
                                     Style="{StaticResource TextBlockButtonStyle}" />
@@ -447,7 +470,8 @@
                                 Grid.Row="2"
                                 MaxWidth="600"
                                 Orientation="Horizontal"
-                                Spacing="5">
+                                Spacing="5"
+                                Visibility="Collapsed">
                                 <TextBlock
                                     x:Name="TextBlockAlbumNameTip"
                                     Padding="0,6,0,6"
@@ -456,11 +480,11 @@
                                     Text="专辑: "
                                     TextAlignment="Center" />
                                 <HyperlinkButton
-                                    Name="TextBlockAlbum"
+                                    
                                     Click="TextBlockAlbum_OnTapped"
                                     FontSize="18"
                                     Style="{StaticResource TextBlockButtonStyle}" />
-                            </StackPanel>
+                            </StackPanel>-->
                         </Grid>
                     </StackPanel>
                 </Grid>

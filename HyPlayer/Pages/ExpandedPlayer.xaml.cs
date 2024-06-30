@@ -943,8 +943,9 @@ public sealed partial class ExpandedPlayer : Page, IDisposable
                 ".lrc" => new ALRC.Converters.LrcConverter(),
                 ".alrc" => new ALRCConverter(),
                 ".ttml" => new AppleSyllableConverter(),
-                ".lys" => new LyricifySyllableConverter()
-            };
+                ".lys" => new LyricifySyllableConverter(),
+                _ => throw new ArgumentOutOfRangeException()
+            } ;
             var lrcs = LrcConverter.Convert(converter.Convert(qrc));
             LyricBox.SetLyricLines(lrcs);
         }

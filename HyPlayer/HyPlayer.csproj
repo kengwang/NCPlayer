@@ -91,6 +91,7 @@
       <DependentUpon>App.xaml</DependentUpon>
     </Compile>
     <Compile Include="Classes\Api.cs" />
+    <Compile Include="Classes\BrushHelper.cs" />
     <Compile Include="Classes\CloudUpload.cs" />
     <Compile Include="Classes\Converters.cs" />
     <Compile Include="Classes\Extensions.cs" />

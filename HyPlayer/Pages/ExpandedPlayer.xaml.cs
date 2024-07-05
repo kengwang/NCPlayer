@@ -512,6 +512,18 @@ public sealed partial class ExpandedPlayer : Page, IDisposable
                     null);
 
         NowPlaybackSpeed = "x" + HyPlayList.Player.PlaybackSession.PlaybackRate;
+        if (Common.Setting.pureLyricFocusingColor is not null)
+        {
+            _pureAccentBrushCache ??= BrushHelper.GetAccentBrush();
+        }
+        if (Common.Setting.pureLyricIdleColor is not null)
+        {
+            _pureIdleBrushCache ??= BrushHelper.GetIdleBrush();
+        }
+        if (Common.Setting.karaokLyricFocusingColor is not null)
+        {
+            _karaokAccentColorCache ??= BrushHelper.GetKaraokAccentBrush();
+        }
     }
 
     private readonly BringIntoViewOptions AnimatedBringIntoViewOptions =
@@ -580,7 +592,7 @@ public sealed partial class ExpandedPlayer : Page, IDisposable
             lastlrcid = HyPlayList.NowPlayingHashCode;
             if (HyPlayList.NowPlayingItem == null) return;
             LyricBox.Width = LyricWidth;
-            LyricBox.ChangeRenderColor(GetIdleBrush().Color, GetAccentBrush().Color);
+            LyricBox.ChangeRenderColor(BrushHelper.GetIdleBrush().Color, BrushHelper.GetAccentBrush().Color);
             LyricBox.ChangeRenderFontSize((float)showsize, (Common.Setting.translationSize > 0) ? Common.Setting.translationSize : (float)showsize / 2, Common.Setting.romajiSize);
         });
     }
@@ -626,42 +638,10 @@ public sealed partial class ExpandedPlayer : Page, IDisposable
         return alrc;
     }
 
-    private Windows.UI.Color GetKaraokAccentBrush()
-    {
-        if (Common.Setting.karaokLyricFocusingColor is not null)
-        {
-            _karaokAccentColorCache ??= Common.Setting.karaokLyricFocusingColor;
-            return _karaokAccentColorCache.Value;
-        }
 
-        return Common.PageExpandedPlayer != null
-            ? Common.PageExpandedPlayer.ForegroundAccentTextBrush.Color
-            : (Application.Current.Resources["SystemControlPageTextBaseHighBrush"] as SolidColorBrush)!.Color;
-    }
 
-    private SolidColorBrush GetAccentBrush()
-    {
-        if (Common.Setting.pureLyricFocusingColor is not null)
-        {
-            return _pureAccentBrushCache ??= new SolidColorBrush(Common.Setting.pureLyricFocusingColor.Value);
-        }
 
-        return (Common.PageExpandedPlayer != null
-            ? Common.PageExpandedPlayer.ForegroundAccentTextBrush
-            : Application.Current.Resources["SystemControlPageTextBaseHighBrush"] as SolidColorBrush)!;
-    }
 
-    private SolidColorBrush GetIdleBrush()
-    {
-        if (Common.Setting.pureLyricIdleColor is not null)
-        {
-            return _pureIdleBrushCache ??= new SolidColorBrush(Common.Setting.pureLyricIdleColor.Value);
-        }
-
-        return (Common.PageExpandedPlayer != null
-            ? Common.PageExpandedPlayer.ForegroundIdleTextBrush
-            : Application.Current.Resources["TextFillColorTertiaryBrush"] as SolidColorBrush)!;
-    }
 
     public async Task OnEnteringForeground()
     {
@@ -720,9 +700,10 @@ public sealed partial class ExpandedPlayer : Page, IDisposable
         });
     }
 
-    public void RefreshLyricColor()
+    public void RefreshUIColor()
     {
-        LyricBox.ChangeRenderColor(GetIdleBrush().Color, GetAccentBrush().Color);
+        LyricBox.ChangeRenderColor(BrushHelper.GetIdleBrush().Color, BrushHelper.GetAccentBrush().Color);
+        Bindings.Update();
     }
 
     public void StartExpandAnimation()
@@ -1419,14 +1400,11 @@ public sealed partial class ExpandedPlayer : Page, IDisposable
                     }
 
 
-                    TextBlockSongTitle.Foreground = ForegroundAccentTextBrush;
 
-                    TextBlockSinger.Foreground = ForegroundAccentTextBrush;
-                    TextBlockAlbum.Foreground = ForegroundAccentTextBrush;
                     if (Common.Setting.playbarBackgroundElay)
                         Common.BarPlayBar!.SetPlayBarIdleBackground(ForegroundIdleTextBrush);
                     //LoadLyricsBox();
-                    RefreshLyricColor();
+                    RefreshUIColor();
                     if (Common.Setting.expandedPlayerBackgroundType == 6)
                     {
                         BgRect00.Fill = new SolidColorBrush(albumColors[0]);

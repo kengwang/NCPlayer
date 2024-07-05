@@ -416,7 +416,8 @@
                                     x:Name="TextBlockSongTitle"
                                     FontSize="40" IsTextSelectionEnabled="True"
                                     FontWeight="SemiBold"
-                                    TextWrapping="Wrap" />
+                                    TextWrapping="Wrap"
+                                    Foreground="{x:Bind ForegroundAccentTextBrush}"/>
 
   
                                 <StackPanel Orientation="Horizontal" Spacing="12">
@@ -425,14 +426,16 @@
                                             Name="TextBlockSinger"
                                             Click="TextBlockSinger_OnTapped"
                                             FontSize="18"
-                                            Style="{StaticResource TextBlockButtonStyle}" />
+                                            Style="{StaticResource TextBlockButtonStyle}"
+                                            Foreground="{x:Bind ForegroundAccentTextBrush}"/>
                                     </controls1:AutoScrollView>
                                     <controls1:AutoScrollView MaxWidth="250" IsPlaying="True">
                                         <HyperlinkButton
                                             Name="TextBlockAlbum"
                                             Click="TextBlockAlbum_OnTapped"
                                             FontSize="18"
-                                            Style="{StaticResource TextBlockButtonStyle}" />
+                                            Style="{StaticResource TextBlockButtonStyle}" 
+                                            Foreground="{x:Bind ForegroundAccentTextBrush}"/>
                                     </controls1:AutoScrollView>
 
                                 </StackPanel>
@@ -646,7 +649,7 @@
                     </MenuFlyout>
                 </Button.Flyout>
                 <Button.Content>
-                    <FontIcon Glyph="&#xEDE3;" />
+                    <FontIcon Glyph="&#xEDE3;" Foreground="{x:Bind ForegroundAccentTextBrush}"/>
                 </Button.Content>
             </Button>
         </Grid>

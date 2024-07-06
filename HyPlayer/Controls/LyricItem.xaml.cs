@@ -62,7 +62,7 @@ public sealed partial class LyricItem : UserControl, IDisposable
 
         if (_lyricIsKaraokeLyric)
         {
-            var accBrush = new SolidColorBrush(GetKaraokAccentBrush());
+            var accBrush = new SolidColorBrush(Common.BrushManagement.KaraokAccentBrush);
             accBrush.Opacity = 0.41;
             foreach (var wordTextBlock in WordTextBlocks)
             {
@@ -91,48 +91,15 @@ public sealed partial class LyricItem : UserControl, IDisposable
             2 => HorizontalAlignment.Right,
             _ => HorizontalAlignment.Left
         };
-    private SolidColorBrush AccentBrush => GetAccentBrush();
+    private SolidColorBrush AccentBrush => Common.BrushManagement.AccentBrush;
 
-    private SolidColorBrush IdleBrush => GetIdleBrush();
+    private SolidColorBrush IdleBrush => Common.BrushManagement.IdleBrush;
 
     private SolidColorBrush? _pureIdleBrushCache;
     private SolidColorBrush? _pureAccentBrushCache;
     private Color? _karaokAccentColorCache;
     private bool disposedValue;
 
-    private Color GetKaraokAccentBrush()
-    {
-        if (Common.Setting.karaokLyricFocusingColor is not null)
-        {
-            return _karaokAccentColorCache ??= Common.Setting.karaokLyricFocusingColor.Value;
-        }
-        return Common.PageExpandedPlayer != null
-            ? Common.PageExpandedPlayer.ForegroundAccentTextBrush.Color
-            : (Application.Current.Resources["SystemControlPageTextBaseHighBrush"] as SolidColorBrush)!.Color;
-    }
-
-    private SolidColorBrush GetAccentBrush()
-    {
-        if (Common.Setting.pureLyricFocusingColor is not null)
-        {
-            return _pureAccentBrushCache ??= new SolidColorBrush(Common.Setting.pureLyricFocusingColor.Value);
-        }
-        return (Common.PageExpandedPlayer != null
-            ? Common.PageExpandedPlayer.ForegroundAccentTextBrush
-            : Application.Current.Resources["SystemControlPageTextBaseHighBrush"] as SolidColorBrush)!;
-    }
-
-    private SolidColorBrush GetIdleBrush()
-    {
-        if (Common.Setting.pureLyricIdleColor is not null)
-        {
-            return _pureIdleBrushCache ??= new SolidColorBrush(Common.Setting.pureLyricIdleColor.Value);
-        }
-
-        return (Common.PageExpandedPlayer != null
-            ? Common.PageExpandedPlayer.ForegroundIdleTextBrush
-            : Application.Current.Resources["TextFillColorTertiaryBrush"] as SolidColorBrush)!;
-    }
 
     public void RefreshFontSize()
     {
@@ -491,7 +458,7 @@ public sealed partial class LyricItem : UserControl, IDisposable
         if (_lyricIsKaraokeLyric)
         {
 
-            var accBrush = new SolidColorBrush(GetKaraokAccentBrush());
+            var accBrush = new SolidColorBrush(Common.BrushManagement.KaraokAccentBrush);
             foreach (var item in ((KaraokeLyricsLine)Lrc.LyricLine).WordInfos)
             {
                 var textBlock = new Run()
@@ -505,7 +472,7 @@ public sealed partial class LyricItem : UserControl, IDisposable
                 KaraokeDictionary[textBlock] = item;
             }
         }
-        OnHoverRectangle.Fill = GetAccentBrush();
+        OnHoverRectangle.Fill = AccentBrush;
         RefreshFontSize();
         OnHind();
     }

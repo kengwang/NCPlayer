@@ -417,7 +417,7 @@
                                     FontSize="40" IsTextSelectionEnabled="True"
                                     FontWeight="SemiBold"
                                     TextWrapping="Wrap"
-                                    Foreground="{x:Bind ForegroundAccentTextBrush}"/>
+                                    Foreground="{x:Bind hyplayer:Common.BrushManagement.AccentBrush, Mode=OneWay}"/>
 
   
                                 <StackPanel Orientation="Horizontal" Spacing="12">
@@ -427,7 +427,7 @@
                                             Click="TextBlockSinger_OnTapped"
                                             FontSize="18"
                                             Style="{StaticResource TextBlockButtonStyle}"
-                                            Foreground="{x:Bind ForegroundAccentTextBrush}"/>
+                                            Foreground="{x:Bind hyplayer:Common.BrushManagement.AccentBrush, Mode=OneWay}"/>
                                     </controls1:AutoScrollView>
                                     <controls1:AutoScrollView MaxWidth="250" IsPlaying="True">
                                         <HyperlinkButton
@@ -435,7 +435,7 @@
                                             Click="TextBlockAlbum_OnTapped"
                                             FontSize="18"
                                             Style="{StaticResource TextBlockButtonStyle}" 
-                                            Foreground="{x:Bind ForegroundAccentTextBrush}"/>
+                                            Foreground="{x:Bind hyplayer:Common.BrushManagement.AccentBrush, Mode=OneWay}"/>
                                     </controls1:AutoScrollView>
 
                                 </StackPanel>
@@ -649,7 +649,7 @@
                     </MenuFlyout>
                 </Button.Flyout>
                 <Button.Content>
-                    <FontIcon Glyph="&#xEDE3;" Foreground="{x:Bind ForegroundAccentTextBrush}"/>
+                    <FontIcon Glyph="&#xEDE3;" Foreground="{x:Bind hyplayer:Common.BrushManagement.AccentBrush, Mode=OneWay}"/>
                 </Button.Content>
             </Button>
         </Grid>

@@ -38,7 +38,6 @@ namespace HyPlayer.Controls;
 public sealed partial class PlayBar
 {
     private SolidColorBrush BackgroundElayBrush = new(Colors.Transparent);
-    private SolidColorBrush _accentBrush;
     private bool _isSliding = false;
     public PlayMode NowPlayType = PlayMode.DefaultRoll;
     private TimeSpan StartingTimeSpan = TimeSpan.Zero;
@@ -58,7 +57,6 @@ DoubleAnimation verticalAnimation;
     {
         Common.BarPlayBar = this;
         InitializeComponent();
-        _accentBrush = Application.Current.Resources["SystemControlPageTextBaseHighBrush"] as SolidColorBrush;
     }
 
     public TimeSpan nowtime => HyPlayList.Player.PlaybackSession.Position;
@@ -500,7 +498,7 @@ DoubleAnimation verticalAnimation;
         }
     }
 
-    public async void ShowExpandedPlayer()
+    public void ShowExpandedPlayer()
     {
         ButtonExpand.Visibility = Visibility.Collapsed;
         ButtonCollapse.Visibility = Visibility.Visible;
@@ -531,9 +529,6 @@ DoubleAnimation verticalAnimation;
         Common.isExpanded = true;
         GridSongInfo.Visibility = Visibility.Collapsed;
         GridSongAdvancedOperation.Visibility = Visibility.Visible;
-        await Task.Delay(350);
-        _accentBrush = BrushHelper.GetAccentBrush();
-        Bindings.Update();
     }
 
     private void ButtonExpand_OnClick(object sender, RoutedEventArgs e)
@@ -554,6 +549,7 @@ DoubleAnimation verticalAnimation;
         GridSongAdvancedOperation.Visibility = Visibility.Collapsed;
         GridSongInfo.Visibility = Visibility.Visible;
         PlayBarBackgroundFadeIn.Begin();
+        Common.BrushManagement.AccentBrush = null;
         if (Common.Setting.expandAnimation && GridSongInfoContainer.Visibility == Visibility.Visible)
         {
             ConnectedAnimation anim1 = null;
@@ -984,23 +980,6 @@ DoubleAnimation verticalAnimation;
                 }
             }
         });
-        if (Common.isExpanded)
-        {
-            await Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, async () =>
-            {
-                await Task.Delay(350);
-                _accentBrush = BrushHelper.GetAccentBrush();
-                Bindings.Update();
-            });
-        }
-        else
-        {
-            await Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () =>
-            {
-                _accentBrush = Application.Current.Resources["SystemControlPageTextBaseHighBrush"] as SolidColorBrush;
-                Bindings.Update();
-            });
-        }
 
     }
 

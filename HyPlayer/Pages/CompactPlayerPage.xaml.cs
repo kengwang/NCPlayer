@@ -70,16 +70,8 @@ public sealed partial class CompactPlayerPage : Page, IDisposable
 #nullable restore
     private bool disposedValue;
 
-    private Color GetKaraokAccentBrush()
-    {
-        if (Common.Setting.karaokLyricFocusingColor is not null)
-        {
-            return _karaokAccentColorCache ??= Common.Setting.karaokLyricFocusingColor.Value;
-        }
-        return Common.PageExpandedPlayer != null
-            ? Common.PageExpandedPlayer.ForegroundAccentTextBrush.Color
-            : (Application.Current.Resources["SystemControlPageTextBaseHighBrush"] as SolidColorBrush)!.Color;
-    }
+    private Color KaraokAccentBrush=>Common.BrushManagement.KaraokAccentBrush;
+
 
     public CompactPlayerPage()
     {

@@ -57,11 +57,6 @@ public sealed partial class ExpandedPlayer : Page, IDisposable
         "NowPlaybackSpeed", typeof(string), typeof(ExpandedPlayer),
         new PropertyMetadata("x" + HyPlayList.Player.PlaybackSession.PlaybackRate));
 
-    public SolidColorBrush ForegroundAccentTextBrush =
-        (SolidColorBrush)Application.Current.Resources["SystemControlPageTextBaseHighBrush"];
-
-    public SolidColorBrush ForegroundIdleTextBrush =
-        (SolidColorBrush)Application.Current.Resources["TextFillColorTertiaryBrush"];
 
 
     public bool jumpedLyrics;
@@ -514,15 +509,15 @@ public sealed partial class ExpandedPlayer : Page, IDisposable
         NowPlaybackSpeed = "x" + HyPlayList.Player.PlaybackSession.PlaybackRate;
         if (Common.Setting.pureLyricFocusingColor is not null)
         {
-            _pureAccentBrushCache ??= BrushHelper.GetAccentBrush();
+            _pureAccentBrushCache ??= Common.BrushManagement.AccentBrush;
         }
         if (Common.Setting.pureLyricIdleColor is not null)
         {
-            _pureIdleBrushCache ??= BrushHelper.GetIdleBrush();
+            _pureIdleBrushCache ??= Common.BrushManagement.IdleBrush;
         }
         if (Common.Setting.karaokLyricFocusingColor is not null)
         {
-            _karaokAccentColorCache ??= BrushHelper.GetKaraokAccentBrush();
+            _karaokAccentColorCache ??= Common.BrushManagement.KaraokAccentBrush;
         }
     }
 
@@ -592,7 +587,7 @@ public sealed partial class ExpandedPlayer : Page, IDisposable
             lastlrcid = HyPlayList.NowPlayingHashCode;
             if (HyPlayList.NowPlayingItem == null) return;
             LyricBox.Width = LyricWidth;
-            LyricBox.ChangeRenderColor(BrushHelper.GetIdleBrush().Color, BrushHelper.GetAccentBrush().Color);
+            LyricBox.ChangeRenderColor(Common.BrushManagement.IdleBrush.Color, Common.BrushManagement.AccentBrush.Color);
             LyricBox.ChangeRenderFontSize((float)showsize, (Common.Setting.translationSize > 0) ? Common.Setting.translationSize : (float)showsize / 2, Common.Setting.romajiSize);
         });
     }
@@ -702,8 +697,7 @@ public sealed partial class ExpandedPlayer : Page, IDisposable
 
     public void RefreshUIColor()
     {
-        LyricBox.ChangeRenderColor(BrushHelper.GetIdleBrush().Color, BrushHelper.GetAccentBrush().Color);
-        Bindings.Update();
+        LyricBox.ChangeRenderColor(Common.BrushManagement.IdleBrush.Color, Common.BrushManagement.AccentBrush.Color);
     }
 
     public void StartExpandAnimation()
@@ -977,7 +971,7 @@ public sealed partial class ExpandedPlayer : Page, IDisposable
 
         if (HyPlayList.NowPlayingItem.PlayItem == null) return false;
 
-        if (lastSongForBrush == HyPlayList.NowPlayingItem.PlayItem) return ForegroundAccentTextBrush.Color.R == 0;
+        if (lastSongForBrush == HyPlayList.NowPlayingItem.PlayItem) return Common.BrushManagement.AccentBrush.Color.R == 0;
         try
         {
             Buffer buffer = new Buffer(MIMEHelper.PICTURE_FILE_HEADER_CAPACITY);
@@ -1351,16 +1345,16 @@ public sealed partial class ExpandedPlayer : Page, IDisposable
                     {
                         if (isBright)
                         {
-                            ForegroundAccentTextBrush = new SolidColorBrush(Windows.UI.Color.FromArgb(255, 0, 0, 0));
-                            ForegroundIdleTextBrush = new SolidColorBrush(Windows.UI.Color.FromArgb(114, 0, 0, 0));
+                            Common.BrushManagement.AccentBrush = new SolidColorBrush(Windows.UI.Color.FromArgb(255, 0, 0, 0));
+                            Common.BrushManagement.IdleBrush = new SolidColorBrush(Windows.UI.Color.FromArgb(114, 0, 0, 0));
                             ImmersiveTopStop.Color = Windows.UI.Color.FromArgb(0, 255, 255, 255);
                             //ImmersiveCover.Color = Windows.UI.Color.FromArgb(255, 210,210, 210);
                         }
                         else
                         {
-                            ForegroundAccentTextBrush =
+                            Common.BrushManagement.AccentBrush =
                                 new SolidColorBrush(Windows.UI.Color.FromArgb(255, 255, 255, 255));
-                            ForegroundIdleTextBrush = new SolidColorBrush(Windows.UI.Color.FromArgb(66, 255, 255, 255));
+                            Common.BrushManagement.IdleBrush = new SolidColorBrush(Windows.UI.Color.FromArgb(66, 255, 255, 255));
                             ImmersiveTopStop.Color = Windows.UI.Color.FromArgb(0, 0, 0, 0);
                             //ImmersiveCover.Color = Windows.UI.Color.FromArgb(255, 35, 35, 35);
                         }
@@ -1372,29 +1366,29 @@ public sealed partial class ExpandedPlayer : Page, IDisposable
                             if (isBright)
                             {
                                 var AccentColor = AdjustBrightness((Windows.UI.Color)albumMainColor, -0.3f);
-                                ForegroundAccentTextBrush = new SolidColorBrush(AccentColor);
+                                Common.BrushManagement.AccentBrush = new SolidColorBrush(AccentColor);
                                 var idleColor = AccentColor;
                                 idleColor.A = 150;
-                                ForegroundIdleTextBrush = new SolidColorBrush(idleColor);
+                                Common.BrushManagement.IdleBrush = new SolidColorBrush(idleColor);
                                 ImmersiveTopStop.Color = Windows.UI.Color.FromArgb(0, 255, 255, 255);
                             }
                             else
                             {
                                 var AccentColor = AdjustBrightness((Windows.UI.Color)albumMainColor, 0.3f);
-                                ForegroundAccentTextBrush = new SolidColorBrush(AccentColor);
+                                Common.BrushManagement.AccentBrush = new SolidColorBrush(AccentColor);
                                 var idleColor = AdjustBrightness((Windows.UI.Color)AccentColor, -0.15f);
                                 idleColor.A = 150;
-                                ForegroundIdleTextBrush = new SolidColorBrush(idleColor);
+                                Common.BrushManagement.IdleBrush = new SolidColorBrush(idleColor);
                                 ImmersiveTopStop.Color = Windows.UI.Color.FromArgb(0, 0, 0, 0);
                             }
                         }
                         else
                         {
                             var AccentColor = AdjustBrightness((Windows.UI.Color)albumMainColor, -0.3f);
-                            ForegroundAccentTextBrush = new SolidColorBrush(AccentColor);
+                            Common.BrushManagement.AccentBrush = new SolidColorBrush(AccentColor);
                             var idleColor = AccentColor;
                             idleColor.A = 150;
-                            ForegroundIdleTextBrush = new SolidColorBrush(idleColor);
+                            Common.BrushManagement.IdleBrush = new SolidColorBrush(idleColor);
                             ImmersiveTopStop.Color = Windows.UI.Color.FromArgb(0, 255, 255, 255);
                         }
                     }
@@ -1402,7 +1396,7 @@ public sealed partial class ExpandedPlayer : Page, IDisposable
 
 
                     if (Common.Setting.playbarBackgroundElay)
-                        Common.BarPlayBar!.SetPlayBarIdleBackground(ForegroundIdleTextBrush);
+                        Common.BarPlayBar!.SetPlayBarIdleBackground(Common.BrushManagement.IdleBrush);
                     //LoadLyricsBox();
                     RefreshUIColor();
                     if (Common.Setting.expandedPlayerBackgroundType == 6)

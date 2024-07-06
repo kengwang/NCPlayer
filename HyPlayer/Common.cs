@@ -66,6 +66,7 @@ namespace HyPlayer
         public static CloudMusicApi? ncapi;
         public static PixelShaderEffect? PixelShaderShareEffect;
 #nullable restore
+        public static BrushManagement BrushManagement = new();
         public static KMeansPaletteGenerator PaletteGenerator = new();
         public static Setting Setting = new();
         public static bool ShowLyricSound = true;
@@ -75,6 +76,7 @@ namespace HyPlayer
         public static DisplayRequest DisplayRequest = new();
         public static readonly Stack<NavigationHistoryItem> NavigationHistory = new();
         public static readonly DateTime UnixEpoch = new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc).ToLocalTime();
+
         public static void InitializeHttpClientAndAPI()
         {
             ncapi = new CloudMusicApi(Setting.EnableProxy);

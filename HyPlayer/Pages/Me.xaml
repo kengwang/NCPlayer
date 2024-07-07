@@ -162,7 +162,7 @@
                         x:Load="{x:Bind hyplayer:Common.Setting.listHeaderAcrylicBlur}"
                         Visibility="{x:Bind hyplayer:Common.Setting.listHeaderAcrylicBlur}">
                         <Border.Background>
-                            <ImageBrush ImageSource="{x:Bind ImageRect.ImageSource, Mode=OneWay}" Stretch="UniformToFill" />
+                            <ImageBrush ImageSource="{x:Bind userDisplay.AvatarSource, Mode=OneWay}" Stretch="UniformToFill" />
                         </Border.Background>
                     </Border>
                     <Border
@@ -174,30 +174,22 @@
                         x:Name="GridPersonalInformation"
                         Margin="8"
                         LastChildFill="True">
-                        <Rectangle
-                            x:Name="RectangleImage"
+                        <muxc:PersonPicture
                             Width="120"
                             Height="120"
                             Margin="20"
                             controls:DockPanel.Dock="Left"
-                            RadiusX="8"
-                            RadiusY="8"
-                            RightTapped="RectangleImage_OnRightTapped">
-                            <Rectangle.Fill>
-                                <ImageBrush x:Name="ImageRect" Stretch="UniformToFill">
-                                    <ImageBrush.ImageSource>
-                                        <BitmapImage UriSource="/Assets/icon.png" />
-                                    </ImageBrush.ImageSource>
-                                </ImageBrush>
-                            </Rectangle.Fill>
+                            x:Name="UserAvatar"
+                            ProfilePicture="{x:Bind userDisplay.AvatarSource}"
+                            >
                             <ui:Effects.Shadow>
                                 <media:AttachedCardShadow
-                                    CornerRadius="8"
-                                    Opacity="0.3"
-                                    Offset="0,4,1"
-                                    Color="Black" />
+                                CornerRadius="60"
+                                Opacity="0.3"
+                                Offset="0,4,1"
+                                Color="Black" />
                             </ui:Effects.Shadow>
-                        </Rectangle>
+                        </muxc:PersonPicture>
                         <StackPanel
                             Name="StackPanelUserInfo"
                             VerticalAlignment="Center"
@@ -207,13 +199,13 @@
                                 FontWeight="Bold"
                                 IsTextSelectionEnabled="True"
                                 Style="{StaticResource TitleTextBlockStyle}"
-                                Text="用户名"
-                                TextWrapping="NoWrap" />
+                                Text="{x:Bind userDisplay.UserName}"
+                                TextWrapping="NoWrap"/>
                             <controls1:SelectableTextBox
                                 x:Name="TextBoxSignature"
                                 FontSize="16"
                                 Foreground="{ThemeResource ApplicationForegroundThemeBrush}"
-                                Text="签名" />
+                                Text="{x:Bind userDisplay.Signature}" />
                             <Button
                                 x:Name="ButtonLogout"
                                 VerticalAlignment="Bottom"
@@ -336,8 +328,8 @@
                         <Setter Target="FirstGrid.Margin" Value="0,0,0,0" />
                         <Setter Target="SecondGrid.Margin" Value="0,0,0,0" />
                         <Setter Target="MainGrid.ColumnSpacing" Value="0" />
-                        <Setter Target="RectangleImage.Width" Value="100" />
-                        <Setter Target="RectangleImage.Height" Value="100" />
+                        <Setter Target="UserAvatar.Width" Value="100" />
+                        <Setter Target="UserAvatar.Height" Value="100" />
                         <Setter Target="StackPanelUserInfo.(Grid.Column)" Value="1" />
                         <Setter Target="StackPanelUserInfo.(Grid.ColumnSpan)" Value="10" />
                         <Setter Target="TextBoxSignature.Visibility" Value="Collapsed" />
@@ -355,7 +347,7 @@
                         <Setter Target="FirstGrid.Margin" Value="0,10,-15,0" />
                         <Setter Target="SecondGrid.Margin" Value="-15,10,0,0" />
                         <Setter Target="SecondGrid.(Grid.Row)" Value="0" />
-                        <Setter Target="RectangleImage.Visibility" Value="Visible" />
+                        <Setter Target="UserAvatar.Visibility" Value="Visible" />
                         <Setter Target="StackPanelUserInfo.(Grid.Column)" Value="5" />
                         <Setter Target="StackPanelUserInfo.(Grid.ColumnSpan)" Value="6" />
                         <Setter Target="TextBoxSignature.Visibility" Value="Visible" />

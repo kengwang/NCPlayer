@@ -34,7 +34,8 @@ public sealed partial class Me : Page, IDisposable
     private CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource();
     private CancellationToken _cancellationToken;
     private Task _loadPlaylistTask;
-    private Task _loadInfoTask;
+    private Task _loadUserTask;
+    private UserDisplay userDisplay;
 
     public Me()
     {
@@ -46,13 +47,13 @@ public sealed partial class Me : Page, IDisposable
     {
         base.OnNavigatedFrom(e);
         if ((_loadPlaylistTask != null && !_loadPlaylistTask.IsCompleted)
-            || (_loadInfoTask != null && !_loadInfoTask.IsCompleted))
+            || (_loadUserTask != null && !_loadUserTask.IsCompleted))
         {
             try
             {
                 _cancellationTokenSource.Cancel();
                 await _loadPlaylistTask;
-                await _loadInfoTask;
+                await _loadUserTask;
             }
             catch
             {
@@ -66,20 +67,40 @@ public sealed partial class Me : Page, IDisposable
     protected override void OnNavigatedTo(NavigationEventArgs e)
     {
         base.OnNavigatedTo(e);
+        userDisplay = new(Common.LoginedUser);
         if (e.Parameter != null)
         {
             uid = (string)e.Parameter;
-            ButtonLogout.Visibility = Visibility.Collapsed;
+            ButtonLogout.Visibility = Visibility.Collapsed;            
         }
         else
         {
             uid = Common.LoginedUser.id;
         }
-
-        _loadInfoTask = LoadInfo();
+        _loadUserTask = LoadUser();
         _loadPlaylistTask = LoadPlayList();
     }
-
+    public async Task LoadUser()
+    {
+        if (disposedValue) throw new ObjectDisposedException(nameof(Me));
+        _cancellationToken.ThrowIfCancellationRequested();
+        try
+        {
+            var json = await Common.ncapi?.RequestAsync(CloudMusicApiProviders.UserDetail,
+                    new Dictionary<string, object> { ["uid"] = uid });
+            NCUser currentUser = NCUser.CreateFromJson(json["profile"]);
+            userDisplay = new(currentUser);
+        }
+        catch (Exception ex)
+        {
+            if (ex.GetType() != typeof(TaskCanceledException) && ex.GetType() != typeof(OperationCanceledException))
+                Common.AddToTeachingTipLists(ex.Message, (ex.InnerException ?? new Exception()).Message);
+        }
+        finally
+        {
+            Bindings.Update();
+        }
+    }
     public async Task LoadPlayList()
     {
         if (disposedValue) throw new ObjectDisposedException(nameof(Me));
@@ -135,53 +156,7 @@ public sealed partial class Me : Page, IDisposable
         }
     }
 
-    public async Task LoadInfo()
-    {
-        if (disposedValue) throw new ObjectDisposedException(nameof(Me));
-        _cancellationToken.ThrowIfCancellationRequested();
-        if (uid == Common.LoginedUser?.id)
-        {
-            TextBoxUserName.Text = Common.LoginedUser.name;
-            TextBoxSignature.Text = Common.LoginedUser.signature;
-            ImageRect.ImageSource = Common.Setting.noImage
-                ? null
-                : new BitmapImage(new Uri(Common.LoginedUser.avatar, UriKind.RelativeOrAbsolute));
-        }
-        else
-        {
-            try
-            {
-                var json = await Common.ncapi?.RequestAsync(CloudMusicApiProviders.UserDetail,
-                    new Dictionary<string, object> { ["uid"] = uid });
-
-                TextBoxUserName.Text = json["profile"]["nickname"].ToString();
-                TextBoxSignature.Text = json["profile"]["signature"].ToString();
-                if (Common.Setting.noImage)
-                {
-                    ImageRect.ImageSource = null;
-                }
-                else
-                {
-                    var img = new BitmapImage();
-                    ImageRect.ImageSource = img;
-                    img.UriSource = new Uri(json["profile"]["avatarUrl"].ToString());
-                }
-                json.RemoveAll();
-            }
-            catch (Exception ex)
-            {
-                if (ex.GetType() != typeof(TaskCanceledException) && ex.GetType() != typeof(OperationCanceledException))
-                    Common.AddToTeachingTipLists(ex.Message, (ex.InnerException ?? new Exception()).Message);
-            }
-        }
-        /*
-        (bool isok, JObject json) = await Common.ncapi?.RequestAsync(CloudMusicApiProviders.UserLevel);
-        if (isok)
-        {
-            TextBlockLevel.Text = "LV. " + json["data"]["level"].ToString();
-        }
-        */
-    }
+    
 
     private async void Logout_OnClick(object sender, RoutedEventArgs e)
     {
@@ -229,7 +204,7 @@ public sealed partial class Me : Page, IDisposable
         {
             if (disposing)
             {
-                ImageRect.ImageSource = null;
+                UserAvatar.ProfilePicture = null;
                 myPlayList.Clear();
                 likedPlayList.Clear();
                 _cancellationTokenSource.Dispose();

@@ -31,14 +31,14 @@
                             Grid.Column="0"
                             Width="32"
                             Height="32"
-                            ProfilePicture="{x:Bind AvatarSource, Mode=OneWay}"
+                            ProfilePicture="{x:Bind CommentUserDisplay.AvatarSource, Mode=OneWay}"
                             Tapped="NavToUser_Click" />
                         <StackPanel Margin="8,0,0,0">
                             <HyperlinkButton
                                 x:Name="Nickname"
                                 Padding="0"
                                 Click="NavToUser_Click"
-                                Content="{x:Bind MainComment.Nickname, Mode=OneWay}"
+                                Content="{x:Bind CommentUserDisplay.UserName, Mode=OneWay}"
                                 Style="{StaticResource TextBlockButtonStyle}" />
                             <TextBlock Foreground="{StaticResource SystemControlForegroundBaseMediumBrush}" Text="{x:Bind MainComment.SendTime, Mode=OneWay}" />
                         </StackPanel>

@@ -654,9 +654,9 @@ public sealed partial class ExpandedPlayer : Page, IDisposable
         _ = Common.Invoke(() =>
         {
             var artistText = mpi?.PlayItem?.ArtistString;
-            TextBlockSinger.Content = artistText;
+            SingerTextBlock.Text = artistText;
             TextBlockSongTitle.Text = mpi?.PlayItem?.Name;
-            TextBlockAlbum.Content = mpi?.PlayItem?.AlbumString;
+            AlbumTextBlock.Text   = mpi?.PlayItem?.AlbumString;
             if (mpi?.PlayItem == null)
             {
                 LyricList.Clear();
@@ -703,7 +703,7 @@ public sealed partial class ExpandedPlayer : Page, IDisposable
     public void StartExpandAnimation()
     {
         ImageAlbum.Visibility = Visibility.Visible;
-        TextBlockSinger.Visibility = Visibility.Visible;
+        SingerHyperlinkBtn.Visibility = Visibility.Visible;
         TextBlockSongTitle.Visibility = Visibility.Visible;
         var anim1 = ConnectedAnimationService.GetForCurrentView().GetAnimation("SongTitle");
         var anim2 = ConnectedAnimationService.GetForCurrentView().GetAnimation("SongImg");
@@ -734,10 +734,10 @@ public sealed partial class ExpandedPlayer : Page, IDisposable
                     ConnectedAnimationService.GetForCurrentView().PrepareToAnimate("SongTitle", TextBlockSongTitle);
                 if (ImageAlbum.ActualSize.X != 0 && ImageAlbum.ActualSize.Y != 0)
                     ConnectedAnimationService.GetForCurrentView().PrepareToAnimate("SongImg", ImageAlbum);
-                if (TextBlockSinger.ActualSize.X != 0 && TextBlockSinger.ActualSize.Y != 0)
-                    ConnectedAnimationService.GetForCurrentView().PrepareToAnimate("SongArtist", TextBlockSinger);
-                if (TextBlockAlbum.ActualSize.X != 0 && TextBlockAlbum.ActualSize.Y != 0)
-                    ConnectedAnimationService.GetForCurrentView().PrepareToAnimate("SongAlbum", TextBlockAlbum);
+                if (SingerHyperlinkBtn.ActualSize.X != 0 && SingerHyperlinkBtn.ActualSize.Y != 0)
+                    ConnectedAnimationService.GetForCurrentView().PrepareToAnimate("SongArtist", SingerHyperlinkBtn);
+                if (AlbumHyperlinkBtn.ActualSize.X != 0 && AlbumHyperlinkBtn.ActualSize.Y != 0)
+                    ConnectedAnimationService.GetForCurrentView().PrepareToAnimate("SongAlbum", AlbumHyperlinkBtn);
             }
         }
         catch
@@ -779,7 +779,7 @@ public sealed partial class ExpandedPlayer : Page, IDisposable
 
     }
 
-    private async void TextBlockAlbum_OnTapped(object sender, RoutedEventArgs e)
+    private async void AlbumHyperlinkBtn_OnTapped(object sender, RoutedEventArgs e)
     {
         try
         {

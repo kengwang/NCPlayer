@@ -421,22 +421,28 @@
 
   
                                 <StackPanel Orientation="Horizontal" Spacing="12">
-                                    <controls1:AutoScrollView MaxWidth="300" IsPlaying="True">
-                                        <HyperlinkButton
-                                            Name="TextBlockSinger"
-                                            Click="TextBlockSinger_OnTapped"
-                                            FontSize="18"
-                                            Style="{StaticResource TextBlockButtonStyle}"
-                                            Foreground="{x:Bind hyplayer:Common.BrushManagement.AccentBrush, Mode=OneWay}"/>
-                                    </controls1:AutoScrollView>
-                                    <controls1:AutoScrollView MaxWidth="250" IsPlaying="True">
-                                        <HyperlinkButton
-                                            Name="TextBlockAlbum"
-                                            Click="TextBlockAlbum_OnTapped"
-                                            FontSize="18"
-                                            Style="{StaticResource TextBlockButtonStyle}" 
-                                            Foreground="{x:Bind hyplayer:Common.BrushManagement.AccentBrush, Mode=OneWay}"/>
-                                    </controls1:AutoScrollView>
+
+                                    <HyperlinkButton
+                                        Name="SingerHyperlinkBtn"
+                                        Click="TextBlockSinger_OnTapped"
+                                        FontSize="18"
+                                        Style="{StaticResource TextBlockButtonStyle}"
+                                        Foreground="{x:Bind hyplayer:Common.BrushManagement.AccentBrush, Mode=OneWay}">
+                                        <controls1:AutoScrollView MaxWidth="300" IsPlaying="True">
+                                            <TextBlock Name="SingerTextBlock"/>
+                                        </controls1:AutoScrollView>
+                                    </HyperlinkButton>
+                                    <HyperlinkButton
+                                        Name="AlbumHyperlinkBtn"
+                                        Click="AlbumHyperlinkBtn_OnTapped"
+                                        FontSize="18"
+                                        Style="{StaticResource TextBlockButtonStyle}" 
+                                        Foreground="{x:Bind hyplayer:Common.BrushManagement.AccentBrush, Mode=OneWay}">
+                                        <controls1:AutoScrollView MaxWidth="250"  IsPlaying="True">
+                                            <TextBlock x:Name="AlbumTextBlock"/>
+                                        </controls1:AutoScrollView>
+
+                                    </HyperlinkButton>
 
                                 </StackPanel>
 
@@ -476,7 +482,7 @@
                                 Spacing="5"
                                 Visibility="Collapsed">
                                 <TextBlock
-                                    x:Name="TextBlockAlbumNameTip"
+                                    x:Name="AlbumHyperlinkBtnNameTip"
                                     Padding="0,6,0,6"
                                     FontSize="18"
                                     Foreground="{StaticResource SystemControlForegroundBaseMediumBrush}"
@@ -484,7 +490,7 @@
                                     TextAlignment="Center" />
                                 <HyperlinkButton
                                     
-                                    Click="TextBlockAlbum_OnTapped"
+                                    Click="AlbumHyperlinkBtn_OnTapped"
                                     FontSize="18"
                                     Style="{StaticResource TextBlockButtonStyle}" />
                             </StackPanel>-->

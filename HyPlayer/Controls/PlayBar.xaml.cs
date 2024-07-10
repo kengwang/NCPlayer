@@ -354,7 +354,7 @@ DoubleAnimation verticalAnimation;
             {
                 IconLiked.Foreground = isLiked
                     ? new SolidColorBrush(Colors.Red)
-                    : IconPrevious.Foreground;
+                    : new SolidColorBrush(Colors.Transparent);
                 FlyoutLiked.Foreground = isLiked
                     ? new SolidColorBrush(Colors.Red)
                     : Application.Current.Resources["TextFillColorPrimaryBrush"] as Brush;
@@ -987,7 +987,7 @@ DoubleAnimation verticalAnimation;
     {
         IconLiked.Foreground = isLiked
             ? new SolidColorBrush(Colors.Red)
-            : IconPrevious.Foreground;
+            : new SolidColorBrush(Colors.Transparent);
         FlyoutLiked.Foreground = isLiked
             ? new SolidColorBrush(Colors.Red)
             : Application.Current.Resources["TextFillColorPrimaryBrush"] as Brush;

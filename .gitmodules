@@ -11,3 +11,6 @@
 	path = LyricParser
 	url = https://github.com/HyPlayer/LyricParser
 	branch = UWP
+[submodule "Impressionist"]
+	path = Impressionist
+	url = https://github.com/Storyteller-Studios/Impressionist

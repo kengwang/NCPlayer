@@ -94,6 +94,7 @@
     <Compile Include="Classes\CloudUpload.cs" />
     <Compile Include="Classes\Converters.cs" />
     <Compile Include="Classes\Extensions.cs" />
+    <Compile Include="Classes\ImageDecoder.cs" />
     <Compile Include="Classes\LastFMManager.cs" />
     <Compile Include="Classes\LyricRenderComposer.cs" />
     <Compile Include="Classes\MIMEHelper.cs" />
@@ -571,9 +572,6 @@
     <PackageReference Include="Inflatable.Lastfm">
       <Version>1.2.0</Version>
     </PackageReference>
-    <PackageReference Include="ksemenenko.ColorThief">
-      <Version>1.1.1.4</Version>
-    </PackageReference>
     <PackageReference Include="Microsoft.AppCenter.Analytics">
       <Version>5.0.5</Version>
     </PackageReference>
@@ -605,7 +603,7 @@
       <Version>2.8.6</Version>
     </PackageReference>
     <PackageReference Include="QRCoder">
-      <Version>1.5.1</Version>
+      <Version>1.6.0</Version>
     </PackageReference>
     <PackageReference Include="System.Net.Http">
       <Version>4.3.4</Version>
@@ -618,6 +616,10 @@
     <ProjectReference Include="..\AudioEffectComponent\AudioEffectComponent.csproj">
       <Project>{3622fd12-ce05-4b0f-8ce2-fae1add0bb4e}</Project>
       <Name>AudioEffectComponent</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Impressionist\Impressionist\Impressionist.csproj">
+      <Project>{0f920821-8006-4512-abcd-1396d1916fed}</Project>
+      <Name>Impressionist</Name>
     </ProjectReference>
     <ProjectReference Include="..\Kawazu\Kawazu\Kawazu.csproj">
       <Project>{2dc18999-32f2-40d4-ad9b-c5a09514e087}</Project>

@@ -211,7 +211,7 @@ namespace HyPlayer.LyricRenderer.LyricLineRenderers
                 }
             }
 
-            var gap = Id - context.CurrentLyricLineIndex;
+            var gap = _isFocusing ? 0 : Math.Clamp(Math.Abs(Id - context.CurrentLyricLineIndex), 1, 250);
             ICanvasImage finalEffect = totalCommand;
             if (context.Effects.ScaleWhenFocusing)
             {
@@ -265,7 +265,7 @@ namespace HyPlayer.LyricRenderer.LyricLineRenderers
                 var blurEffect = new GaussianBlurEffect
                 {
                     Source = finalEffect,
-                    BlurAmount = Math.Clamp(Math.Abs(gap), 0, 250),
+                    BlurAmount = Math.Clamp(gap, 0, 250),
                 };
                 session.DrawImage(blurEffect, actualX, drawingTop);
             }
@@ -274,7 +274,7 @@ namespace HyPlayer.LyricRenderer.LyricLineRenderers
                 var opacityEffect = new Microsoft.Graphics.Canvas.Effects.OpacityEffect
                 {
                     Source = finalEffect,
-                    Opacity = 1 - Math.Clamp(Math.Abs(gap) / (10f - (Common.Setting.lyricFadingRatio / 10f)), 0, 0.9f),
+                    Opacity = 1 - Math.Clamp(gap / (10f - (Common.Setting.lyricFadingRatio / 10f)), 0, 0.9f),
                 };
                 session.DrawImage(opacityEffect, actualX, drawingTop);
             }
@@ -283,12 +283,12 @@ namespace HyPlayer.LyricRenderer.LyricLineRenderers
                 var blurEffect = new GaussianBlurEffect
                 {
                     Source = finalEffect,
-                    BlurAmount = Math.Clamp(Math.Abs(gap), 0, 250),
+                    BlurAmount = Math.Clamp(gap, 0, 250),
                 };
                 var opacityEffect = new Microsoft.Graphics.Canvas.Effects.OpacityEffect
                 {
                     Source = blurEffect,
-                    Opacity = 1 - Math.Clamp(Math.Abs(gap) / (10f - (Common.Setting.lyricFadingRatio / 10f)), 0, 0.9f),
+                    Opacity = 1 - Math.Clamp(gap / (10f - (Common.Setting.lyricFadingRatio / 10f)), 0, 0.9f),
                 };
                 session.DrawImage(opacityEffect, actualX, drawingTop);
             }

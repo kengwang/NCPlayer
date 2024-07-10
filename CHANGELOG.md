@@ -1,7 +1,9 @@
-## 紧急修复
+## 修复优化
 
-尝试修复部分场景Isolation颜色不正确的情况
+修复Isolation内存泄漏，优化Isolation效果
 
-优化(?)Isolation取色
+引入Impressionist替代ColorThief
 
-修改ExpandedPlayer配色行为
+Impressionist支持帧数调整 渲染倍率调整
+
+修改Playbar样式

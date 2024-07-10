@@ -550,11 +550,18 @@
                     BorderThickness="0"
                     Click="BtnLike_OnClick"
                     CornerRadius="30">
-                    <FontIcon
+                    <Grid>
+                        <FontIcon
+                        x:Name="IconLikedBackground"
+                        FontSize="14"
+                        Glyph="{x:Bind IconLiked.Glyph}" 
+                        Foreground="{x:Bind hy:Common.BrushManagement.AccentBrush, Mode=OneWay}"
+                        />
+                        <FontIcon
                         x:Name="IconLiked"
                         FontSize="14"
-                        Glyph="&#xE00B;" 
-                        />
+                        Glyph="&#xE00B;"/>
+                    </Grid>
                 </Button>
             </Grid>
             <Grid

@@ -1609,6 +1609,7 @@ public sealed partial class ExpandedPlayer : Page, IDisposable
             ImmersiveModeInAniOtrMode.Begin();
         LeftPanel.VerticalAlignment = VerticalAlignment.Bottom;
         Common.IsInImmersiveMode = true;
+        needRedesign++;
     }
 
     private void ImmersiveModeExit()
@@ -1632,6 +1633,7 @@ public sealed partial class ExpandedPlayer : Page, IDisposable
             ImmersiveModeOutAniOtrMode.Begin();
         LeftPanel.VerticalAlignment = VerticalAlignment.Top;
         Common.IsInImmersiveMode = false;
+        needRedesign++;
     }
 
     private void LuminousBackground_SizeChanged(object sender, SizeChangedEventArgs e)

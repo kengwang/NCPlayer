@@ -1,33 +1,19 @@
-﻿using HyPlayer.HyPlayControl;
+﻿using HyPlayer.Classes;
 using HyPlayer.HyPlayControl;
+using HyPlayer.LyricRenderer.Converters;
 using HyPlayer.LyricRenderer.RollingCalculators;
+using Microsoft.Gaming.XboxGameBar;
+using Microsoft.Gaming.XboxGameBar.Input;
 using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Runtime.InteropServices.WindowsRuntime;
-using Windows.Foundation;
-using Windows.Foundation.Collections;
+using System.Threading.Tasks;
+using Windows.Media.Playback;
+using Windows.System;
+using Windows.UI.Core;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
-using Windows.UI.Xaml.Controls.Primitives;
-using Windows.UI.Xaml.Data;
 using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
-using HyPlayer.LyricRenderer.Converters;
-using Microsoft.Gaming.XboxGameBar;
-using Windows.UI;
-using Microsoft.Gaming.XboxGameBar.Input;
-using Windows.System;
-using Windows.ApplicationModel.Core;
-using Windows.UI.Core;
-using HyPlayer.Classes;
-using System.Diagnostics;
-using System.Threading;
-using System.Threading.Tasks;
-using Microsoft.Toolkit.Uwp.Helpers;
-using Windows.Media.Playback;
 
 // https://go.microsoft.com/fwlink/?LinkId=234238 上介绍了“空白页”项模板
 

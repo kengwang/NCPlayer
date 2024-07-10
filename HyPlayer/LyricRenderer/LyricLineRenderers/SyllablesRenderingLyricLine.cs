@@ -12,7 +12,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
 using Windows.Foundation;
-using Windows.Graphics.Effects;
 using Windows.UI;
 using Windows.UI.Text;
 using Windows.UI.Xaml;
@@ -22,12 +21,18 @@ namespace HyPlayer.LyricRenderer.LyricLineRenderers
 {
     public class RenderingSyllable
     {
-#pragma warning disable CS8618 // 在退出构造函数时，不可为 null 的字段必须包含非 null 值。请考虑声明为可以为 null。还我required字段
         public string Syllable { get; set; }
-#pragma warning restore CS8618 // 在退出构造函数时，不可为 null 的字段必须包含非 null 值。请考虑声明为可以为 null。
         public long StartTime { get; set; }
         public long EndTime { get; set; }
         public string? Transliteration { get; set; }
+        public RenderingSyllable(string syllable, long startTime, long endTime, string? transliteration)
+        {
+            Syllable = syllable;
+            StartTime = startTime;
+            EndTime = endTime;
+            Transliteration = transliteration;
+        }
+
     }
 
     public class SyllablesRenderingLyricLine : RenderingLyricLine
@@ -266,11 +271,11 @@ namespace HyPlayer.LyricRenderer.LyricLineRenderers
                 Source = blurEffect,
                 Opacity = 1,
             };
-            if (context.Effects.Blur && !_isFocusing)
+            if (context.Effects.Blur && !_isFocusing && !context.IsScrolling)
             {
                 blurEffect.BlurAmount = Math.Clamp(Math.Abs(gap), 0, 250);
             }
-            if (Common.Setting.lyricRenderFade)
+            if (Common.Setting.lyricRenderFade && !context.IsScrolling)
             {
                 opacityEffect.Opacity = 1 - Math.Clamp(Math.Abs(gap) / (10f - (Common.Setting.lyricFadingRatio / 10f)), 0, 0.9f);
             }

@@ -181,7 +181,7 @@ sealed partial class App : Application
                     widgetArgs,
                     Window.Current.CoreWindow,
                     widgetFrame);
-                widgetFrame.Navigate(typeof(WidgetPage),widget);
+                widgetFrame.Navigate(typeof(WidgetPage), widget);
 
                 Window.Current.Closed += WidgetWindowClosed;
                 OnLaunchedOrActivatedAsync(args);

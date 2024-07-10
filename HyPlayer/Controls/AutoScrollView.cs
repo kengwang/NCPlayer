@@ -1,14 +1,9 @@
-﻿using System;
-using Windows.System;
-using Windows.UI.Composition;
-using Windows.UI.Xaml.Hosting;
-using Windows.UI.Xaml;
-using System.Numerics;
-using Windows.UI.Xaml.Controls;
-using Windows.UI.Xaml.Markup;
-using Windows.UI.Core;
+﻿using HyPlayer.Controls.Primitives;
+using System;
 using Windows.ApplicationModel.Core;
-using HyPlayer.Controls.Primitives;
+using Windows.UI.Composition;
+using Windows.UI.Xaml;
+using Windows.UI.Xaml.Hosting;
 
 namespace HyPlayer.Controls;
 

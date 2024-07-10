@@ -1,10 +1,10 @@
-﻿using System.Numerics;
-using System;
+﻿using System;
+using System.Numerics;
 using Windows.UI.Composition;
+using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Hosting;
 using Windows.UI.Xaml.Markup;
-using Windows.UI.Xaml;
 
 namespace HyPlayer.Controls.Primitives;
 
@@ -91,7 +91,7 @@ public class RedirectVisualView : Control
     private bool attached;
     private bool redirectVisualEnabled = true;
     private bool childVisualBrushOffsetEnabled;
-
+#nullable enable
     private Grid? layoutRoot;
     private ContentPresenter? childPresenter;
     private Grid? childPresenterContainer;
@@ -211,7 +211,7 @@ public class RedirectVisualView : Control
 
     public static readonly DependencyProperty ChildProperty =
         DependencyProperty.Register("Child", typeof(UIElement), typeof(RedirectVisualView), new PropertyMetadata(null));
-
+#nullable restore
     private void AttachVisuals()
     {
         if (attached) return;

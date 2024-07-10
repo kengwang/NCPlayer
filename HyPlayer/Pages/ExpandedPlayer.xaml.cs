@@ -219,7 +219,7 @@ public sealed partial class ExpandedPlayer : Page, IDisposable
             {
                 luminousColorsRotateStoryBoard.Pause();
             }
-            if(LuminousBackground != null)
+            if (LuminousBackground != null)
             {
                 LuminousBackground.Paused = true;
             }
@@ -656,7 +656,7 @@ public sealed partial class ExpandedPlayer : Page, IDisposable
             var artistText = mpi?.PlayItem?.ArtistString;
             SingerTextBlock.Text = artistText;
             TextBlockSongTitle.Text = mpi?.PlayItem?.Name;
-            AlbumTextBlock.Text   = mpi?.PlayItem?.AlbumString;
+            AlbumTextBlock.Text = mpi?.PlayItem?.AlbumString;
             if (mpi?.PlayItem == null)
             {
                 LyricList.Clear();
@@ -930,7 +930,7 @@ public sealed partial class ExpandedPlayer : Page, IDisposable
                 ".ttml" => new AppleSyllableConverter(),
                 ".lys" => new LyricifySyllableConverter(),
                 _ => throw new ArgumentOutOfRangeException()
-            } ;
+            };
             var lrcs = LrcConverter.Convert(converter.Convert(qrc));
             LyricBox.SetLyricLines(lrcs);
         }
@@ -988,15 +988,15 @@ public sealed partial class ExpandedPlayer : Page, IDisposable
             var paletteIsDark = false;
             if (Common.Setting.expandedPlayerBackgroundType != 6 && Common.Setting.expandedPlayerBackgroundType != 7)
             {
-                themeColor = await Common.PaletteGenerator.CreateThemeColor(colors, Common.Setting.ImpressionistIgnoreWhite,Common.Setting.ImpressionistLABSpace);
+                themeColor = await Common.PaletteGenerator.CreateThemeColor(colors, Common.Setting.ImpressionistIgnoreWhite, Common.Setting.ImpressionistLABSpace);
                 albumMainColor = Windows.UI.Color.FromArgb(255, (byte)themeColor.Color.X, (byte)themeColor.Color.Y, (byte)themeColor.Color.Z);
             }
             else
             {
-                palette = await Common.PaletteGenerator.CreatePalette(colors, 
-                    Common.Setting.expandedPlayerBackgroundType is 6 ? 9 : 4, 
-                    Common.Setting.ImpressionistIgnoreWhite, 
-                    Common.Setting.ImpressionistLABSpace, 
+                palette = await Common.PaletteGenerator.CreatePalette(colors,
+                    Common.Setting.expandedPlayerBackgroundType is 6 ? 9 : 4,
+                    Common.Setting.ImpressionistIgnoreWhite,
+                    Common.Setting.ImpressionistLABSpace,
                     Common.Setting.ImpressionistUseKMeansPP);
                 themeColor = palette.ThemeColor;
                 albumColors = palette.Palette.Select(quantizedColor => Windows.UI.Color.FromArgb(255, (byte)quantizedColor.X, (byte)quantizedColor.Y, (byte)quantizedColor.Z))
@@ -1182,7 +1182,7 @@ public sealed partial class ExpandedPlayer : Page, IDisposable
         {
             luminousColorsRotateStoryBoard.Resume();
         }
-        if (HyPlayList.IsPlaying && LuminousBackground!= null)
+        if (HyPlayList.IsPlaying && LuminousBackground != null)
         {
             LuminousBackground.Paused = false;
         }
@@ -1649,7 +1649,7 @@ public sealed partial class ExpandedPlayer : Page, IDisposable
     {
         if (_shaderEffect == null)
         {
-            if(Common.PixelShaderShareEffect == null)
+            if (Common.PixelShaderShareEffect == null)
             {
                 StorageFile file = await StorageFile.GetFileFromApplicationUriAsync(new Uri("ms-appx:///Shaders/BackgroundShader.bin"));
                 IBuffer buffer = await FileIO.ReadBufferAsync(file);

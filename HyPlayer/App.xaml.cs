@@ -385,6 +385,10 @@ sealed partial class App : Application
         await HistoryManagement.SetcurPlayingListHistory(HyPlayList.List
             .Where(t => t.ItemType == HyPlayItemType.Netease)
             .Select(t => t.PlayItem.Id).ToList());
+        if (Common.XboxGameBarWidget != null)
+        {
+            Common.XboxGameBarWidget.Close();
+        }
         deferral.Complete();
     }
 }

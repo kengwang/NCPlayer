@@ -23,16 +23,26 @@
             BorderThickness="1" />
 
         <renderer:LyricRenderView x:Name="LyricView" Grid.Row="0" />
-        <Grid Grid.Row="0" x:Name="TipContent">
-            <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="12">
-                <TextBlock HorizontalAlignment="Center" Text="HyPlayer 桌面歌词小部件" Style="{ThemeResource SubtitleTextBlockStyle}"/>
+        <Grid x:Name="TipContent" Grid.Row="0">
+            <StackPanel
+                HorizontalAlignment="Center"
+                VerticalAlignment="Center"
+                Spacing="12">
+                <TextBlock
+                    HorizontalAlignment="Center"
+                    Style="{ThemeResource SubtitleTextBlockStyle}"
+                    Text="HyPlayer 桌面歌词小部件" />
                 <TextBlock HorizontalAlignment="Center" Text="无歌曲。启动应用并播放歌曲后点击“重试”按钮以继续" />
-                <Button x:Name="FindLyricButton" HorizontalAlignment="Center" Content="重试"/>
+                <Button
+                    x:Name="FindLyricButton"
+                    HorizontalAlignment="Center"
+                    Content="重试" />
             </StackPanel>
         </Grid>
-        <!--这个透明Border用于触发鼠标事件-->
-        <Border Grid.Row="1" Background="Transparent"/>
-        <Grid x:Name="PlayBar"
+        <!--  这个透明Border用于触发鼠标事件  -->
+        <Border Grid.Row="1" Background="Transparent" />
+        <Grid
+            x:Name="PlayBar"
             Grid.Row="1"
             Margin="0"
             Padding="4"
@@ -40,46 +50,61 @@
             BorderBrush="{ThemeResource CardStrokeColorDefault}"
             BorderThickness="1"
             Canvas.ZIndex="1">
-            <muxc:ProgressBar x:Name="PositionProgressBar" VerticalAlignment="Top" Margin="-4,-4,-4,0"/>
+            <muxc:ProgressBar
+                x:Name="PositionProgressBar"
+                Margin="-4,-4,-4,0"
+                VerticalAlignment="Top" />
             <Grid ColumnSpacing="8">
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="Auto"/>
-                    <ColumnDefinition Width="Auto"/>
-                    <ColumnDefinition Width="Auto"/>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
                 <!--  上一首  -->
-                <Button Grid.Column="0"
+                <Button
                     x:Name="MovePreviousButton"
+                    Grid.Column="0"
+                    Width="42"
+                    Height="36"
                     Background="Transparent"
-                    BorderBrush="Transparent" Height="36" Width="42">
+                    BorderBrush="Transparent">
                     <FontIcon FontSize="14" Glyph="&#xE892;" />
                 </Button>
                 <!--  暂停/继续  -->
-                <Button Grid.Column="1"
+                <Button
                     x:Name="ChangePlayStateButton"
-                    Background="Transparent" Height="36" Width="45"
+                    Grid.Column="1"
+                    Width="45"
+                    Height="36"
+                    Background="Transparent"
                     BorderBrush="Transparent">
-                    <FontIcon  x:Name="PlayStateIcon" Glyph="&#xE769;" />
+                    <FontIcon x:Name="PlayStateIcon" Glyph="&#xE769;" />
                 </Button>
                 <!--  下一首  -->
-                <Button Grid.Column="2"
-                        x:Name="MoveNextButton"
-                        Background="Transparent" Height="36" Width="42"
-                        BorderBrush="Transparent">
+                <Button
+                    x:Name="MoveNextButton"
+                    Grid.Column="2"
+                    Width="42"
+                    Height="36"
+                    Background="Transparent"
+                    BorderBrush="Transparent">
                     <FontIcon FontSize="14" Glyph="&#xE893;" />
                 </Button>
 
-                <TextBlock Grid.Column="3"
-                           Margin="12,0,0,4"
-                           VerticalAlignment="Center" TextTrimming="CharacterEllipsis"
-                           FontSize="16">
+                <TextBlock
+                    Grid.Column="3"
+                    Margin="12,0,0,4"
+                    VerticalAlignment="Center"
+                    FontSize="16"
+                    TextTrimming="CharacterEllipsis">
                     <Run x:Name="SongNameText" />
                     <Run x:Name="ArtistText" Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}" />
                 </TextBlock>
-                <TextBlock Grid.Column="4"
+                <TextBlock
                     x:Name="CurrentPositionText"
+                    Grid.Column="4"
                     Margin="0,0,12,4"
                     HorizontalAlignment="Right"
                     VerticalAlignment="Center"
@@ -88,7 +113,7 @@
 
 
         </Grid>
-        
-        
+
+
     </Grid>
 </Page>

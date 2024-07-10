@@ -212,7 +212,7 @@ namespace HyPlayer.LyricRenderer.LyricLineRenderers
                 }
             }
 
-            var gap = Id - context.CurrentLyricLineIndex;
+            var gap = _isFocusing ? 0 : Math.Clamp(Math.Abs(Id - context.CurrentLyricLineIndex), 1, 250);
             ICanvasImage finalEffect = totalCommand;
             if (context.Effects.ScaleWhenFocusing)
             {
@@ -533,7 +533,7 @@ namespace HyPlayer.LyricRenderer.LyricLineRenderers
                     };
                     string? trimmedText = Translation?.ToString().TrimEnd();
                     tl = new CanvasTextLayout(session, trimmedText, translationFormat,
-                        Math.Clamp(context.ItemWidth - 16, 0, int.MaxValue), _canvasHeight);
+                        Math.Clamp(context.ItemWidth - 16, 10, int.MaxValue), _canvasHeight);
                     add += 30;
 
                 }

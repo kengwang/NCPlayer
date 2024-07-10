@@ -7,6 +7,7 @@ using HyPlayer.HyPlayControl;
 using HyPlayer.Pages;
 using Impressionist.Implementations;
 using Kawazu;
+using Microsoft.Gaming.XboxGameBar;
 using Microsoft.Graphics.Canvas.Effects;
 using Microsoft.Toolkit.Uwp.UI;
 using Microsoft.UI.Xaml.Controls;
@@ -64,6 +65,7 @@ namespace HyPlayer
         public static HttpBaseProtocolFilter? HttpBaseProtocolFilter;
         public static HttpClient? HttpClient;
         public static CloudMusicApi? ncapi;
+        public static XboxGameBarWidget? XboxGameBarWidget;
         public static PixelShaderEffect? PixelShaderShareEffect;
 #nullable restore
         public static KMeansPaletteGenerator PaletteGenerator = new();
@@ -332,7 +334,6 @@ namespace HyPlayer
                     BaseFrame?.GoBack();
             }
         }
-
         public class NavigationHistoryItem
         {
             public object Item;

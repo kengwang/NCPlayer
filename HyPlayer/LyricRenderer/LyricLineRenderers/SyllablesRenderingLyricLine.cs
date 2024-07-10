@@ -548,7 +548,7 @@ namespace HyPlayer.LyricRenderer.LyricLineRenderers
                     };
                     string? trimmedText = Translation?.ToString().TrimEnd();
                     tl = new CanvasTextLayout(session, trimmedText, translationFormat,
-                        Math.Clamp(context.ItemWidth - 16, 0, int.MaxValue), _canvasHeight);
+                        Math.Clamp(context.ItemWidth - 16, 10, int.MaxValue), _canvasHeight);
                     add += 30;
 
                 }

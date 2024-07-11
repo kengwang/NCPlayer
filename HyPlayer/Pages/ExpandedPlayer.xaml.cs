@@ -1705,11 +1705,6 @@ public sealed partial class ExpandedPlayer : Page, IDisposable
             ChangeWindowMode();
         }
     }
-
-    private void SongInfo_Tapped(object sender, TappedRoutedEventArgs e)
-    {
-
-    }
 }
 
 internal enum ExpandedWindowMode

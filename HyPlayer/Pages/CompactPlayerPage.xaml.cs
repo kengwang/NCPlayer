@@ -65,12 +65,7 @@ public sealed partial class CompactPlayerPage : Page, IDisposable
     private List<Run> WordTextBlocks = new();
     private Dictionary<Run, Storyboard> BlockToAnimation = new();
 
-#nullable enable
-    private Color? _karaokAccentColorCache;
-#nullable restore
     private bool disposedValue;
-
-    private Color KaraokAccentBrush=>Common.BrushManagement.KaraokAccentBrush;
 
 
     public CompactPlayerPage()

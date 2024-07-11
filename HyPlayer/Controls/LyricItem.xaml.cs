@@ -7,7 +7,6 @@ using LyricParser.Abstraction;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Windows.UI;
 using Windows.UI.Text;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
@@ -94,10 +93,6 @@ public sealed partial class LyricItem : UserControl, IDisposable
     private SolidColorBrush AccentBrush => Common.BrushManagement.AccentBrush;
 
     private SolidColorBrush IdleBrush => Common.BrushManagement.IdleBrush;
-
-    private SolidColorBrush? _pureIdleBrushCache;
-    private SolidColorBrush? _pureAccentBrushCache;
-    private Color? _karaokAccentColorCache;
     private bool disposedValue;
 
 

@@ -1,10 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel;
-using System.Linq;
 using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading.Tasks;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Media;
 
@@ -42,7 +38,7 @@ namespace HyPlayer.Classes
         public SolidColorBrush AccentBrush
         {
             get
-            
+
             {
                 if (Common.Setting.pureLyricFocusingColor is not null)
                 {

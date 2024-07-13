@@ -985,7 +985,6 @@ public sealed partial class ExpandedPlayer : Page, IDisposable
             var colors = await ImageDecoder.GetPixelColor(decoder);
             ThemeColorResult themeColor;
             PaletteResult palette;
-            var paletteIsDark = false;
             if (Common.Setting.expandedPlayerBackgroundType != 6 && Common.Setting.expandedPlayerBackgroundType != 7)
             {
                 themeColor = await Common.PaletteGenerator.CreateThemeColor(colors, Common.Setting.ImpressionistIgnoreWhite, Common.Setting.ImpressionistLABSpace);
@@ -1003,7 +1002,6 @@ public sealed partial class ExpandedPlayer : Page, IDisposable
                     .ToList();
                 albumMainColor = Windows.UI.Color.FromArgb(255, (byte)themeColor.Color.X, (byte)themeColor.Color.Y, (byte)themeColor.Color.Z);
                 albumColorVectors = palette.Palette.Select(t => t / 255).ToList();
-                paletteIsDark = palette.PaletteIsDark;
             }
             lastSongForBrush = HyPlayList.NowPlayingItem.PlayItem;
             if (Common.Setting.expandedPlayerBackgroundType is 1)
@@ -1011,15 +1009,7 @@ public sealed partial class ExpandedPlayer : Page, IDisposable
                 PageContainer.Background =
                     new SolidColorBrush(albumMainColor!.Value);
             }
-
-            if (Common.Setting.expandedPlayerBackgroundType is not 6 or 7)
-            {
-                return !themeColor.ColorIsDark;
-            }
-            else
-            {
-                return paletteIsDark;
-            }
+            return !themeColor.ColorIsDark;
         }
         catch
         {

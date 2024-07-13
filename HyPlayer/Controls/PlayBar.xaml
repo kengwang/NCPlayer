@@ -323,7 +323,10 @@
                         HorizontalAlignment="Stretch"
                         VerticalAlignment="Stretch"
                         Canvas.ZIndex="15"
-                        Visibility="Collapsed">
+                        Visibility="Collapsed" 
+                        Margin="{x:Bind AlbumImage.Margin}"
+                        CornerRadius="{x:Bind AlbumImage.CornerRadius}"
+                        >
                         <Border.Background>
                             <media:BackdropBlurBrush Amount="10" />
                         </Border.Background>
@@ -343,7 +346,9 @@
                 <Grid
                     Grid.Column="1"
                     VerticalAlignment="Center"
-                    RowSpacing="2">
+                    RowSpacing="2"
+                    x:Name="SongInfoText"
+                    Visibility="Collapsed">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto" />
                         <RowDefinition Height="Auto" />
@@ -892,6 +897,9 @@
                         <AdaptiveTrigger MinWindowWidth="1000" />
                     </VisualState.StateTriggers>
                     <VisualState.Setters>
+                        <Setter Target="AlbumImageHover.Margin" Value="0,0,0,0" />
+                        <Setter Target="MainControlGrid.Margin" Value="-200,0,-200,0" />
+                        <Setter Target="SongInfoText.Visibility" Value="Visible" />
                         <Setter Target="TbSongName.FontSize" Value="22" />
                         <Setter Target="Btns.Visibility" Value="Visible" />
                         <Setter Target="Btns.Margin" Value="10" />
@@ -955,23 +963,29 @@
                         <Setter Target="MainBtnsGrid.Margin" Value="0,5,60,0" />
                     </VisualState.Setters>
                 </VisualState>
+  
                 <VisualState>
                     <VisualState.StateTriggers>
-                        <AdaptiveTrigger MinWindowWidth="999" />
+                        <AdaptiveTrigger MinWindowWidth="859" />
                     </VisualState.StateTriggers>
                     <VisualState.Setters>
-                        <Setter Target="AlbumImageHover.Width" Value="0" />
+                        <Setter Target="TbSongName.MaxWidth" Value="100" />
+                        <Setter Target="TbSongName.HorizontalAlignment" Value="Left" />
+                        <Setter Target="SongInfoText.Visibility" Value="Visible" />
+                        <Setter Target="GridSongAdvancedOperation.Visibility" Value="Collapsed" />
+                        <Setter Target="AlbumImageHover.Width" Value="NaN" />
                         <Setter Target="Btns.Visibility" Value="Visible" />
                         <Setter Target="BtnLike.Visibility" Value="Collapsed" />
                         <Setter Target="BtnPlayRollType.Visibility" Value="Collapsed" />
                         <Setter Target="BtnPreviousSong.(Grid.ColumnSpan)" Value="2" />
-                        <Setter Target="BtnPreviousSong.(Grid.Column)" Value="3" />
+                        <Setter Target="BtnPreviousSong.(Grid.Column)" Value="2" />
                         <Setter Target="BtnPlayStateChange.(Grid.ColumnSpan)" Value="2" />
                         <Setter Target="BtnPlayStateChange.(Grid.Column)" Value="4" />
                         <Setter Target="BtnNextSong.(Grid.ColumnSpan)" Value="2" />
-                        <Setter Target="BtnNextSong.(Grid.Column)" Value="5" />
+                        <Setter Target="BtnNextSong.(Grid.Column)" Value="6" />
                         <Setter Target="MainControlGrid.(Grid.Column)" Value="0" />
                         <Setter Target="MainControlGrid.(Grid.ColumnSpan)" Value="3" />
+                        <Setter Target="MainControlGrid.Margin" Value="0,0,0,0" />
                         <Setter Target="PlayProgress.Margin" Value="90,-5,30,0" />
                         <Setter Target="SongInfoTag.Margin" Value="0,0,0,0" />
                         <Setter Target="TbSongName.Margin" Value="0,-3,0,0" />
@@ -985,7 +999,51 @@
                         <Setter Target="ButtonExpand.Margin" Value="10,10,10,40" />
                         <Setter Target="Btns.Margin" Value="10,10,10,40" />
                         <Setter Target="AlbumImage.Margin" Value="10,0,0,0" />
-                        <Setter Target="AlbumImage.CornerRadius" Value="16" />
+                        <Setter Target="AlbumImage.CornerRadius" Value="8" />
+                        <Setter Target="GridSongAdvancedOperation.Margin" Value="0,0,0,0" />
+                        <Setter Target="GridSongAdvancedOperation.Spacing" Value="5" />
+                        <Setter Target="MainBtnsGrid.Margin" Value="0,5,60,0" />
+                        <Setter Target="TbAlbumName.FontSize" Value="10" />
+                        <Setter Target="TbSingerName.FontSize" Value="10" />
+                        <Setter Target="TbSongName.FontSize" Value="18" />
+                        <Setter Target="MainBtnsGrid.Margin" Value="-100,5,0,0" />
+                        <Setter Target="TbSongTag.Visibility" Value="Collapsed" />
+                        <Setter Target="SongInfoTag.Visibility" Value="Collapsed" />
+                    </VisualState.Setters>
+                </VisualState>
+                <VisualState>
+                    <VisualState.StateTriggers>
+                        <AdaptiveTrigger MinWindowWidth="649" />
+                    </VisualState.StateTriggers>
+                    <VisualState.Setters>
+                        <Setter Target="GridSongAdvancedOperation.Visibility" Value="Collapsed" />
+                        <Setter Target="AlbumImageHover.Width" Value="NaN" />
+                        <Setter Target="Btns.Visibility" Value="Collapsed" />
+                        <Setter Target="BtnLike.Visibility" Value="Collapsed" />
+                        <Setter Target="BtnPlayRollType.Visibility" Value="Collapsed" />
+                        <Setter Target="BtnPreviousSong.(Grid.ColumnSpan)" Value="2" />
+                        <Setter Target="BtnPreviousSong.(Grid.Column)" Value="2" />
+                        <Setter Target="BtnPlayStateChange.(Grid.ColumnSpan)" Value="2" />
+                        <Setter Target="BtnPlayStateChange.(Grid.Column)" Value="4" />
+                        <Setter Target="BtnNextSong.(Grid.ColumnSpan)" Value="2" />
+                        <Setter Target="BtnNextSong.(Grid.Column)" Value="6" />
+                        <Setter Target="MainControlGrid.(Grid.Column)" Value="0" />
+                        <Setter Target="MainControlGrid.(Grid.ColumnSpan)" Value="3" />
+                        <Setter Target="MainControlGrid.Margin" Value="0,0,0,0" />
+                        <Setter Target="PlayProgress.Margin" Value="90,-5,30,0" />
+                        <Setter Target="SongInfoTag.Margin" Value="0,0,0,0" />
+                        <Setter Target="TbSongName.Margin" Value="0,-3,0,0" />
+                        <Setter Target="TbSongTag.FontSize" Value="10" />
+                        <Setter Target="SongInfoTag.Margin" Value="0" />
+                        <Setter Target="SongInfoTag.Height" Value="18" />
+                        <Setter Target="GridSongInfoContainer.Width" Value="500" />
+                        <Setter Target="GridSongInfoContainer.Height" Value="50" />
+                        <Setter Target="GridSongInfoContainer.Margin" Value="5,0,-70,30" />
+                        <Setter Target="ButtonCollapse.Margin" Value="10,10,10,40" />
+                        <Setter Target="ButtonExpand.Margin" Value="10,10,10,40" />
+                        <Setter Target="Btns.Margin" Value="10,10,10,40" />
+                        <Setter Target="AlbumImage.Margin" Value="10,0,0,0" />
+                        <Setter Target="AlbumImage.CornerRadius" Value="8" />
                         <Setter Target="GridSongAdvancedOperation.Margin" Value="0,0,0,0" />
                         <Setter Target="GridSongAdvancedOperation.Spacing" Value="5" />
                         <Setter Target="MainBtnsGrid.Margin" Value="0,5,60,0" />

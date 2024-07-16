@@ -91,6 +91,7 @@
       <DependentUpon>App.xaml</DependentUpon>
     </Compile>
     <Compile Include="Classes\Api.cs" />
+    <Compile Include="Classes\BrushManagement.cs" />
     <Compile Include="Classes\CloudUpload.cs" />
     <Compile Include="Classes\Converters.cs" />
     <Compile Include="Classes\Extensions.cs" />
@@ -108,6 +109,7 @@
     <Compile Include="Controls\ArtistSelectDialog.xaml.cs">
       <DependentUpon>ArtistSelectDialog.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Controls\AutoScrollView.cs" />
     <Compile Include="Controls\CommentsList.xaml.cs">
       <DependentUpon>CommentsList.xaml</DependentUpon>
     </Compile>
@@ -133,6 +135,7 @@
     <Compile Include="Controls\PlaylistItem.xaml.cs">
       <DependentUpon>PlaylistItem.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Controls\Primitives\RedirectVisualView.cs" />
     <Compile Include="Controls\ScrollingTextBlock.xaml.cs">
       <DependentUpon>ScrollingTextBlock.xaml</DependentUpon>
     </Compile>
@@ -349,6 +352,11 @@
     </Page>
     <Page Include="Controls\LyricControl\LyricControl.xaml">
       <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+
+    <Page Include="Controls\Primitives\RedirectVisualView.xaml">
+    <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Pages\WidgetPage.xaml">

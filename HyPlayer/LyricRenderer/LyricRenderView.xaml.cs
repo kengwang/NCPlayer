@@ -35,6 +35,7 @@ namespace HyPlayer.LyricRenderer
         private readonly CustomCircleEase _circleEase = new() { EasingMode = EasingMode.EaseOut };
 
         private bool _pointerPressed;
+        private bool _jumpedLyrics = false;
         private double? _lastPointerPressedYValue;
 
         public bool EnableTranslation
@@ -57,6 +58,10 @@ namespace HyPlayer.LyricRenderer
                 _isTypographyChanged = true;
                 _needRecalculate = true;
             }
+        }
+        public bool HasJumpedLyrics
+        {
+            get => _jumpedLyrics;
         }
 
         public LyricRenderView()
@@ -513,25 +518,30 @@ namespace HyPlayer.LyricRenderer
 
         private void LyricView_DoubleTapped(object sender, DoubleTappedRoutedEventArgs e)
         {
-            
-                foreach (var renderOffsetsKey in Context.RenderOffsets.Keys)
-                {
-                    if (Context.LyricLines[renderOffsetsKey].Hidden)
-                        continue;
-                    if (Context.RenderOffsets[renderOffsetsKey].Y <= e.GetPosition(this).Y &&
-                        Context.RenderOffsets[renderOffsetsKey].Y + Context.LyricLines[renderOffsetsKey].RenderingHeight >=
-                        e.GetPosition(this).Y)
-                    {
-                        Context.LyricLines[renderOffsetsKey].GoToReactionState(ReactionState.Press, Context);
-                        OnRequestSeek?.Invoke(Context.LyricLines[renderOffsetsKey].StartTime);
-                        break;
-                    }
-                }
-                Context.ScrollingDelta = 0;
-            
-            _pointerPressed = true;
-        }
 
+            foreach (var renderOffsetsKey in Context.RenderOffsets.Keys)
+            {
+                if (Context.LyricLines[renderOffsetsKey].Hidden)
+                    continue;
+                if (Context.RenderOffsets[renderOffsetsKey].Y <= e.GetPosition(this).Y &&
+                    Context.RenderOffsets[renderOffsetsKey].Y + Context.LyricLines[renderOffsetsKey].RenderingHeight >=
+                    e.GetPosition(this).Y)
+                {
+                    Context.LyricLines[renderOffsetsKey].GoToReactionState(ReactionState.Press, Context);
+                    OnRequestSeek?.Invoke(Context.LyricLines[renderOffsetsKey].StartTime);
+                    _jumpedLyrics = true;
+                    break;
+                }
+
+            }
+            Context.ScrollingDelta = 0;
+            _pointerPressed = true;
+
+        }
+        private void LyricView_Tapped(object sender, TappedRoutedEventArgs e)
+        {
+            _jumpedLyrics = false;
+        }
         public void PauseLyricRender(bool targetPauseMode)
         {
             LyricView.Paused = targetPauseMode;

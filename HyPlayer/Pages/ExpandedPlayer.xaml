@@ -334,7 +334,8 @@
                         RightTapped="{x:Bind hyplayer:Common.UIElement_RightTapped}"
                         Stretch="Uniform">
                         <ani:Explicit.Animations>
-                            <ani:AnimationSet x:Name="RotateAnimationSet">
+                            <ani:AnimationSet
+                                x:Name="RotateAnimationSet">
                                 <ani:RotationInDegreesAnimation
                                     x:Name="AlbumRotateAnimation"
                                     EasingMode="EaseOut"
@@ -347,9 +348,16 @@
                         </ani:Explicit.Animations>
                         <controls:ImageEx.RenderTransform>
                             <TransformGroup>
-                                <ScaleTransform x:Name="ImageScale" CenterX="300" CenterY="300" />
-                                <TranslateTransform x:Name="ImagePositionOffset" />
-                                <RotateTransform x:Name="ImageRotateTransform" CenterX="280" CenterY="280" />
+                                <ScaleTransform
+                                    x:Name="ImageScale"
+                                    CenterX="300"
+                                    CenterY="300" />
+                                <TranslateTransform
+                                    x:Name="ImagePositionOffset" />
+                                <RotateTransform
+                                    x:Name="ImageRotateTransform"
+                                    CenterX="280"
+                                    CenterY="280" />
                             </TransformGroup>
                         </controls:ImageEx.RenderTransform>
                         <controls:ImageEx.ContextFlyout>
@@ -367,20 +375,25 @@
                             </MenuFlyout>
                         </controls:ImageEx.ContextFlyout>
                         <controls:ImageEx.Source>
-                            <BitmapImage x:Name="ImageAlbumSource" UriSource="/Assets/icon.png" />
+                            <BitmapImage
+                                x:Name="ImageAlbumSource"
+                                UriSource="/Assets/icon.png" />
                         </controls:ImageEx.Source>
                     </controls:ImageEx>
                     <StackPanel
                         x:Name="SongInfo"
                         Grid.Row="2"
                         MaxWidth="600"
-                        Orientation="Horizontal"
+                        VerticalAlignment="Top"
+                        IsTapEnabled="True"
+                        Orientation="Vertical"
                         Spacing="5">
                         <controls:ImageEx
                             x:Name="ImageAlbumImerssive"
                             MaxWidth="250"
                             MaxHeight="250"
-                            HorizontalAlignment="Center"
+                            Margin="20,0,0,0"
+                            HorizontalAlignment="Left"
                             VerticalAlignment="Center"
                             ui:Effects.Shadow="{StaticResource AlbumShadow}"
                             ui:VisualExtensions.NormalizedCenterPoint="0.5"
@@ -394,29 +407,66 @@
                             Visibility="Collapsed" />
                         <Grid
                             MaxWidth="600"
-                            Margin="20"
+                            Margin="20,0,20,20"
                             CornerRadius="0">
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="Auto" />
                                 <RowDefinition Height="Auto" />
                                 <RowDefinition Height="Auto" />
                             </Grid.RowDefinitions>
-                            <controls1:SelectableTextBox
-                                x:Name="TextBlockSongTitle"
+                            <StackPanel x:Name="SongInfoContainer">
+                                <TextBlock
+                                    x:Name="TextBlockSongTitle"
+                                    FontSize="40"
+                                    FontWeight="Bold"
+                                    Foreground="{x:Bind hyplayer:Common.BrushManagement.AccentBrush, Mode=OneWay}"
+                                    IsTextSelectionEnabled="True"
+                                    TextWrapping="Wrap" />
+
+
+                                <StackPanel Orientation="Horizontal" Spacing="12">
+
+                                    <HyperlinkButton
+                                        Name="SingerHyperlinkBtn"
+                                        Click="TextBlockSinger_OnTapped"
+                                        FontSize="18"
+                                        Foreground="{x:Bind hyplayer:Common.BrushManagement.AccentBrush, Mode=OneWay}"
+                                        Style="{StaticResource TextBlockButtonStyle}">
+                                        <controls1:AutoScrollView MaxWidth="300" IsPlaying="True">
+                                            <TextBlock Name="SingerTextBlock" />
+                                        </controls1:AutoScrollView>
+                                    </HyperlinkButton>
+                                    <HyperlinkButton
+                                        Name="AlbumHyperlinkBtn"
+                                        Click="AlbumHyperlinkBtn_OnTapped"
+                                        FontSize="18"
+                                        Foreground="{x:Bind hyplayer:Common.BrushManagement.AccentBrush, Mode=OneWay}"
+                                        Style="{StaticResource TextBlockButtonStyle}">
+                                        <controls1:AutoScrollView MaxWidth="250" IsPlaying="True">
+                                            <TextBlock x:Name="AlbumTextBlock" />
+                                        </controls1:AutoScrollView>
+
+                                    </HyperlinkButton>
+
+                                </StackPanel>
+
+                            </StackPanel>
+                            <!--<controls1:SelectableTextBox
                                 Grid.Row="0"
                                 Margin="0,-10,0,0"
-                                HorizontalAlignment="Stretch"
+                                HorizontalAlignment="Left"
                                 x:FieldModifier="public"
                                 FontSize="36"
                                 FontWeight="Bold"
                                 Text="歌曲名"
-                                TextWrapping="Wrap" />
+                                TextWrapping="Wrap"
+                                Visibility="Collapsed" />
                             <StackPanel
-                                x:Name="SongInfoContainer"
                                 Grid.Row="1"
                                 MaxWidth="600"
                                 Orientation="Horizontal"
-                                Spacing="4">
+                                Spacing="4"
+                                Visibility="Collapsed">
                                 <TextBlock
                                     x:Name="TextBlockSingerNameTip"
                                     Padding="0,6,0,6"
@@ -425,7 +475,6 @@
                                     Text="歌手: "
                                     TextAlignment="Center" />
                                 <HyperlinkButton
-                                    Name="TextBlockSinger"
                                     Click="TextBlockSinger_OnTapped"
                                     FontSize="18"
                                     Style="{StaticResource TextBlockButtonStyle}" />
@@ -434,20 +483,21 @@
                                 Grid.Row="2"
                                 MaxWidth="600"
                                 Orientation="Horizontal"
-                                Spacing="5">
+                                Spacing="5"
+                                Visibility="Collapsed">
                                 <TextBlock
-                                    x:Name="TextBlockAlbumNameTip"
+                                    x:Name="AlbumHyperlinkBtnNameTip"
                                     Padding="0,6,0,6"
                                     FontSize="18"
                                     Foreground="{StaticResource SystemControlForegroundBaseMediumBrush}"
                                     Text="专辑: "
                                     TextAlignment="Center" />
                                 <HyperlinkButton
-                                    Name="TextBlockAlbum"
-                                    Click="TextBlockAlbum_OnTapped"
+
+                                    Click="AlbumHyperlinkBtn_OnTapped"
                                     FontSize="18"
                                     Style="{StaticResource TextBlockButtonStyle}" />
-                            </StackPanel>
+                            </StackPanel>-->
                         </Grid>
                     </StackPanel>
                 </Grid>
@@ -463,7 +513,8 @@
                 <lyricrenderer:LyricRenderView
                     x:Name="LyricBox"
                     RightTapped="LyricBoxContainer_RightTapped"
-                    Tapped="LyricBox_Tapped" />
+                    Tapped="LyricBox_Tapped"
+                    ToolTipService.ToolTip="单击切换到歌曲封面 双击跳转到指定歌词" />
             </Grid>
             <Button
                 x:Name="MoreBtn"
@@ -609,7 +660,7 @@
                     </MenuFlyout>
                 </Button.Flyout>
                 <Button.Content>
-                    <FontIcon Glyph="&#xEDE3;" />
+                    <FontIcon Foreground="{x:Bind hyplayer:Common.BrushManagement.AccentBrush, Mode=OneWay}" Glyph="&#xEDE3;" />
                 </Button.Content>
             </Button>
         </Grid>

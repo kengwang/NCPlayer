@@ -9,15 +9,12 @@ using System.Numerics;
 using System.Threading.Tasks;
 using Windows.UI;
 using Windows.UI.Composition;
-using ColorStop = (float offset, Windows.UI.Color color);
 using Windows.UI.ViewManagement;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Hosting;
 using Windows.UI.Xaml.Media.Animation;
 using Windows.UI.Xaml.Navigation;
-using Windows.UI.Xaml.Controls;
-using Windows.UI.Xaml.Shapes;
-using Windows.UI.Xaml.Media;
+using ColorStop = (float offset, Windows.UI.Color color);
 
 #endregion
 

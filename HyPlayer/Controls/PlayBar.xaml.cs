@@ -353,7 +353,7 @@ DoubleAnimation verticalAnimation;
             {
                 IconLiked.Foreground = isLiked
                     ? new SolidColorBrush(Colors.Red)
-                    : IconPrevious.Foreground;
+                    : new SolidColorBrush(Colors.Transparent);
                 FlyoutLiked.Foreground = isLiked
                     ? new SolidColorBrush(Colors.Red)
                     : Application.Current.Resources["TextFillColorPrimaryBrush"] as Brush;
@@ -548,6 +548,7 @@ DoubleAnimation verticalAnimation;
         GridSongAdvancedOperation.Visibility = Visibility.Collapsed;
         GridSongInfo.Visibility = Visibility.Visible;
         PlayBarBackgroundFadeIn.Begin();
+        Common.BrushManagement.AccentBrush = null;
         if (Common.Setting.expandAnimation && GridSongInfoContainer.Visibility == Visibility.Visible)
         {
             ConnectedAnimation anim1 = null;
@@ -978,13 +979,14 @@ DoubleAnimation verticalAnimation;
                 }
             }
         });
+
     }
 
     private void HyPlayList_OnSongLikeStatusChange(bool isLiked)
     {
         IconLiked.Foreground = isLiked
             ? new SolidColorBrush(Colors.Red)
-            : IconPrevious.Foreground;
+            : new SolidColorBrush(Colors.Transparent);
         FlyoutLiked.Foreground = isLiked
             ? new SolidColorBrush(Colors.Red)
             : Application.Current.Resources["TextFillColorPrimaryBrush"] as Brush;

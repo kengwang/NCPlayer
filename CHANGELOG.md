@@ -1,9 +1,9 @@
 ## 修复优化
 
-修复Isolation内存泄漏，优化Isolation效果
+添加 Xbox 小组件
 
-引入Impressionist替代ColorThief
+ExpandedPlayer布局修改/优化
 
-Impressionist支持帧数调整 渲染倍率调整
+ExpandedPlayer 支持 歌手/专辑文字滚动
 
-修改Playbar样式
+优化AdaptiveUI

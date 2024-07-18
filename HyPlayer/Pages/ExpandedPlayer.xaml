@@ -334,8 +334,7 @@
                         RightTapped="{x:Bind hyplayer:Common.UIElement_RightTapped}"
                         Stretch="Uniform">
                         <ani:Explicit.Animations>
-                            <ani:AnimationSet
-                                x:Name="RotateAnimationSet">
+                            <ani:AnimationSet x:Name="RotateAnimationSet">
                                 <ani:RotationInDegreesAnimation
                                     x:Name="AlbumRotateAnimation"
                                     EasingMode="EaseOut"
@@ -348,16 +347,9 @@
                         </ani:Explicit.Animations>
                         <controls:ImageEx.RenderTransform>
                             <TransformGroup>
-                                <ScaleTransform
-                                    x:Name="ImageScale"
-                                    CenterX="300"
-                                    CenterY="300" />
-                                <TranslateTransform
-                                    x:Name="ImagePositionOffset" />
-                                <RotateTransform
-                                    x:Name="ImageRotateTransform"
-                                    CenterX="280"
-                                    CenterY="280" />
+                                <ScaleTransform x:Name="ImageScale" CenterX="300" CenterY="300" />
+                                <TranslateTransform x:Name="ImagePositionOffset" />
+                                <RotateTransform x:Name="ImageRotateTransform" CenterX="280" CenterY="280" />
                             </TransformGroup>
                         </controls:ImageEx.RenderTransform>
                         <controls:ImageEx.ContextFlyout>
@@ -375,9 +367,7 @@
                             </MenuFlyout>
                         </controls:ImageEx.ContextFlyout>
                         <controls:ImageEx.Source>
-                            <BitmapImage
-                                x:Name="ImageAlbumSource"
-                                UriSource="/Assets/icon.png" />
+                            <BitmapImage x:Name="ImageAlbumSource" UriSource="/Assets/icon.png" />
                         </controls:ImageEx.Source>
                     </controls:ImageEx>
                     <StackPanel
@@ -513,8 +503,7 @@
                 <lyricrenderer:LyricRenderView
                     x:Name="LyricBox"
                     RightTapped="LyricBoxContainer_RightTapped"
-                    Tapped="LyricBox_Tapped"
-                    ToolTipService.ToolTip="单击切换到歌曲封面 双击跳转到指定歌词" />
+                    Tapped="LyricBox_Tapped" />
             </Grid>
             <Button
                 x:Name="MoreBtn"

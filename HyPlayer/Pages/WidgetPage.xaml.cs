@@ -23,6 +23,7 @@ public sealed partial class WidgetPage : Page
 {
     private XboxGameBarWidget _widget;
     private XboxGameBarHotkeyWatcher _hotkeyWatcher;
+    private bool _pointerEntered = false;
 
     public WidgetPage()
     {
@@ -51,6 +52,7 @@ public sealed partial class WidgetPage : Page
         HyPlayList.OnLyricLoaded += OnPlaylistLyricLoaded;
 
         _widget.WindowBoundsChanged += OnResized;
+        _widget.RequestedThemeChanged += RequestedThemeChanged;
         _hotkeyWatcher = XboxGameBarHotkeyWatcher.CreateWatcher(_widget, [VirtualKey.Control, VirtualKey.LeftMenu, VirtualKey.A]);//全局热键
         _hotkeyWatcher.Start();
         _hotkeyWatcher.HotkeySetStateChanged += OnHotkeySetStateChanged;
@@ -71,6 +73,16 @@ public sealed partial class WidgetPage : Page
         MovePreviousButton.Click += MovePreviousButton_Click;
         TipContent.Visibility = Visibility.Collapsed;
         _widget.CloseRequested += Widget_CloseRequested;
+    }
+
+    private void RequestedThemeChanged(XboxGameBarWidget sender, object args)
+    {
+        _ = Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
+        {
+            this.RequestedTheme = _widget.RequestedTheme;
+            LyricView.RequestedTheme = _widget.RequestedTheme;
+            LyricView.ChangeRenderColor(GetIdleBrush().Color, GetAccentBrush().Color);
+        });
     }
 
     private void Widget_CloseRequested(XboxGameBarWidget sender, XboxGameBarWidgetCloseRequestedEventArgs args)
@@ -150,12 +162,16 @@ public sealed partial class WidgetPage : Page
 
     private void WidgetPage_PointerExited(object sender, PointerRoutedEventArgs e)
     {
-        BorderBackground.Visibility = PlayBar.Visibility = Visibility.Collapsed;
+        _pointerEntered = false;
+        BorderBackground.Visibility = Visibility.Collapsed;
+        PlayBar.Visibility = Visibility.Collapsed;
     }
 
     private void WidgetPage_PointerEntered(object sender, PointerRoutedEventArgs e)
     {
-        BorderBackground.Visibility = PlayBar.Visibility = Visibility.Visible;
+        _pointerEntered = true;
+        BorderBackground.Visibility = Visibility.Visible;
+        PlayBar.Visibility = Visibility.Visible;
     }
 
     private void OnPlaylistLyricLoaded()
@@ -256,12 +272,12 @@ public sealed partial class WidgetPage : Page
 
     private SolidColorBrush GetAccentBrush()
     {
-        return Application.Current.Resources["SystemControlPageTextBaseHighBrush"] as SolidColorBrush;
+        return Resources["AccentBrush"] as SolidColorBrush;
     }
 
     private SolidColorBrush GetIdleBrush()
     {
-        return Application.Current.Resources["TextFillColorTertiaryBrush"] as SolidColorBrush;
+        return Resources["IdleBrush"] as SolidColorBrush;
     }
 
 }

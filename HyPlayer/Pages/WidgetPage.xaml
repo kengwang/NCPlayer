@@ -8,8 +8,12 @@
     xmlns:muxc="using:Microsoft.UI.Xaml.Controls"
     xmlns:renderer="using:HyPlayer.LyricRenderer"
     muxc:BackdropMaterial.ApplyToRootOrPageBackground="True"
+    Background="Transparent"
     mc:Ignorable="d">
-
+    <Page.Resources>
+        <SolidColorBrush x:Key="AccentBrush" Color="{ThemeResource SystemBaseHighColor}" />
+        <SolidColorBrush x:Key="IdleBrush" Color="{ThemeResource SystemBaseMediumColor}" />
+    </Page.Resources>
     <Grid Margin="4" CornerRadius="8">
         <Grid.RowDefinitions>
             <RowDefinition Height="*" />
@@ -110,10 +114,6 @@
                     VerticalAlignment="Center"
                     FontSize="16" />
             </Grid>
-
-
         </Grid>
-
-
     </Grid>
 </Page>

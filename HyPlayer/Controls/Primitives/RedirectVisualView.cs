@@ -30,6 +30,10 @@ public class RedirectVisualView : Control
         redirectVisual = compositor.CreateSpriteVisual();
         redirectVisual.RelativeSizeAdjustment = Vector2.One;
         redirectVisual.Brush = childVisualBrush;
+        if (Environment.OSVersion.Version >= SupportedVersion)
+        {
+            redirectVisual.IsPixelSnappingEnabled = UseLayoutRounding;
+        }
 
         if (childVisualBrushOffsetEnabled)
         {
@@ -44,6 +48,7 @@ public class RedirectVisualView : Control
 
     protected virtual bool ChildVisualBrushOffsetEnabled => true;
 
+    private readonly Version SupportedVersion = new Version(10, 0, 20348, 0);
 
     private bool measureChildInBoundingBox = true;
 

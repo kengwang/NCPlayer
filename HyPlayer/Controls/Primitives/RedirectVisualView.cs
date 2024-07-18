@@ -30,7 +30,6 @@ public class RedirectVisualView : Control
         redirectVisual = compositor.CreateSpriteVisual();
         redirectVisual.RelativeSizeAdjustment = Vector2.One;
         redirectVisual.Brush = childVisualBrush;
-        redirectVisual.IsPixelSnappingEnabled = UseLayoutRounding;
 
         if (childVisualBrushOffsetEnabled)
         {

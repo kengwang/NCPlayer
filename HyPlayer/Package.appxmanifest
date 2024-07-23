@@ -69,6 +69,8 @@
                     <GameBarWidget Type="Standard">
                       <HomeMenuVisible>true</HomeMenuVisible>
                       <PinningSupported>true</PinningSupported>
+                      <FavoriteAfterInstall>true</FavoriteAfterInstall>
+                      <ActivateAfterInstall>true</ActivateAfterInstall>
                       <Window>
                         <Size>
                           <Height>300</Height>

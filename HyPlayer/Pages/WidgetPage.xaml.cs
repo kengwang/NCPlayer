@@ -280,4 +280,9 @@ public sealed partial class WidgetPage : Page
         return Resources["IdleBrush"] as SolidColorBrush;
     }
 
+    private void CloseButton_Click(object sender, RoutedEventArgs e)
+    {
+        _widget.Close();
+    }
+
 }

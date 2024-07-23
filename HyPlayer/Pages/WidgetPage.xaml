@@ -6,7 +6,9 @@
     xmlns:local="using:HyPlayer.Pages"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:muxc="using:Microsoft.UI.Xaml.Controls"
+    xmlns:media="using:Microsoft.Toolkit.Uwp.UI.Media"
     xmlns:renderer="using:HyPlayer.LyricRenderer"
+    xmlns:ui="using:Microsoft.Toolkit.Uwp.UI"
     muxc:BackdropMaterial.ApplyToRootOrPageBackground="True"
     Background="Transparent"
     mc:Ignorable="d">
@@ -14,17 +16,19 @@
         <SolidColorBrush x:Key="AccentBrush" Color="{ThemeResource SystemBaseHighColor}" />
         <SolidColorBrush x:Key="IdleBrush" Color="{ThemeResource SystemBaseMediumColor}" />
     </Page.Resources>
-    <Grid Margin="4" CornerRadius="8">
+    <Grid Margin="0" >
         <Grid.RowDefinitions>
             <RowDefinition Height="*" />
             <RowDefinition Height="48" />
         </Grid.RowDefinitions>
         <Border
             x:Name="BorderBackground"
-            Grid.RowSpan="2"
-            Background="{ThemeResource ApplicationPageBackgroundThemeBrush}"
+            Grid.RowSpan="2"  CornerRadius="8"
+            Background="{ThemeResource ApplicationPageBackgroundThemeBrush}" 
             BorderBrush="{ThemeResource CardStrokeColorDefault}"
-            BorderThickness="1" />
+            BorderThickness="1" >
+            
+        </Border>
 
         <renderer:LyricRenderView x:Name="LyricView" Grid.Row="0" />
         <Grid x:Name="TipContent" Grid.Row="0">
@@ -45,7 +49,7 @@
         </Grid>
         <!--  这个透明Border用于触发鼠标事件  -->
         <Border Grid.Row="1" Background="Transparent" />
-        <Grid
+        <Grid CornerRadius="0,0,8,8"
             x:Name="PlayBar"
             Grid.Row="1"
             Margin="0"
@@ -64,6 +68,7 @@
                     <ColumnDefinition Width="Auto" />
                     <ColumnDefinition Width="Auto" />
                     <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
                     <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
                 <!--  上一首  -->
@@ -109,10 +114,11 @@
                 <TextBlock
                     x:Name="CurrentPositionText"
                     Grid.Column="4"
-                    Margin="0,0,12,4"
+                    Margin="0,0,0,4"
                     HorizontalAlignment="Right"
                     VerticalAlignment="Center"
                     FontSize="16" />
+                <Button x:Name="CloseButton" Click="CloseButton_Click" Padding="8" Grid.Column="5" Content="{ui:FontIcon FontSize=16, Glyph=&#xE711;}"  Background="Transparent" BorderBrush="Transparent"/>
             </Grid>
         </Grid>
     </Grid>

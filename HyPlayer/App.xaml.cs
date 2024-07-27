@@ -146,44 +146,33 @@ sealed partial class App : Application
         }
         if (widgetArgs != null)
         {
-            //
-            // Activation Notes:
-            //
-            //    If IsLaunchActivation is true, this is Game Bar launching a new instance
-            // of our widget. This means we have a NEW CoreWindow with corresponding UI
-            // dispatcher, and we MUST create and hold onto a new XboxGameBarWidget.
-            //
-            // Otherwise this is a subsequent activation coming from Game Bar. We MUST
-            // continue to hold the XboxGameBarWidget created during initial activation
-            // and ignore this repeat activation, or just observe the URI command here and act 
-            // accordingly.  It is ok to perform a navigate on the root frame to switch 
-            // views/pages if needed.  Game Bar lets us control the URI for sending widget to
-            // widget commands or receiving a command from another non-widget process. 
-            //
-            // Important Cleanup Notes:
-            //    When our widget is closed--by Game Bar or us calling XboxGameBarWidget.Close()-,
-            // the CoreWindow will get a closed event.  We can register for Window.Closed
-            // event to know when our particular widget has shutdown, and cleanup accordingly.
-            //
-            // NOTE: If a widget's CoreWindow is the LAST CoreWindow being closed for the process
-            // then we won't get the Window.Closed event.  However, we will get the OnSuspending
-            // call and can use that for cleanup.
-            //
             if (widgetArgs.IsLaunchActivation)
             {
                 var widgetFrame = new Frame();
                 rootFrame = widgetFrame;
                 widgetFrame.NavigationFailed += OnNavigationFailed;
                 Window.Current.Content = widgetFrame;
-
                 // Create Game Bar widget object which bootstraps the connection with Game Bar
-                widget = new XboxGameBarWidget(
-                    widgetArgs,
-                    Window.Current.CoreWindow,
-                    widgetFrame);
-                widgetFrame.Navigate(typeof(WidgetPage), widget);
 
-                Window.Current.Closed += WidgetWindowClosed;
+
+                if (widgetArgs.AppExtensionId == "SettingWidget")
+                {
+                    var settingsWidget = new XboxGameBarWidget(
+                        widgetArgs,
+                        Window.Current.CoreWindow,
+                        widgetFrame);
+                    widgetFrame.Navigate(typeof(WidgetSettingsPage), settingsWidget);
+                }
+                else
+                {
+                    widget = new XboxGameBarWidget(
+                        widgetArgs,
+                        Window.Current.CoreWindow,
+                        widgetFrame);
+                    widgetFrame.Navigate(typeof(WidgetPage), widget);
+                    Window.Current.Closed += WidgetWindowClosed;
+
+                }
                 OnLaunchedOrActivatedAsync(args);
                 Window.Current.Activate();
             }

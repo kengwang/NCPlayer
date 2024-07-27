@@ -20,16 +20,7 @@
             <controls:SettingsCard Header="显示发音">
                 <ToggleSwitch HorizontalAlignment="Right" IsOn="{x:Bind _settings.EnableTransliteration, Mode=TwoWay}" />
             </controls:SettingsCard>
-            <controls:SettingsCard Header="对齐方式">
-                <ComboBox
-                    MinWidth="10"
-                    HorizontalAlignment="Right"
-                    SelectedIndex="{x:Bind _settings.LyricAlignment, Mode=TwoWay}">
-                    <ComboBoxItem Content="左对齐" />
-                    <ComboBoxItem Content="居中" />
-                    <ComboBoxItem Content="右对齐" />
-                </ComboBox>
-            </controls:SettingsCard>
+
             <controls:SettingsCard Description="0为自动" Header="歌词大小">
                 <controls1:NumberBox
                     x:Name="LyricSize"
@@ -71,7 +62,25 @@
                     SpinButtonPlacementMode="Inline"
                     Value="{x:Bind _settings.LyricLineSpacing, Mode=TwoWay}" />
             </controls:SettingsCard>
-
+            <controls:SettingsCard Header="歌词字体" Description="需重启小部件">
+                <ComboBox
+                    x:Name="FontComboBox"
+                    MinWidth="10"
+                    HorizontalAlignment="Right"
+                    DisplayMemberPath="Name"
+                    SelectedValue="{x:Bind _settings.LyricFontFamily, Mode=TwoWay}"
+                    SelectedValuePath="Value" />
+            </controls:SettingsCard>
+            <controls:SettingsCard Header="对齐方式">
+                <ComboBox
+                    MinWidth="10"
+                    HorizontalAlignment="Right"
+                    SelectedIndex="{x:Bind _settings.LyricAlignment, Mode=TwoWay}">
+                    <ComboBoxItem Content="左对齐" />
+                    <ComboBoxItem Content="居中" />
+                    <ComboBoxItem Content="右对齐" />
+                </ComboBox>
+            </controls:SettingsCard>
 
         </StackPanel>
     </ScrollViewer>

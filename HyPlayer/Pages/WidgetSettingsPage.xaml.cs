@@ -1,4 +1,5 @@
 ﻿using Microsoft.Gaming.XboxGameBar;
+using Microsoft.Graphics.Canvas.Text;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
@@ -19,6 +20,7 @@ using Windows.UI.Xaml.Data;
 using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
+using static HyPlayer.Pages.Settings;
 
 // https://go.microsoft.com/fwlink/?LinkId=234238 上介绍了“空白页”项模板
 
@@ -35,8 +37,15 @@ namespace HyPlayer.Pages
         {
             this.InitializeComponent();
             _settings = new GameBarSettings(Dispatcher);
-            _settings.PropertyChanged += OnSettingsChanged;
+
         }
+        protected override void OnNavigatedTo(NavigationEventArgs e)
+        {
+            base.OnNavigatedTo(e);
+            _settings.PropertyChanged += OnSettingsChanged;
+            FontComboBox.ItemsSource = GetAllFonts();
+        }
+
 
         private void OnSettingsChanged(object sender, PropertyChangedEventArgs e)
         {
@@ -44,6 +53,23 @@ namespace HyPlayer.Pages
         }
 
         private readonly GameBarSettings _settings;
+
+        private List<FontInfo> GetAllFonts()
+        {
+            var names = CanvasTextFormat.GetSystemFontFamilies();
+            var displayNames = CanvasTextFormat.GetSystemFontFamilies(new[] { "zh-cn" });
+            var models = new List<FontInfo>();
+            for (var i = 0; i < names.Length; i++)
+            {
+                models.Add(new FontInfo
+                {
+                    Name = displayNames[i],
+                    Value = names[i]
+                });
+            }
+
+            return models.OrderBy(t => t.Name).ToList();
+        }
 
 
     }
@@ -99,16 +125,7 @@ namespace HyPlayer.Pages
                 OnPropertyChanged();
             }
         }
-        public int LineRollingCalculator
-        {
-            //  0 - 不进行转换  1 - 自动选择  2 - 网易云优先  3 - Kawazu 转换优先
-            get => GetSettings(nameof(LineRollingCalculator), 0);
-            set
-            {
-                SetValue(value);
-                OnPropertyChanged();
-            }
-        }
+
         public int LyricAlignment
         {
             get => GetSettings(nameof(LyricAlignment), 0);

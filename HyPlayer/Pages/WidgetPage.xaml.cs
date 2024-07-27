@@ -216,7 +216,7 @@ public sealed partial class WidgetPage : Page
         LyricView.Context.LyricPaddingTopRatio = Common.Setting.lyricPaddingTopRatio / 100f;
         LyricView.Context.Debug = Common.Setting.LyricRendererDebugMode;
         LyricView.Context.Effects.Blur = Common.Setting.lyricRenderBlur;
-        LyricView.Context.LineRollingEaseCalculator = _settings.LineRollingCalculator switch
+        LyricView.Context.LineRollingEaseCalculator = Common.Setting.LineRollingCalculator switch
         {
             1 => new SinRollingCalculator(),
             2 => new LyricifyRollingCalculator(),

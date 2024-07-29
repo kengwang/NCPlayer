@@ -1,4 +1,5 @@
 ﻿#nullable enable
+#nullable enable
 using HyPlayer.LyricRenderer.Abstraction;
 using HyPlayer.LyricRenderer.Abstraction.Render;
 using HyPlayer.LyricRenderer.Animator;
@@ -201,10 +202,11 @@ namespace HyPlayer.LyricRenderer.LyricLineRenderers
                     //画发光效果
                     var highlightOpacityEffect = new Microsoft.Graphics.Canvas.Effects.OpacityEffect
                     {
-                        Source = new GaussianBlurEffect
+                        Source = new ShadowEffect
                         {
                             Source = cl,
                             BlurAmount = 6,
+                            ShadowColor = context.PreferTypography.ShadowColor ?? context.PreferTypography.FocusingColor!.Value,
                         },
                         Opacity = 0.4f
                     };

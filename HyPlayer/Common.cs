@@ -378,6 +378,11 @@ namespace HyPlayer
         }
 
 
+
+
+
+
+
         public string lyricFontFamily
         {
             get => GetSettings(nameof(lyricFontFamily), "Microsoft YaHei UI");
@@ -817,6 +822,8 @@ namespace HyPlayer
                 OnPropertyChanged();
             }
         }
+
+
 
         public bool noImage
         {
@@ -1646,6 +1653,8 @@ namespace HyPlayer
                 OnPropertyChanged();
             }
         }
+
+
 
         public bool UseHttp
         {

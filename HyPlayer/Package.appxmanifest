@@ -69,6 +69,9 @@
                     <GameBarWidget Type="Standard">
                       <HomeMenuVisible>true</HomeMenuVisible>
                       <PinningSupported>true</PinningSupported>
+                      <FavoriteAfterInstall>true</FavoriteAfterInstall>
+                      <ActivateAfterInstall>true</ActivateAfterInstall>
+                      <SettingsSupported AppExtensionId="SettingWidget" />
                       <Window>
                         <Size>
                           <Height>300</Height>
@@ -76,6 +79,29 @@
                           <MinHeight>100</MinHeight>
                           <MinWidth>280</MinWidth>
                           <MaxWidth>1600</MaxWidth>
+                        </Size>
+                        <ResizeSupported>
+                          <Horizontal>true</Horizontal>
+                          <Vertical>true</Vertical>
+                        </ResizeSupported>
+                      </Window>
+                    </GameBarWidget>
+                  </uap3:Properties>
+                </uap3:AppExtension>
+              </uap3:Extension>
+              <uap3:Extension Category="windows.appExtension">
+                <uap3:AppExtension Name="microsoft.gameBarUIExtension"
+                                   Id="SettingWidget"
+                                   DisplayName="小部件设置"
+                                   Description="HyPlayer 桌面歌词小部件设置"
+                                   PublicFolder="GameBar\Widget1">
+                  <uap3:Properties>
+                    <GameBarWidget Type="Settings">
+                      <PinningSupported>true</PinningSupported>
+                      <Window>
+                        <Size>
+                          <Height>600</Height>
+                          <Width>512</Width>
                         </Size>
                         <ResizeSupported>
                           <Horizontal>true</Horizontal>

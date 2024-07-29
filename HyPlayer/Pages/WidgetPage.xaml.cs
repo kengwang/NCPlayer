@@ -8,6 +8,7 @@ using System;
 using System.Threading.Tasks;
 using Windows.Media.Playback;
 using Windows.System;
+using Windows.UI;
 using Windows.UI.Core;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
@@ -92,7 +93,7 @@ public sealed partial class WidgetPage : Page
         {
             this.RequestedTheme = _widget.RequestedTheme;
             LyricView.RequestedTheme = _widget.RequestedTheme;
-            LyricView.ChangeRenderColor(GetIdleBrush().Color, GetAccentBrush().Color);
+            LyricView.ChangeRenderColor(GetIdleBrush().Color, GetAccentBrush().Color, Colors.Black);
         });
     }
 
@@ -231,7 +232,7 @@ public sealed partial class WidgetPage : Page
         LyricView.Context.LineSpacing = _settings.LyricLineSpacing;
         LyricView.EnableTranslation = _settings.EnableTranslation;
         LyricView.EnableTransliteration = _settings.EnableTransliteration;
-        LyricView.ChangeRenderColor(GetIdleBrush().Color, GetAccentBrush().Color);
+        LyricView.ChangeRenderColor(GetIdleBrush().Color, GetAccentBrush().Color, Colors.Black);
         UpdateLyricSize();
     }
 

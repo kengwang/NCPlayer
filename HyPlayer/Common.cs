@@ -1918,9 +1918,9 @@ namespace HyPlayer
         }
     }
 
-    internal class HistoryManagement
+    internal class HistoryManagement()
     {
-        public static void InitializeHistoryTrack()
+        public void InitializeHistoryTrack()
         {
             var list = new List<string>();
             if (ApplicationData.Current.LocalSettings.Values["songHistory"] == null)
@@ -1941,7 +1941,7 @@ namespace HyPlayer
                 ApplicationData.Current.LocalSettings.Values["songlistHistory"] = JsonConvert.SerializeObject(list);
         }
 
-        public static void AddNCSongHistory(string songid)
+        public void AddNCSongHistory(string songid)
         {
             var list = new List<string>();
             list = JsonConvert.DeserializeObject<List<string>>(ApplicationData.Current.LocalSettings
@@ -1954,7 +1954,7 @@ namespace HyPlayer
             ApplicationData.Current.LocalSettings.Values["songHistory"] = JsonConvert.SerializeObject(list);
         }
 
-        public static void AddSearchHistory(string Text)
+        public void AddSearchHistory(string Text)
         {
             var list = new List<string>();
             list = JsonConvert.DeserializeObject<List<string>>(ApplicationData.Current.LocalSettings
@@ -1972,7 +1972,7 @@ namespace HyPlayer
             ApplicationData.Current.LocalSettings.Values["searchHistory"] = JsonConvert.SerializeObject(list);
         }
 
-        public static void AddSonglistHistory(string playListid)
+        public void AddSonglistHistory(string playListid)
         {
             var list = new List<string>();
             list = JsonConvert.DeserializeObject<List<string>>(ApplicationData.Current.LocalSettings
@@ -1985,7 +1985,7 @@ namespace HyPlayer
             ApplicationData.Current.LocalSettings.Values["songlistHistory"] = JsonConvert.SerializeObject(list);
         }
 
-        public static async Task SetcurPlayingListHistory(List<string> songids)
+        public async Task SetcurPlayingListHistory(List<string> songids)
         {
             if (Common.Setting.advancedMusicHistoryStorage)
                 try
@@ -2004,7 +2004,7 @@ namespace HyPlayer
                     JsonConvert.SerializeObject(songids.Count > 100 ? songids.GetRange(0, 100) : songids);
         }
 
-        public static async Task ClearHistory()
+        public async Task ClearHistory()
         {
             var list = new List<string>();
             ApplicationData.Current.LocalSettings.Values["songlistHistory"] = JsonConvert.SerializeObject(list);
@@ -2014,7 +2014,7 @@ namespace HyPlayer
                 CreationCollisionOption.OpenIfExists)).DeleteAsync();
         }
 
-        public static async Task<List<NCSong>> GetNCSongHistory()
+        public async Task<List<NCSong>> GetNCSongHistory()
         {
             var retsongs = new List<NCSong>();
             try
@@ -2038,7 +2038,7 @@ namespace HyPlayer
             return new List<NCSong>();
         }
 
-        public static async Task<List<NCPlayList>> GetSonglistHistory()
+        public async Task<List<NCPlayList>> GetSonglistHistory()
         {
             var i = 0;
             var queries = new Dictionary<string, object>();
@@ -2070,13 +2070,13 @@ namespace HyPlayer
             return ret;
         }
 
-        public static List<string> GetSearchHistory()
+        public List<string> GetSearchHistory()
         {
             return JsonConvert.DeserializeObject<List<string>>(ApplicationData.Current.LocalSettings
                 .Values["searchHistory"].ToString());
         }
 
-        public static async Task<List<NCSong>> GetcurPlayingListHistory()
+        public async Task<List<NCSong>> GetcurPlayingListHistory()
         {
             var retsongs = new List<NCSong>();
             List<string> trackIds = new();

@@ -290,7 +290,7 @@ public sealed partial class Settings : Page, IDisposable
     private void ClearHistory_Click(object sender, RoutedEventArgs e)
     {
         if (disposedValue) throw new ObjectDisposedException(nameof(Settings));
-        _ = HistoryManagement.ClearHistory();
+        _ = Locator.Instance.GetService<HistoryManagement>().ClearHistory();
     }
 
 

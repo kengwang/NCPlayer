@@ -134,6 +134,8 @@ sealed partial class App : Application
 
     protected override void OnActivated(IActivatedEventArgs args)
     {
+        base.OnActivated(args);
+
         XboxGameBarWidgetActivatedEventArgs widgetArgs = null;
         if (args.Kind == ActivationKind.Protocol)
         {
@@ -182,7 +184,7 @@ sealed partial class App : Application
             }
         }
 
-        base.OnActivated(args);
+        
         if (args.Kind == ActivationKind.ToastNotification)
         {
             rootFrame = Window.Current.Content as Frame;
@@ -371,7 +373,7 @@ sealed partial class App : Application
     private async void OnSuspending(object sender, SuspendingEventArgs e)
     {
         var deferral = e.SuspendingOperation.GetDeferral();
-        await HistoryManagement.SetcurPlayingListHistory(HyPlayList.List
+        await Locator.Instance.GetService<HistoryManagement>().SetcurPlayingListHistory(HyPlayList.List
             .Where(t => t.ItemType == HyPlayItemType.Netease)
             .Select(t => t.PlayItem.Id).ToList());
         if (Common.XboxGameBarWidget != null)

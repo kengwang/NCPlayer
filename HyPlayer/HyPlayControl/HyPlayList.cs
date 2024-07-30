@@ -274,7 +274,7 @@ public static class HyPlayList
             highTimer.Elapsed += (_, _) => { LoadLyricChange(); };
             highTimer.Start();
         }
-        HistoryManagement.InitializeHistoryTrack();
+        Locator.Instance.GetService<HistoryManagement>().InitializeHistoryTrack();
         if (!Common.Setting.EnableAudioGain) AudioEffectsProperties["AudioGain_Disabled"] = true;
         Player.AddAudioEffect(typeof(AudioGainEffect).FullName, true, AudioEffectsProperties);
         Common.IsInFm = false;

@@ -44,7 +44,7 @@
                 x:Name="HistoryComboBox"
                 Margin="15,0,15,5"
                 HorizontalAlignment="Stretch"
-                ItemsSource="{x:Bind hyplayer:HistoryManagement.GetSearchHistory()}"
+                ItemsSource="{x:Bind SearchHistory}"
                 PlaceholderText="展开搜索历史"
                 SelectionChanged="HistoryComboBox_SelectionChanged" />
         </StackPanel>

@@ -38,12 +38,14 @@ public sealed partial class Search : Page, IDisposable
     private CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource();
     private CancellationToken _cancellationToken;
     private Task _loadResultTask;
+    private List<string> SearchHistory;
 
     public Search()
     {
         InitializeComponent();
         NavigationViewSelector.SelectedItem = NavigationViewSelector.MenuItems[0];
         _cancellationToken = _cancellationTokenSource.Token;
+        SearchHistory = Locator.Instance.GetService<HistoryManagement>().GetSearchHistory();
     }
 
     public bool HasNextPage
@@ -57,6 +59,7 @@ public sealed partial class Search : Page, IDisposable
         get => (bool)GetValue(HasPreviousPageProperty);
         set => SetValue(HasPreviousPageProperty, value);
     }
+
 
     protected override void OnNavigatedTo(NavigationEventArgs e)
     {
@@ -100,7 +103,7 @@ public sealed partial class Search : Page, IDisposable
         }
 
         TBNoRes.Visibility = Visibility.Collapsed;
-        HistoryManagement.AddSearchHistory(searchText);
+        Locator.Instance.GetService<HistoryManagement>().AddSearchHistory(searchText);
 
         SearchResultContainer.ListItems.Clear();
         SongResults.Clear();
@@ -151,6 +154,7 @@ public sealed partial class Search : Page, IDisposable
             if (ex.GetType() != typeof(TaskCanceledException) && ex.GetType() != typeof(OperationCanceledException))
                 Common.AddToTeachingTipLists(ex.Message, (ex.InnerException ?? new Exception()).Message);
         }
+        SearchHistory = Locator.Instance.GetService<HistoryManagement>().GetSearchHistory();
     }
 
     private void LoadMVResult(JObject json)

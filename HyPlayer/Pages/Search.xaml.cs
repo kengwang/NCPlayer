@@ -45,7 +45,7 @@ public sealed partial class Search : Page, IDisposable
         InitializeComponent();
         NavigationViewSelector.SelectedItem = NavigationViewSelector.MenuItems[0];
         _cancellationToken = _cancellationTokenSource.Token;
-        SearchHistory = Locator.Instance.GetService<HistoryManagement>().GetSearchHistory();
+        SearchHistory = Locator.Instance.GetService<Services.HistoryManagement>().GetSearchHistory();
     }
 
     public bool HasNextPage
@@ -103,7 +103,7 @@ public sealed partial class Search : Page, IDisposable
         }
 
         TBNoRes.Visibility = Visibility.Collapsed;
-        Locator.Instance.GetService<HistoryManagement>().AddSearchHistory(searchText);
+        Locator.Instance.GetService<Services.HistoryManagement>().AddSearchHistory(searchText);
 
         SearchResultContainer.ListItems.Clear();
         SongResults.Clear();
@@ -154,7 +154,7 @@ public sealed partial class Search : Page, IDisposable
             if (ex.GetType() != typeof(TaskCanceledException) && ex.GetType() != typeof(OperationCanceledException))
                 Common.AddToTeachingTipLists(ex.Message, (ex.InnerException ?? new Exception()).Message);
         }
-        SearchHistory = Locator.Instance.GetService<HistoryManagement>().GetSearchHistory();
+        SearchHistory = Locator.Instance.GetService<Services.HistoryManagement>().GetSearchHistory();
     }
 
     private void LoadMVResult(JObject json)

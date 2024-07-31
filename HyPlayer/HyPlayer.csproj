@@ -272,6 +272,7 @@
     <Compile Include="Resources\Theme.xaml.cs">
       <DependentUpon>Theme.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Services\HistoryManagement.cs" />
   </ItemGroup>
   <ItemGroup>
     <AppxManifest Include="Package.appxmanifest">

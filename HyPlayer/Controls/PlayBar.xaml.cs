@@ -365,7 +365,7 @@ DoubleAnimation verticalAnimation;
                     : "\uE006";
                 //BtnFlyoutLike.IsChecked = Common.LikedSongs.Contains(HyPlayList.NowPlayingItem.PlayItem.Id);
             });
-            Locator.Instance.GetService<HistoryManagement>().AddNCSongHistory(mpi.PlayItem.Id);
+            Locator.Instance.GetService<Services.HistoryManagement>().AddNCSongHistory(mpi.PlayItem.Id);
         }
 
         /*
@@ -1003,7 +1003,7 @@ DoubleAnimation verticalAnimation;
         if (HyPlayList.PlaySourceId == "local") return;
         try
         {
-            var list = await Locator.Instance.GetService<HistoryManagement>().GetcurPlayingListHistory();
+            var list = await Locator.Instance.GetService<Services.HistoryManagement>().GetcurPlayingListHistory();
             if (list.Count > 0)
             {
                 int.TryParse(ApplicationData.Current.LocalSettings.Values["nowSongPointer"].ToString(),

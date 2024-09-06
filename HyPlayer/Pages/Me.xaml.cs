@@ -9,7 +9,9 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Windows.Graphics.Imaging;
 using Windows.Storage;
+using Windows.Storage.Streams;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Input;
@@ -143,9 +145,21 @@ public sealed partial class Me : Page, IDisposable
         {
             TextBoxUserName.Text = Common.LoginedUser.name;
             TextBoxSignature.Text = Common.LoginedUser.signature;
+            var avatarUri = new Uri(Common.LoginedUser.avatar, UriKind.RelativeOrAbsolute);
+            var avatarImage = new BitmapImage(avatarUri);
             ImageRect.ImageSource = Common.Setting.noImage
                 ? null
-                : new BitmapImage(new Uri(Common.LoginedUser.avatar, UriKind.RelativeOrAbsolute));
+                : avatarImage;
+            using var result = await Common.HttpClient.GetAsync(avatarUri);
+            using var stream = new InMemoryRandomAccessStream();
+            await result.Content.WriteToStreamAsync(stream);
+            _cancellationToken.ThrowIfCancellationRequested();
+            Windows.UI.Color imageMainColor = await ColorExtractor.ExtractColorFromStream(stream);
+            if (MeTitleColor is null)
+            {
+                MeTitleColor = new Windows.UI.Xaml.Media.GradientStop();
+            }
+            MeTitleColor.Color = imageMainColor;
         }
         else
         {
@@ -164,7 +178,21 @@ public sealed partial class Me : Page, IDisposable
                 {
                     var img = new BitmapImage();
                     ImageRect.ImageSource = img;
-                    img.UriSource = new Uri(json["profile"]["avatarUrl"].ToString());
+                    Uri avatarUri = new Uri(json["profile"]["avatarUrl"].ToString());
+                    img.UriSource = avatarUri;
+                    using var result = await Common.HttpClient.GetAsync(avatarUri);
+                    if (result.IsSuccessStatusCode)
+                    {
+                        using var stream = new InMemoryRandomAccessStream();
+                        await result.Content.WriteToStreamAsync(stream);
+                        _cancellationToken.ThrowIfCancellationRequested();
+                        Windows.UI.Color imageMainColor = await ColorExtractor.ExtractColorFromStream(stream);
+                        if (MeTitleColor is null)
+                        {
+                            MeTitleColor = new Windows.UI.Xaml.Media.GradientStop();
+                        }
+                        MeTitleColor.Color = imageMainColor;
+                    }
                 }
                 json.RemoveAll();
             }

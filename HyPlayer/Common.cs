@@ -28,8 +28,11 @@ using Windows.ApplicationModel.Core;
 using Windows.Foundation;
 using Windows.Storage;
 using Windows.System.Display;
+using Windows.System.Power;
 using Windows.UI;
+using Windows.UI.Composition;
 using Windows.UI.Core;
+using Windows.UI.ViewManagement;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Controls.Primitives;
@@ -1387,6 +1390,9 @@ namespace HyPlayer
                 OnPropertyChanged();
             }
         }
+
+        public bool acrylicAvailabiliity => new UISettings().AdvancedEffectsEnabled && Windows.UI.Composition.CompositionCapabilities.GetForCurrentView().AreEffectsFast();
+
 
         public bool expandedPlayerFullCover
         {

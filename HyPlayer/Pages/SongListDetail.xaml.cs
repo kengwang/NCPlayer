@@ -78,16 +78,10 @@ public sealed partial class SongListDetail : Page, IDisposable
             using var stream = new InMemoryRandomAccessStream();
             await result.Content.WriteToStreamAsync(stream);
             _cancellationToken.ThrowIfCancellationRequested();
-            var buffer = new Buffer(MIMEHelper.PICTURE_FILE_HEADER_CAPACITY);
-            stream.Seek(0);
-            await stream.ReadAsync(buffer, MIMEHelper.PICTURE_FILE_HEADER_CAPACITY, InputStreamOptions.None);
-            var mime = MIMEHelper.GetPictureCodecFromBuffer(buffer);
-            var decoder = await BitmapDecoder.CreateAsync(mime, stream);
-            var colors = await ImageDecoder.GetPixelColor(decoder);
-            var color = await Common.PaletteGenerator.CreateThemeColor(colors);
+            Color imageMainColor = await ColorExtractor.ExtractColorFromStream(stream);
             if (AlbumColor != null)
             {
-                _ = Common.Invoke(() => AlbumColor.Color = Color.FromArgb(255, (byte)color.Color.X, (byte)color.Color.Y, (byte)color.Color.Z));
+                _ = Common.Invoke(() => AlbumColor.Color = imageMainColor);
             }
         }
     }

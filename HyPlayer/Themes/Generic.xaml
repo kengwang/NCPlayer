@@ -4,5 +4,6 @@
         <ResourceDictionary Source="/Controls/PivotExtensions/PivotEx.xaml" />
         <ResourceDictionary Source="/Controls/PivotExtensions/PivotExHeaderView.xaml" />
         <ResourceDictionary Source="/Controls/PivotExtensions/PivotView.xaml" />
+        <ResourceDictionary Source="/Controls/Primitives/RedirectVisualView.xaml" />
     </ResourceDictionary.MergedDictionaries>
 </ResourceDictionary>

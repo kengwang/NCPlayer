@@ -85,10 +85,11 @@ public class ProgressBarRenderingLyricLine : RenderingLyricLine
             {
                 surplus = Math.Clamp(1 - (AnimationDuration - remain) * 1.0f / AnimationDuration, 0, 1);
             }
-            var blur = new GaussianBlurEffect
+            var blur = new ShadowEffect
             {
                 Source = cl,
                 BlurAmount = 10,
+                ShadowColor = context.PreferTypography.ShadowColor ?? context.PreferTypography.IdleColor!.Value,
             };
             var opacity = new OpacityEffect
             {

@@ -10,6 +10,7 @@ public class RenderTypography
     public TextAlignment? Alignment { get; set; } = null;
     public Color? IdleColor { get; set; } = null;
     public Color? FocusingColor { get; set; } = null;
+    public Color? ShadowColor { get; set; } = null;
     public float? LyricFontSize { get; set; } = null;
     public float? TranslationFontSize { get; set; } = null;
     public float? TransliterationFontSize { get; set; } = null;
@@ -21,6 +22,7 @@ public class RenderTypography
     {
         Alignment = TextAlignment.Center,
         IdleColor = Colors.White,
+        ShadowColor = Colors.Black,
         FocusingColor = Colors.Yellow,
         LyricFontSize = 24,
         TranslationFontSize = 16,

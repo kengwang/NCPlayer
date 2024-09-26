@@ -7,6 +7,7 @@ using Kawazu;
 using Microsoft.AppCenter;
 using Microsoft.AppCenter.Analytics;
 using Microsoft.AppCenter.Crashes;
+using Microsoft.Gaming.XboxGameBar;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
@@ -39,6 +40,7 @@ sealed partial class App : Application
     private ExtendedExecutionSession executionSession;
 #pragma warning restore CS0169 // 从不使用字段“App.executionSession”
     private Frame rootFrame;
+    private XboxGameBarWidget widget = null;
 
     public App()
     {
@@ -132,6 +134,54 @@ sealed partial class App : Application
 
     protected override void OnActivated(IActivatedEventArgs args)
     {
+        XboxGameBarWidgetActivatedEventArgs widgetArgs = null;
+        if (args.Kind == ActivationKind.Protocol)
+        {
+            var protocolArgs = args as IProtocolActivatedEventArgs;
+            string scheme = protocolArgs.Uri.Scheme;
+            if (scheme.Equals("ms-gamebarwidget"))
+            {
+                widgetArgs = args as XboxGameBarWidgetActivatedEventArgs;
+            }
+        }
+        if (widgetArgs != null)
+        {
+            if (widgetArgs.IsLaunchActivation)
+            {
+                var widgetFrame = new Frame();
+                rootFrame = widgetFrame;
+                widgetFrame.NavigationFailed += OnNavigationFailed;
+                Window.Current.Content = widgetFrame;
+                // Create Game Bar widget object which bootstraps the connection with Game Bar
+
+
+                if (widgetArgs.AppExtensionId == "SettingWidget")
+                {
+                    var settingsWidget = new XboxGameBarWidget(
+                        widgetArgs,
+                        Window.Current.CoreWindow,
+                        widgetFrame);
+                    widgetFrame.Navigate(typeof(WidgetSettingsPage), settingsWidget);
+                }
+                else
+                {
+                    widget = new XboxGameBarWidget(
+                        widgetArgs,
+                        Window.Current.CoreWindow,
+                        widgetFrame);
+                    widgetFrame.Navigate(typeof(WidgetPage), widget);
+                    Window.Current.Closed += WidgetWindowClosed;
+
+                }
+                OnLaunchedOrActivatedAsync(args);
+                Window.Current.Activate();
+            }
+            else
+            {
+                // You can perform whatever behavior you need based on the URI payload.
+            }
+        }
+
         base.OnActivated(args);
         if (args.Kind == ActivationKind.ToastNotification)
         {
@@ -154,9 +204,15 @@ sealed partial class App : Application
         }
         if (args.Kind == ActivationKind.Protocol)
         {
-            var launchUri = ((ProtocolActivatedEventArgs)args).Uri;
-            if (launchUri.Host == "link.last.fm") _ = LastFMManager.TryLoginLastfmAccountFromBrowser(launchUri.Query.Replace("?token=", string.Empty));
+            var launchUri = (args as ProtocolActivatedEventArgs)?.Uri;
+            if (launchUri?.Host == "link.last.fm") _ = LastFMManager.TryLoginLastfmAccountFromBrowser(launchUri.Query.Replace("?token=", string.Empty));
         }
+    }
+
+    private void WidgetWindowClosed(object sender, Windows.UI.Core.CoreWindowEventArgs e)
+    {
+        widget = null;
+        Window.Current.Closed -= WidgetWindowClosed;
     }
 
     private async void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)
@@ -318,6 +374,10 @@ sealed partial class App : Application
         await HistoryManagement.SetcurPlayingListHistory(HyPlayList.List
             .Where(t => t.ItemType == HyPlayItemType.Netease)
             .Select(t => t.PlayItem.Id).ToList());
+        if (Common.XboxGameBarWidget != null)
+        {
+            Common.XboxGameBarWidget.Close();
+        }
         deferral.Complete();
     }
 }

@@ -7,7 +7,8 @@
     xmlns:controls1="using:HyPlayer.Controls"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:hyplayer="using:HyPlayer"
-    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+    xmlns:converters="using:Microsoft.Toolkit.Uwp.UI.Converters"
     xmlns:media="using:Microsoft.Toolkit.Uwp.UI.Media"
     xmlns:muxc="using:Microsoft.UI.Xaml.Controls"
     xmlns:ui="using:Microsoft.Toolkit.Uwp.UI"
@@ -19,6 +20,7 @@
                 <ResourceDictionary x:Key="Default">
                     <AcrylicBrush
                         x:Key="MePageAcrylicBrush"
+                        x:Name="MePageAcrylicBrush"
                         BackgroundSource="Backdrop"
                         FallbackColor="{ThemeResource SystemRevealAltMediumHighColor}"
                         TintColor="{ThemeResource SystemRevealAltHighColor}"
@@ -145,6 +147,8 @@
                     </DataTemplate>
                 </ResourceDictionary>
             </ResourceDictionary.ThemeDictionaries>
+            <converters:BoolToObjectConverter x:Key="BoolToVisibilityInverseConverter" TrueValue="Collapsed" FalseValue="Visible" />
+            <converters:BoolToObjectConverter x:Key="BoolToOpacityConverter" TrueValue="0.5" FalseValue="0." />
         </ResourceDictionary>
 
     </Page.Resources>
@@ -157,19 +161,31 @@
                     <RowDefinition Height="*" />
                 </Grid.RowDefinitions>
                 <Grid Grid.Row="0">
-                    <Border
-                        x:Name="RectangleImageBack"
-                        x:Load="{x:Bind hyplayer:Common.Setting.listHeaderAcrylicBlur}"
-                        Visibility="{x:Bind hyplayer:Common.Setting.listHeaderAcrylicBlur}">
+                    <Grid x:Name="AcrylicGrid" Visibility="{x:Bind hyplayer:Common.Setting.acrylicAvailabiliity}">
+                        <Border
+                            x:Name="RectangleImageBack"
+                            x:Load="{x:Bind hyplayer:Common.Setting.listHeaderAcrylicBlur}"
+                            Visibility="{x:Bind hyplayer:Common.Setting.listHeaderAcrylicBlur}">
+                                <Border.Background>
+                                    <ImageBrush ImageSource="{x:Bind ImageRect.ImageSource, Mode=OneWay}" Stretch="UniformToFill" />
+                                </Border.Background>
+                            </Border>
+                        <Border
+                            x:Name="RectangleImageAcrylic"
+                            x:Load="{x:Bind hyplayer:Common.Setting.listHeaderAcrylicBlur}"
+                            Background="{ThemeResource MePageAcrylicBrush}"
+                            Visibility="{x:Bind hyplayer:Common.Setting.listHeaderAcrylicBlur}" />
+                    </Grid>
+                    
+                    <Border x:Name="RectangleImageFallback" Visibility="{x:Bind hyplayer:Common.Setting.acrylicAvailabiliity, Converter={StaticResource BoolToVisibilityInverseConverter}}">
                         <Border.Background>
                             <ImageBrush ImageSource="{x:Bind userDisplay.AvatarSource, Mode=OneWay}" Stretch="UniformToFill" />
                         </Border.Background>
                     </Border>
-                    <Border
-                        x:Name="RectangleImageAcrylic"
-                        x:Load="{x:Bind hyplayer:Common.Setting.listHeaderAcrylicBlur}"
-                        Background="{ThemeResource MePageAcrylicBrush}"
-                        Visibility="{x:Bind hyplayer:Common.Setting.listHeaderAcrylicBlur}" />
+
+                    
+
+                    
                     <controls:DockPanel
                         x:Name="GridPersonalInformation"
                         Margin="8"
@@ -228,7 +244,7 @@
                     <ui:Effects.Shadow>
                         <media:AttachedCardShadow
                             CornerRadius="0"
-                            Opacity="0.5"
+                            Opacity="{x:Bind Path=hyplayer:Common.Setting.acrylicAvailabiliity, Converter={StaticResource BoolToOpacityConverter}}"
                             Offset="0,1,0"
                             Color="Black" />
                     </ui:Effects.Shadow>

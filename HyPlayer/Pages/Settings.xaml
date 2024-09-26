@@ -1461,7 +1461,7 @@
                                     <Paragraph Margin="0,15,0,0">This is an open-source project under GPL-v3 Licence</Paragraph>
                                     <Paragraph Margin="0,5,0,0">
                                         <Hyperlink NavigateUri="https://github.com/HyPlayer/HyPlayer">
-                                            Github
+                                            GitHub
                                         </Hyperlink>
                                         |<Hyperlink NavigateUri="https://notabug.org/HyPlayer/HyPlayer">
                                             NotABug
@@ -1737,7 +1737,7 @@
                                             </StackPanel>
                                         </StackPanel>
                                         <StackPanel HorizontalAlignment="Right" Orientation="Horizontal">
-                                            <HyperlinkButton Content="Github" NavigateUri="https://github.com/kengwang" />
+                                            <HyperlinkButton Content="GitHub" NavigateUri="https://github.com/kengwang" />
                                             <HyperlinkButton Content="博客" NavigateUri="https://blog.kengwang.com.cn" />
                                             <HyperlinkButton Content="酷安@kengwang" NavigateUri="http://www.coolapk.com/u/1683034" />
                                             <HyperlinkButton Content="爱发电打赏" NavigateUri="https://afdian.net/@kengwang" />
@@ -1769,7 +1769,7 @@
                                             </StackPanel>
                                         </StackPanel>
                                         <StackPanel HorizontalAlignment="Right" Orientation="Horizontal">
-                                            <HyperlinkButton Content="Github" NavigateUri="https://github.com/aaaaaaccd" />
+                                            <HyperlinkButton Content="GitHub" NavigateUri="https://github.com/aaaaaaccd" />
                                             <HyperlinkButton Content="酷安@Aesthed" NavigateUri="https://www.coolapk.com/u/2409682" />
 
                                         </StackPanel>
@@ -1797,7 +1797,7 @@
                                             </StackPanel>
                                         </StackPanel>
                                         <StackPanel HorizontalAlignment="Right" Orientation="Horizontal">
-                                            <HyperlinkButton Content="Github" NavigateUri="https://github.com/EP012014" />
+                                            <HyperlinkButton Content="GitHub" NavigateUri="https://github.com/EP012014" />
                                         </StackPanel>
                                     </Grid>
                                 </Border>
@@ -1826,7 +1826,7 @@
                                             HorizontalAlignment="Right"
                                             Orientation="Horizontal"
                                             Tapped="UIElement_OnTapped">
-                                            <HyperlinkButton Content="Github" NavigateUri="https://github.com/Raspberry-Monster" />
+                                            <HyperlinkButton Content="GitHub" NavigateUri="https://github.com/Raspberry-Monster" />
                                         </StackPanel>
                                     </Grid>
                                 </Border>
@@ -1852,7 +1852,7 @@
                                             </StackPanel>
                                         </StackPanel>
                                         <StackPanel HorizontalAlignment="Right" Orientation="Horizontal">
-                                            <HyperlinkButton Content="Github" NavigateUri="https://github.com/FunnyTHEWorld" />
+                                            <HyperlinkButton Content="GitHub" NavigateUri="https://github.com/FunnyTHEWorld" />
                                             <HyperlinkButton Content="酷安" NavigateUri="https://www.coolapk.com/u/1873068" />
                                         </StackPanel>
                                     </Grid>
@@ -1879,7 +1879,7 @@
                                             </StackPanel>
                                         </StackPanel>
                                         <StackPanel HorizontalAlignment="Right" Orientation="Horizontal">
-                                            <HyperlinkButton Content="Github" NavigateUri="https://github.com/cnbluefire" />
+                                            <HyperlinkButton Content="GitHub" NavigateUri="https://github.com/cnbluefire" />
                                         </StackPanel>
                                     </Grid>
                                 </Border>
@@ -1905,7 +1905,7 @@
                                             </StackPanel>
                                         </StackPanel>
                                         <StackPanel HorizontalAlignment="Right" Orientation="Horizontal">
-                                            <HyperlinkButton Content="Github" NavigateUri="https://github.com/zxbmmmmmmmmm" />
+                                            <HyperlinkButton Content="GitHub" NavigateUri="https://github.com/zxbmmmmmmmmm" />
                                             <HyperlinkButton Content="酷安" NavigateUri="http://www.coolapk.com/u/6052095" />
                                         </StackPanel>
                                     </Grid>
@@ -1935,7 +1935,7 @@
                                             HorizontalAlignment="Right"
                                             Orientation="Horizontal"
                                             Tapped="UIElement_OnTapped">
-                                            <HyperlinkButton Content="Github" NavigateUri="https://github.com/Clrs17" />
+                                            <HyperlinkButton Content="GitHub" NavigateUri="https://github.com/Clrs17" />
                                             <HyperlinkButton Content="知乎" NavigateUri="https://www.zhihu.com/people/ClarisS01017" />
                                         </StackPanel>
                                     </Grid>

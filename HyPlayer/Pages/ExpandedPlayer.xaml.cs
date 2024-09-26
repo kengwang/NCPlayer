@@ -57,11 +57,6 @@ public sealed partial class ExpandedPlayer : Page, IDisposable
         "NowPlaybackSpeed", typeof(string), typeof(ExpandedPlayer),
         new PropertyMetadata("x" + HyPlayList.Player.PlaybackSession.PlaybackRate));
 
-    public SolidColorBrush ForegroundAccentTextBrush =
-        (SolidColorBrush)Application.Current.Resources["SystemControlPageTextBaseHighBrush"];
-
-    public SolidColorBrush ForegroundIdleTextBrush =
-        (SolidColorBrush)Application.Current.Resources["TextFillColorTertiaryBrush"];
 
 
     public bool jumpedLyrics;
@@ -170,6 +165,15 @@ public sealed partial class ExpandedPlayer : Page, IDisposable
         set => SetValue(NowPlaybackSpeedProperty, value);
     }
 
+    public void SingleViewModeToggle()
+    {
+        if (WindowMode == ExpandedWindowMode.Both) return;
+        else
+        {
+            WindowMode = WindowMode == ExpandedWindowMode.LyricOnly ? ExpandedWindowMode.CoverOnly : ExpandedWindowMode.LyricOnly;
+            ChangeWindowMode();
+        }
+    }
     private void HyPlayList_OnPlay()
     {
         _ = Common.Invoke(() =>
@@ -215,7 +219,7 @@ public sealed partial class ExpandedPlayer : Page, IDisposable
             {
                 luminousColorsRotateStoryBoard.Pause();
             }
-            if(LuminousBackground != null)
+            if (LuminousBackground != null)
             {
                 LuminousBackground.Paused = true;
             }
@@ -503,6 +507,18 @@ public sealed partial class ExpandedPlayer : Page, IDisposable
                     null);
 
         NowPlaybackSpeed = "x" + HyPlayList.Player.PlaybackSession.PlaybackRate;
+        if (Common.Setting.pureLyricFocusingColor is not null)
+        {
+            _pureAccentBrushCache ??= Common.BrushManagement.AccentBrush;
+        }
+        if (Common.Setting.pureLyricIdleColor is not null)
+        {
+            _pureIdleBrushCache ??= Common.BrushManagement.IdleBrush;
+        }
+        if (Common.Setting.karaokLyricFocusingColor is not null)
+        {
+            _karaokAccentColorCache ??= Common.BrushManagement.KaraokAccentBrush;
+        }
     }
 
     private readonly BringIntoViewOptions AnimatedBringIntoViewOptions =
@@ -571,7 +587,7 @@ public sealed partial class ExpandedPlayer : Page, IDisposable
             lastlrcid = HyPlayList.NowPlayingHashCode;
             if (HyPlayList.NowPlayingItem == null) return;
             LyricBox.Width = LyricWidth;
-            LyricBox.ChangeRenderColor(GetIdleBrush().Color, GetAccentBrush().Color);
+            LyricBox.ChangeRenderColor(Common.BrushManagement.IdleBrush.Color, Common.BrushManagement.AccentBrush.Color);
             LyricBox.ChangeRenderFontSize((float)showsize, (Common.Setting.translationSize > 0) ? Common.Setting.translationSize : (float)showsize / 2, Common.Setting.romajiSize);
         });
     }
@@ -617,42 +633,10 @@ public sealed partial class ExpandedPlayer : Page, IDisposable
         return alrc;
     }
 
-    private Windows.UI.Color GetKaraokAccentBrush()
-    {
-        if (Common.Setting.karaokLyricFocusingColor is not null)
-        {
-            _karaokAccentColorCache ??= Common.Setting.karaokLyricFocusingColor;
-            return _karaokAccentColorCache.Value;
-        }
 
-        return Common.PageExpandedPlayer != null
-            ? Common.PageExpandedPlayer.ForegroundAccentTextBrush.Color
-            : (Application.Current.Resources["SystemControlPageTextBaseHighBrush"] as SolidColorBrush)!.Color;
-    }
 
-    private SolidColorBrush GetAccentBrush()
-    {
-        if (Common.Setting.pureLyricFocusingColor is not null)
-        {
-            return _pureAccentBrushCache ??= new SolidColorBrush(Common.Setting.pureLyricFocusingColor.Value);
-        }
 
-        return (Common.PageExpandedPlayer != null
-            ? Common.PageExpandedPlayer.ForegroundAccentTextBrush
-            : Application.Current.Resources["SystemControlPageTextBaseHighBrush"] as SolidColorBrush)!;
-    }
 
-    private SolidColorBrush GetIdleBrush()
-    {
-        if (Common.Setting.pureLyricIdleColor is not null)
-        {
-            return _pureIdleBrushCache ??= new SolidColorBrush(Common.Setting.pureLyricIdleColor.Value);
-        }
-
-        return (Common.PageExpandedPlayer != null
-            ? Common.PageExpandedPlayer.ForegroundIdleTextBrush
-            : Application.Current.Resources["TextFillColorTertiaryBrush"] as SolidColorBrush)!;
-    }
 
     public async Task OnEnteringForeground()
     {
@@ -669,9 +653,10 @@ public sealed partial class ExpandedPlayer : Page, IDisposable
         _lyricHasBeenLoaded = lyricIsReady;
         _ = Common.Invoke(() =>
         {
-            TextBlockSinger.Content = mpi?.PlayItem?.ArtistString;
+            var artistText = mpi?.PlayItem?.ArtistString;
+            SingerTextBlock.Text = artistText;
             TextBlockSongTitle.Text = mpi?.PlayItem?.Name;
-            TextBlockAlbum.Content = mpi?.PlayItem?.AlbumString;
+            AlbumTextBlock.Text = mpi?.PlayItem?.AlbumString;
             if (mpi?.PlayItem == null)
             {
                 LyricList.Clear();
@@ -710,15 +695,15 @@ public sealed partial class ExpandedPlayer : Page, IDisposable
         });
     }
 
-    public void RefreshLyricColor()
+    public void RefreshUIColor()
     {
-        LyricBox.ChangeRenderColor(GetIdleBrush().Color, GetAccentBrush().Color);
+        LyricBox.ChangeRenderColor(Common.BrushManagement.IdleBrush.Color, Common.BrushManagement.AccentBrush.Color);
     }
 
     public void StartExpandAnimation()
     {
         ImageAlbum.Visibility = Visibility.Visible;
-        TextBlockSinger.Visibility = Visibility.Visible;
+        SingerHyperlinkBtn.Visibility = Visibility.Visible;
         TextBlockSongTitle.Visibility = Visibility.Visible;
         var anim1 = ConnectedAnimationService.GetForCurrentView().GetAnimation("SongTitle");
         var anim2 = ConnectedAnimationService.GetForCurrentView().GetAnimation("SongImg");
@@ -749,10 +734,10 @@ public sealed partial class ExpandedPlayer : Page, IDisposable
                     ConnectedAnimationService.GetForCurrentView().PrepareToAnimate("SongTitle", TextBlockSongTitle);
                 if (ImageAlbum.ActualSize.X != 0 && ImageAlbum.ActualSize.Y != 0)
                     ConnectedAnimationService.GetForCurrentView().PrepareToAnimate("SongImg", ImageAlbum);
-                if (TextBlockSinger.ActualSize.X != 0 && TextBlockSinger.ActualSize.Y != 0)
-                    ConnectedAnimationService.GetForCurrentView().PrepareToAnimate("SongArtist", TextBlockSinger);
-                if (TextBlockAlbum.ActualSize.X != 0 && TextBlockAlbum.ActualSize.Y != 0)
-                    ConnectedAnimationService.GetForCurrentView().PrepareToAnimate("SongAlbum", TextBlockAlbum);
+                if (SingerHyperlinkBtn.ActualSize.X != 0 && SingerHyperlinkBtn.ActualSize.Y != 0)
+                    ConnectedAnimationService.GetForCurrentView().PrepareToAnimate("SongArtist", SingerHyperlinkBtn);
+                if (AlbumHyperlinkBtn.ActualSize.X != 0 && AlbumHyperlinkBtn.ActualSize.Y != 0)
+                    ConnectedAnimationService.GetForCurrentView().PrepareToAnimate("SongAlbum", AlbumHyperlinkBtn);
             }
         }
         catch
@@ -794,7 +779,7 @@ public sealed partial class ExpandedPlayer : Page, IDisposable
 
     }
 
-    private async void TextBlockAlbum_OnTapped(object sender, RoutedEventArgs e)
+    private async void AlbumHyperlinkBtn_OnTapped(object sender, RoutedEventArgs e)
     {
         try
         {
@@ -945,7 +930,7 @@ public sealed partial class ExpandedPlayer : Page, IDisposable
                 ".ttml" => new AppleSyllableConverter(),
                 ".lys" => new LyricifySyllableConverter(),
                 _ => throw new ArgumentOutOfRangeException()
-            } ;
+            };
             var lrcs = LrcConverter.Convert(converter.Convert(qrc));
             LyricBox.SetLyricLines(lrcs);
         }
@@ -955,15 +940,12 @@ public sealed partial class ExpandedPlayer : Page, IDisposable
     {
         if (WindowMode == ExpandedWindowMode.LyricOnly)
         {
-            await Task.Delay(750);
-            if (!jumpedLyrics)
+            UISettings _uiSettings = new UISettings();
+            await Task.Delay((int)(_uiSettings.DoubleClickTime + 55));
+            if (!LyricBox.HasJumpedLyrics)
             {
                 WindowMode = ExpandedWindowMode.CoverOnly;
                 ChangeWindowMode();
-            }
-            else
-            {
-                jumpedLyrics = false;
             }
         }
     }
@@ -992,7 +974,7 @@ public sealed partial class ExpandedPlayer : Page, IDisposable
 
         if (HyPlayList.NowPlayingItem.PlayItem == null) return false;
 
-        if (lastSongForBrush == HyPlayList.NowPlayingItem.PlayItem) return ForegroundAccentTextBrush.Color.R == 0;
+        if (lastSongForBrush == HyPlayList.NowPlayingItem.PlayItem) return Common.BrushManagement.AccentBrush.Color.R == 0;
         try
         {
             Buffer buffer = new Buffer(MIMEHelper.PICTURE_FILE_HEADER_CAPACITY);
@@ -1003,25 +985,23 @@ public sealed partial class ExpandedPlayer : Page, IDisposable
             var colors = await ImageDecoder.GetPixelColor(decoder);
             ThemeColorResult themeColor;
             PaletteResult palette;
-            var paletteIsDark = false;
             if (Common.Setting.expandedPlayerBackgroundType != 6 && Common.Setting.expandedPlayerBackgroundType != 7)
             {
-                themeColor = await Common.PaletteGenerator.CreateThemeColor(colors, Common.Setting.ImpressionistIgnoreWhite,Common.Setting.ImpressionistLABSpace);
+                themeColor = await Common.PaletteGenerator.CreateThemeColor(colors, Common.Setting.ImpressionistIgnoreWhite, Common.Setting.ImpressionistLABSpace);
                 albumMainColor = Windows.UI.Color.FromArgb(255, (byte)themeColor.Color.X, (byte)themeColor.Color.Y, (byte)themeColor.Color.Z);
             }
             else
             {
-                palette = await Common.PaletteGenerator.CreatePalette(colors, 
-                    Common.Setting.expandedPlayerBackgroundType is 6 ? 9 : 4, 
-                    Common.Setting.ImpressionistIgnoreWhite, 
-                    Common.Setting.ImpressionistLABSpace, 
+                palette = await Common.PaletteGenerator.CreatePalette(colors,
+                    Common.Setting.expandedPlayerBackgroundType is 6 ? 9 : 4,
+                    Common.Setting.ImpressionistIgnoreWhite,
+                    Common.Setting.ImpressionistLABSpace,
                     Common.Setting.ImpressionistUseKMeansPP);
                 themeColor = palette.ThemeColor;
                 albumColors = palette.Palette.Select(quantizedColor => Windows.UI.Color.FromArgb(255, (byte)quantizedColor.X, (byte)quantizedColor.Y, (byte)quantizedColor.Z))
                     .ToList();
                 albumMainColor = Windows.UI.Color.FromArgb(255, (byte)themeColor.Color.X, (byte)themeColor.Color.Y, (byte)themeColor.Color.Z);
                 albumColorVectors = palette.Palette.Select(t => t / 255).ToList();
-                paletteIsDark = palette.PaletteIsDark;
             }
             lastSongForBrush = HyPlayList.NowPlayingItem.PlayItem;
             if (Common.Setting.expandedPlayerBackgroundType is 1)
@@ -1029,15 +1009,7 @@ public sealed partial class ExpandedPlayer : Page, IDisposable
                 PageContainer.Background =
                     new SolidColorBrush(albumMainColor!.Value);
             }
-
-            if (Common.Setting.expandedPlayerBackgroundType is not 6 or 7)
-            {
-                return !themeColor.ColorIsDark;
-            }
-            else
-            {
-                return paletteIsDark;
-            }
+            return !themeColor.ColorIsDark;
         }
         catch
         {
@@ -1200,7 +1172,7 @@ public sealed partial class ExpandedPlayer : Page, IDisposable
         {
             luminousColorsRotateStoryBoard.Resume();
         }
-        if (HyPlayList.IsPlaying && LuminousBackground!= null)
+        if (HyPlayList.IsPlaying && LuminousBackground != null)
         {
             LuminousBackground.Paused = false;
         }
@@ -1366,16 +1338,16 @@ public sealed partial class ExpandedPlayer : Page, IDisposable
                     {
                         if (isBright)
                         {
-                            ForegroundAccentTextBrush = new SolidColorBrush(Windows.UI.Color.FromArgb(255, 0, 0, 0));
-                            ForegroundIdleTextBrush = new SolidColorBrush(Windows.UI.Color.FromArgb(114, 0, 0, 0));
+                            Common.BrushManagement.AccentBrush = new SolidColorBrush(Windows.UI.Color.FromArgb(255, 0, 0, 0));
+                            Common.BrushManagement.IdleBrush = new SolidColorBrush(Windows.UI.Color.FromArgb(114, 0, 0, 0));
                             ImmersiveTopStop.Color = Windows.UI.Color.FromArgb(0, 255, 255, 255);
                             //ImmersiveCover.Color = Windows.UI.Color.FromArgb(255, 210,210, 210);
                         }
                         else
                         {
-                            ForegroundAccentTextBrush =
+                            Common.BrushManagement.AccentBrush =
                                 new SolidColorBrush(Windows.UI.Color.FromArgb(255, 255, 255, 255));
-                            ForegroundIdleTextBrush = new SolidColorBrush(Windows.UI.Color.FromArgb(66, 255, 255, 255));
+                            Common.BrushManagement.IdleBrush = new SolidColorBrush(Windows.UI.Color.FromArgb(66, 255, 255, 255));
                             ImmersiveTopStop.Color = Windows.UI.Color.FromArgb(0, 0, 0, 0);
                             //ImmersiveCover.Color = Windows.UI.Color.FromArgb(255, 35, 35, 35);
                         }
@@ -1387,43 +1359,39 @@ public sealed partial class ExpandedPlayer : Page, IDisposable
                             if (isBright)
                             {
                                 var AccentColor = AdjustBrightness((Windows.UI.Color)albumMainColor, -0.3f);
-                                ForegroundAccentTextBrush = new SolidColorBrush(AccentColor);
+                                Common.BrushManagement.AccentBrush = new SolidColorBrush(AccentColor);
                                 var idleColor = AccentColor;
                                 idleColor.A = 150;
-                                ForegroundIdleTextBrush = new SolidColorBrush(idleColor);
+                                Common.BrushManagement.IdleBrush = new SolidColorBrush(idleColor);
                                 ImmersiveTopStop.Color = Windows.UI.Color.FromArgb(0, 255, 255, 255);
                             }
                             else
                             {
                                 var AccentColor = AdjustBrightness((Windows.UI.Color)albumMainColor, 0.3f);
-                                ForegroundAccentTextBrush = new SolidColorBrush(AccentColor);
+                                Common.BrushManagement.AccentBrush = new SolidColorBrush(AccentColor);
                                 var idleColor = AdjustBrightness((Windows.UI.Color)AccentColor, -0.15f);
                                 idleColor.A = 150;
-                                ForegroundIdleTextBrush = new SolidColorBrush(idleColor);
+                                Common.BrushManagement.IdleBrush = new SolidColorBrush(idleColor);
                                 ImmersiveTopStop.Color = Windows.UI.Color.FromArgb(0, 0, 0, 0);
                             }
                         }
                         else
                         {
                             var AccentColor = AdjustBrightness((Windows.UI.Color)albumMainColor, -0.3f);
-                            ForegroundAccentTextBrush = new SolidColorBrush(AccentColor);
+                            Common.BrushManagement.AccentBrush = new SolidColorBrush(AccentColor);
                             var idleColor = AccentColor;
                             idleColor.A = 150;
-                            ForegroundIdleTextBrush = new SolidColorBrush(idleColor);
+                            Common.BrushManagement.IdleBrush = new SolidColorBrush(idleColor);
                             ImmersiveTopStop.Color = Windows.UI.Color.FromArgb(0, 255, 255, 255);
                         }
                     }
 
 
-                    TextBlockSongTitle.Foreground = ForegroundAccentTextBrush;
-                    TextBlockSingerNameTip.Foreground = ForegroundIdleTextBrush;
-                    TextBlockAlbumNameTip.Foreground = ForegroundIdleTextBrush;
-                    TextBlockSinger.Foreground = ForegroundAccentTextBrush;
-                    TextBlockAlbum.Foreground = ForegroundAccentTextBrush;
+
                     if (Common.Setting.playbarBackgroundElay)
-                        Common.BarPlayBar!.SetPlayBarIdleBackground(ForegroundIdleTextBrush);
+                        Common.BarPlayBar!.SetPlayBarIdleBackground(Common.BrushManagement.IdleBrush);
                     //LoadLyricsBox();
-                    RefreshLyricColor();
+                    RefreshUIColor();
                     if (Common.Setting.expandedPlayerBackgroundType == 6)
                     {
                         BgRect00.Fill = new SolidColorBrush(albumColors[0]);
@@ -1631,6 +1599,7 @@ public sealed partial class ExpandedPlayer : Page, IDisposable
             ImmersiveModeInAniOtrMode.Begin();
         LeftPanel.VerticalAlignment = VerticalAlignment.Bottom;
         Common.IsInImmersiveMode = true;
+        needRedesign++;
     }
 
     private void ImmersiveModeExit()
@@ -1654,6 +1623,7 @@ public sealed partial class ExpandedPlayer : Page, IDisposable
             ImmersiveModeOutAniOtrMode.Begin();
         LeftPanel.VerticalAlignment = VerticalAlignment.Top;
         Common.IsInImmersiveMode = false;
+        needRedesign++;
     }
 
     private void LuminousBackground_SizeChanged(object sender, SizeChangedEventArgs e)
@@ -1669,7 +1639,7 @@ public sealed partial class ExpandedPlayer : Page, IDisposable
     {
         if (_shaderEffect == null)
         {
-            if(Common.PixelShaderShareEffect == null)
+            if (Common.PixelShaderShareEffect == null)
             {
                 StorageFile file = await StorageFile.GetFileFromApplicationUriAsync(new Uri("ms-appx:///Shaders/BackgroundShader.bin"));
                 IBuffer buffer = await FileIO.ReadBufferAsync(file);

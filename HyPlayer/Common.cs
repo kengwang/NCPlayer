@@ -7,6 +7,7 @@ using HyPlayer.HyPlayControl;
 using HyPlayer.Pages;
 using Impressionist.Implementations;
 using Kawazu;
+using Microsoft.Gaming.XboxGameBar;
 using Microsoft.Graphics.Canvas.Effects;
 using Microsoft.Toolkit.Uwp.UI;
 using Microsoft.UI.Xaml.Controls;
@@ -27,8 +28,11 @@ using Windows.ApplicationModel.Core;
 using Windows.Foundation;
 using Windows.Storage;
 using Windows.System.Display;
+using Windows.System.Power;
 using Windows.UI;
+using Windows.UI.Composition;
 using Windows.UI.Core;
+using Windows.UI.ViewManagement;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Controls.Primitives;
@@ -64,8 +68,10 @@ namespace HyPlayer
         public static HttpBaseProtocolFilter? HttpBaseProtocolFilter;
         public static HttpClient? HttpClient;
         public static CloudMusicApi? ncapi;
+        public static XboxGameBarWidget? XboxGameBarWidget;
         public static PixelShaderEffect? PixelShaderShareEffect;
 #nullable restore
+        public static BrushManagement BrushManagement = new();
         public static KMeansPaletteGenerator PaletteGenerator = new();
         public static Setting Setting = new();
         public static bool ShowLyricSound = true;
@@ -75,6 +81,7 @@ namespace HyPlayer
         public static DisplayRequest DisplayRequest = new();
         public static readonly Stack<NavigationHistoryItem> NavigationHistory = new();
         public static readonly DateTime UnixEpoch = new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc).ToLocalTime();
+
         public static void InitializeHttpClientAndAPI()
         {
             ncapi = new CloudMusicApi(Setting.EnableProxy);
@@ -332,7 +339,6 @@ namespace HyPlayer
                     BaseFrame?.GoBack();
             }
         }
-
         public class NavigationHistoryItem
         {
             public object Item;
@@ -373,6 +379,11 @@ namespace HyPlayer
                 OnPropertyChanged();
             }
         }
+
+
+
+
+
 
 
         public string lyricFontFamily
@@ -814,6 +825,8 @@ namespace HyPlayer
                 OnPropertyChanged();
             }
         }
+
+
 
         public bool noImage
         {
@@ -1378,6 +1391,9 @@ namespace HyPlayer
             }
         }
 
+        public bool acrylicAvailabiliity => new UISettings().AdvancedEffectsEnabled && Windows.UI.Composition.CompositionCapabilities.GetForCurrentView().AreEffectsFast();
+
+
         public bool expandedPlayerFullCover
         {
             get => GetSettings(nameof(expandedPlayerFullCover), false);
@@ -1643,6 +1659,8 @@ namespace HyPlayer
                 OnPropertyChanged();
             }
         }
+
+
 
         public bool UseHttp
         {

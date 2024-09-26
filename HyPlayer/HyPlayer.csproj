@@ -91,7 +91,9 @@
       <DependentUpon>App.xaml</DependentUpon>
     </Compile>
     <Compile Include="Classes\Api.cs" />
+    <Compile Include="Classes\BrushManagement.cs" />
     <Compile Include="Classes\CloudUpload.cs" />
+    <Compile Include="Classes\ColorExtractor.cs" />
     <Compile Include="Classes\Converters.cs" />
     <Compile Include="Classes\Extensions.cs" />
     <Compile Include="Classes\ImageDecoder.cs" />
@@ -109,6 +111,7 @@
     <Compile Include="Controls\ArtistSelectDialog.xaml.cs">
       <DependentUpon>ArtistSelectDialog.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Controls\AutoScrollView.cs" />
     <Compile Include="Controls\CommentsList.xaml.cs">
       <DependentUpon>CommentsList.xaml</DependentUpon>
     </Compile>
@@ -134,6 +137,7 @@
     <Compile Include="Controls\PlaylistItem.xaml.cs">
       <DependentUpon>PlaylistItem.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Controls\Primitives\RedirectVisualView.cs" />
     <Compile Include="Controls\ScrollingTextBlock.xaml.cs">
       <DependentUpon>ScrollingTextBlock.xaml</DependentUpon>
     </Compile>
@@ -259,6 +263,12 @@
     <Compile Include="Controls\PivotExtensions\PivotExHeaderView.cs">
       <DependentUpon>PivotExHeaderView.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Pages\WidgetPage.xaml.cs">
+      <DependentUpon>WidgetPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Pages\WidgetSettingsPage.xaml.cs">
+      <DependentUpon>WidgetSettingsPage.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Resources\Theme.xaml.cs">
       <DependentUpon>Theme.xaml</DependentUpon>
@@ -346,6 +356,18 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Controls\LyricControl\LyricControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Controls\Primitives\RedirectVisualView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Pages\WidgetPage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Pages\WidgetSettingsPage.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -572,6 +594,9 @@
     <PackageReference Include="Microsoft.AppCenter.Crashes">
       <Version>5.0.5</Version>
     </PackageReference>
+    <PackageReference Include="Microsoft.Gaming.XboxGameBar">
+      <Version>6.1.240122001</Version>
+    </PackageReference>
     <PackageReference Include="Microsoft.NETCore.UniversalWindowsPlatform">
       <Version>6.2.14</Version>
     </PackageReference>
@@ -594,7 +619,7 @@
       <Version>2.8.6</Version>
     </PackageReference>
     <PackageReference Include="QRCoder">
-      <Version>1.5.1</Version>
+      <Version>1.6.0</Version>
     </PackageReference>
     <PackageReference Include="System.Net.Http">
       <Version>4.3.4</Version>

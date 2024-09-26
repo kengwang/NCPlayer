@@ -65,21 +65,8 @@ public sealed partial class CompactPlayerPage : Page, IDisposable
     private List<Run> WordTextBlocks = new();
     private Dictionary<Run, Storyboard> BlockToAnimation = new();
 
-#nullable enable
-    private Color? _karaokAccentColorCache;
-#nullable restore
     private bool disposedValue;
 
-    private Color GetKaraokAccentBrush()
-    {
-        if (Common.Setting.karaokLyricFocusingColor is not null)
-        {
-            return _karaokAccentColorCache ??= Common.Setting.karaokLyricFocusingColor.Value;
-        }
-        return Common.PageExpandedPlayer != null
-            ? Common.PageExpandedPlayer.ForegroundAccentTextBrush.Color
-            : (Application.Current.Resources["SystemControlPageTextBaseHighBrush"] as SolidColorBrush)!.Color;
-    }
 
     public CompactPlayerPage()
     {

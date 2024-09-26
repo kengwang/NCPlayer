@@ -244,7 +244,7 @@
                     BorderBrush="Transparent"
                     Click="ButtonCollapse_OnClick"
                     CornerRadius="20">
-                    <FontIcon Glyph="&#xE972;" />
+                    <FontIcon Glyph="&#xE972;" Foreground="{x:Bind hy:Common.BrushManagement.AccentBrush, Mode=OneWay}" />
                 </Button>
                 <Button
                     x:Name="Btn_Sub"
@@ -257,7 +257,7 @@
                     CornerRadius="20"
                     ToolTipService.ToolTip="添加到歌单"
                     Visibility="{x:Bind Btn_Share.IsEnabled, Mode=OneWay}">
-                    <FontIcon Glyph="&#xE1DA;" />
+                    <FontIcon Glyph="&#xE1DA;" Foreground="{x:Bind hy:Common.BrushManagement.AccentBrush, Mode=OneWay}"/>
                 </Button>
                 <Button
                     x:Name="Btn_Down"
@@ -270,7 +270,7 @@
                     CornerRadius="20"
                     ToolTipService.ToolTip="下载音乐"
                     Visibility="{x:Bind Btn_Share.IsEnabled, Mode=OneWay}">
-                    <FontIcon Glyph="&#xE118;" />
+                    <FontIcon Glyph="&#xE118;" Foreground="{x:Bind hy:Common.BrushManagement.AccentBrush, Mode=OneWay}" />
                 </Button>
                 <Button
                     x:Name="Btn_Comment"
@@ -284,7 +284,7 @@
                     IsEnabled="{x:Bind Btn_Share.IsEnabled, Mode=OneWay}"
                     ToolTipService.ToolTip="查看评论"
                     Visibility="{x:Bind Mode=OneWay, Path=hy:Common.Setting.notClearMode}">
-                    <FontIcon Glyph="&#xE8F2;" />
+                    <FontIcon Glyph="&#xE8F2;" Foreground="{x:Bind hy:Common.BrushManagement.AccentBrush, Mode=OneWay}" />
                 </Button>
                 <Button
                     x:Name="Btn_Share"
@@ -297,7 +297,7 @@
                     CornerRadius="20"
                     ToolTipService.ToolTip="分享"
                     Visibility="{x:Bind Btn_Share.IsEnabled, Mode=OneWay}">
-                    <FontIcon Glyph="&#xE72D;" />
+                    <FontIcon Glyph="&#xE72D;" Foreground="{x:Bind hy:Common.BrushManagement.AccentBrush, Mode=OneWay}" />
                 </Button>
             </StackPanel>
             <Grid
@@ -323,7 +323,10 @@
                         HorizontalAlignment="Stretch"
                         VerticalAlignment="Stretch"
                         Canvas.ZIndex="15"
-                        Visibility="Collapsed">
+                        Visibility="Collapsed" 
+                        Margin="{x:Bind AlbumImage.Margin}"
+                        CornerRadius="{x:Bind AlbumImage.CornerRadius}"
+                        >
                         <Border.Background>
                             <media:BackdropBlurBrush Amount="10" />
                         </Border.Background>
@@ -343,7 +346,9 @@
                 <Grid
                     Grid.Column="1"
                     VerticalAlignment="Center"
-                    RowSpacing="2">
+                    RowSpacing="2"
+                    x:Name="SongInfoText"
+                    Visibility="Collapsed">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto" />
                         <RowDefinition Height="Auto" />
@@ -485,7 +490,8 @@
                     <FontIcon
                         x:Name="IconPlayType"
                         FontSize="13"
-                        Glyph="&#xE169;" />
+                        Glyph="&#xE169;"
+                        Foreground="{x:Bind hy:Common.BrushManagement.AccentBrush, Mode=OneWay}"/>
                 </Button>
                 <Button
                     x:Name="BtnPreviousSong"
@@ -501,7 +507,8 @@
                     <FontIcon
                         x:Name="IconPrevious"
                         FontSize="13"
-                        Glyph="&#xF8AC;" />
+                        Glyph="&#xF8AC;"
+                        Foreground="{x:Bind hy:Common.BrushManagement.AccentBrush, Mode=OneWay}"/>
                 </Button>
                 <Button
                     x:Name="BtnPlayStateChange"
@@ -520,7 +527,8 @@
                     <FontIcon
                         x:Name="PlayStateIcon"
                         FontSize="18"
-                        Glyph="&#xF5B0;" />
+                        Glyph="&#xF5B0;"
+                        Foreground="{x:Bind hy:Common.BrushManagement.AccentBrush, Mode=OneWay}"/>
                     <!--  EDB4  -->
                 </Button>
                 <Button
@@ -534,7 +542,7 @@
                     BorderThickness="0"
                     Click="BtnNextSong_OnClick"
                     CornerRadius="30">
-                    <FontIcon FontSize="13" Glyph="&#xF8AD;" />
+                    <FontIcon FontSize="13" Glyph="&#xF8AD;" Foreground="{x:Bind hy:Common.BrushManagement.AccentBrush, Mode=OneWay}" />
                 </Button>
                 <Button
                     x:Name="BtnLike"
@@ -547,10 +555,18 @@
                     BorderThickness="0"
                     Click="BtnLike_OnClick"
                     CornerRadius="30">
-                    <FontIcon
+                    <Grid>
+                        <FontIcon
+                        x:Name="IconLikedBackground"
+                        FontSize="14"
+                        Glyph="{x:Bind IconLiked.Glyph}" 
+                        Foreground="{x:Bind hy:Common.BrushManagement.AccentBrush, Mode=OneWay}"
+                        />
+                        <FontIcon
                         x:Name="IconLiked"
                         FontSize="14"
-                        Glyph="&#xE00B;" />
+                        Glyph="&#xE00B;"/>
+                    </Grid>
                 </Button>
             </Grid>
             <Grid
@@ -566,7 +582,8 @@
                     x:Name="TextBlockNowTime"
                     Grid.Column="0"
                     Margin="0,5,5,0"
-                    controls:DockPanel.Dock="Left" />
+                    controls:DockPanel.Dock="Left" 
+                    Foreground="{x:Bind hy:Common.BrushManagement.AccentBrush, Mode=OneWay}"/>
                 <Border Grid.Column="1" Padding="5,0,5,0">
                     <Slider
                         x:Name="SliderProgress"
@@ -585,7 +602,8 @@
                     x:Name="TextBlockTotalTime"
                     Grid.Column="3"
                     Margin="5,5,0,0"
-                    controls:DockPanel.Dock="Right" />
+                    controls:DockPanel.Dock="Right"
+                    Foreground="{x:Bind hy:Common.BrushManagement.AccentBrush, Mode=OneWay}"/>
 
             </Grid>
         </Grid>
@@ -615,7 +633,8 @@
                 <IconSourceElement
                     HorizontalAlignment="Center"
                     VerticalAlignment="Center"
-                    IconSource="{StaticResource DesktopLyricIcon}" />
+                    IconSource="{StaticResource DesktopLyricIcon}"
+                    Foreground="{x:Bind hy:Common.BrushManagement.AccentBrush, Mode=OneWay}"/>
             </ToggleButton>
             <Button
                 x:Name="BtnVolume"
@@ -627,7 +646,7 @@
                 BorderBrush="Transparent"
                 CornerRadius="20"
                 Flyout="{StaticResource VolumeFlyout}">
-                <FontIcon x:Name="BtnVolIcon" Glyph="&#xE15D;" />
+                <FontIcon x:Name="BtnVolIcon" Glyph="&#xE15D;" Foreground="{x:Bind hy:Common.BrushManagement.AccentBrush, Mode=OneWay}" />
                 <!--  E198  -->
             </Button>
             <Button
@@ -709,7 +728,7 @@
                         </StackPanel>
                     </Flyout>
                 </Button.Flyout>
-                <FontIcon Glyph="&#xE142;" />
+                <FontIcon Glyph="&#xE142;" Foreground="{x:Bind hy:Common.BrushManagement.AccentBrush, Mode=OneWay}" />
             </Button>
             <controls:UniformGrid.RenderTransform>
                 <TranslateTransform x:Name="BtnsAni" />
@@ -726,7 +745,7 @@
             BorderBrush="Transparent"
             Click="ButtonExpand_OnClick"
             CornerRadius="20">
-            <FontIcon FontSize="24" Glyph="&#xE971;" />
+            <FontIcon FontSize="24" Glyph="&#xE971;" Foreground="{x:Bind hy:Common.BrushManagement.AccentBrush, Mode=OneWay}" />
             <Button.RenderTransform>
                 <TranslateTransform x:Name="BtnExpandAni" />
             </Button.RenderTransform>
@@ -743,7 +762,7 @@
             Click="ButtonCollapse_OnClick"
             CornerRadius="20"
             Visibility="Collapsed">
-            <FontIcon FontSize="24" Glyph="&#xE972;" />
+            <FontIcon FontSize="24" Glyph="&#xE972;" Foreground="{x:Bind hy:Common.BrushManagement.AccentBrush, Mode=OneWay}" />
         </Button>
         <Button
             x:Name="BtnMore"
@@ -868,7 +887,7 @@
                         Text="{x:Bind hy:Common.Setting.ABEndPointFriendlyValue, Mode=OneWay}" />
                 </MenuFlyout>
             </Button.Flyout>
-            <FontIcon Glyph="&#xE712;" />
+            <FontIcon Glyph="&#xE712;" Foreground="{x:Bind hy:Common.BrushManagement.AccentBrush, Mode=OneWay}"/>
         </Button>
 
         <VisualStateManager.VisualStateGroups>
@@ -878,6 +897,9 @@
                         <AdaptiveTrigger MinWindowWidth="1000" />
                     </VisualState.StateTriggers>
                     <VisualState.Setters>
+                        <Setter Target="AlbumImageHover.Margin" Value="0,0,0,0" />
+                        <Setter Target="MainControlGrid.Margin" Value="-200,0,-200,0" />
+                        <Setter Target="SongInfoText.Visibility" Value="Visible" />
                         <Setter Target="TbSongName.FontSize" Value="22" />
                         <Setter Target="Btns.Visibility" Value="Visible" />
                         <Setter Target="Btns.Margin" Value="10" />
@@ -941,23 +963,29 @@
                         <Setter Target="MainBtnsGrid.Margin" Value="0,5,60,0" />
                     </VisualState.Setters>
                 </VisualState>
+  
                 <VisualState>
                     <VisualState.StateTriggers>
-                        <AdaptiveTrigger MinWindowWidth="999" />
+                        <AdaptiveTrigger MinWindowWidth="859" />
                     </VisualState.StateTriggers>
                     <VisualState.Setters>
-                        <Setter Target="AlbumImageHover.Width" Value="0" />
+                        <Setter Target="TbSongName.MaxWidth" Value="100" />
+                        <Setter Target="TbSongName.HorizontalAlignment" Value="Left" />
+                        <Setter Target="SongInfoText.Visibility" Value="Visible" />
+                        <Setter Target="GridSongAdvancedOperation.Visibility" Value="Collapsed" />
+                        <Setter Target="AlbumImageHover.Width" Value="NaN" />
                         <Setter Target="Btns.Visibility" Value="Visible" />
                         <Setter Target="BtnLike.Visibility" Value="Collapsed" />
                         <Setter Target="BtnPlayRollType.Visibility" Value="Collapsed" />
                         <Setter Target="BtnPreviousSong.(Grid.ColumnSpan)" Value="2" />
-                        <Setter Target="BtnPreviousSong.(Grid.Column)" Value="3" />
+                        <Setter Target="BtnPreviousSong.(Grid.Column)" Value="2" />
                         <Setter Target="BtnPlayStateChange.(Grid.ColumnSpan)" Value="2" />
                         <Setter Target="BtnPlayStateChange.(Grid.Column)" Value="4" />
                         <Setter Target="BtnNextSong.(Grid.ColumnSpan)" Value="2" />
-                        <Setter Target="BtnNextSong.(Grid.Column)" Value="5" />
+                        <Setter Target="BtnNextSong.(Grid.Column)" Value="6" />
                         <Setter Target="MainControlGrid.(Grid.Column)" Value="0" />
                         <Setter Target="MainControlGrid.(Grid.ColumnSpan)" Value="3" />
+                        <Setter Target="MainControlGrid.Margin" Value="0,0,0,0" />
                         <Setter Target="PlayProgress.Margin" Value="90,-5,30,0" />
                         <Setter Target="SongInfoTag.Margin" Value="0,0,0,0" />
                         <Setter Target="TbSongName.Margin" Value="0,-3,0,0" />
@@ -971,7 +999,51 @@
                         <Setter Target="ButtonExpand.Margin" Value="10,10,10,40" />
                         <Setter Target="Btns.Margin" Value="10,10,10,40" />
                         <Setter Target="AlbumImage.Margin" Value="10,0,0,0" />
-                        <Setter Target="AlbumImage.CornerRadius" Value="16" />
+                        <Setter Target="AlbumImage.CornerRadius" Value="8" />
+                        <Setter Target="GridSongAdvancedOperation.Margin" Value="0,0,0,0" />
+                        <Setter Target="GridSongAdvancedOperation.Spacing" Value="5" />
+                        <Setter Target="MainBtnsGrid.Margin" Value="0,5,60,0" />
+                        <Setter Target="TbAlbumName.FontSize" Value="10" />
+                        <Setter Target="TbSingerName.FontSize" Value="10" />
+                        <Setter Target="TbSongName.FontSize" Value="18" />
+                        <Setter Target="MainBtnsGrid.Margin" Value="-100,5,0,0" />
+                        <Setter Target="TbSongTag.Visibility" Value="Collapsed" />
+                        <Setter Target="SongInfoTag.Visibility" Value="Collapsed" />
+                    </VisualState.Setters>
+                </VisualState>
+                <VisualState>
+                    <VisualState.StateTriggers>
+                        <AdaptiveTrigger MinWindowWidth="649" />
+                    </VisualState.StateTriggers>
+                    <VisualState.Setters>
+                        <Setter Target="GridSongAdvancedOperation.Visibility" Value="Collapsed" />
+                        <Setter Target="AlbumImageHover.Width" Value="NaN" />
+                        <Setter Target="Btns.Visibility" Value="Collapsed" />
+                        <Setter Target="BtnLike.Visibility" Value="Collapsed" />
+                        <Setter Target="BtnPlayRollType.Visibility" Value="Collapsed" />
+                        <Setter Target="BtnPreviousSong.(Grid.ColumnSpan)" Value="2" />
+                        <Setter Target="BtnPreviousSong.(Grid.Column)" Value="2" />
+                        <Setter Target="BtnPlayStateChange.(Grid.ColumnSpan)" Value="2" />
+                        <Setter Target="BtnPlayStateChange.(Grid.Column)" Value="4" />
+                        <Setter Target="BtnNextSong.(Grid.ColumnSpan)" Value="2" />
+                        <Setter Target="BtnNextSong.(Grid.Column)" Value="6" />
+                        <Setter Target="MainControlGrid.(Grid.Column)" Value="0" />
+                        <Setter Target="MainControlGrid.(Grid.ColumnSpan)" Value="3" />
+                        <Setter Target="MainControlGrid.Margin" Value="0,0,0,0" />
+                        <Setter Target="PlayProgress.Margin" Value="90,-5,30,0" />
+                        <Setter Target="SongInfoTag.Margin" Value="0,0,0,0" />
+                        <Setter Target="TbSongName.Margin" Value="0,-3,0,0" />
+                        <Setter Target="TbSongTag.FontSize" Value="10" />
+                        <Setter Target="SongInfoTag.Margin" Value="0" />
+                        <Setter Target="SongInfoTag.Height" Value="18" />
+                        <Setter Target="GridSongInfoContainer.Width" Value="500" />
+                        <Setter Target="GridSongInfoContainer.Height" Value="50" />
+                        <Setter Target="GridSongInfoContainer.Margin" Value="5,0,-70,30" />
+                        <Setter Target="ButtonCollapse.Margin" Value="10,10,10,40" />
+                        <Setter Target="ButtonExpand.Margin" Value="10,10,10,40" />
+                        <Setter Target="Btns.Margin" Value="10,10,10,40" />
+                        <Setter Target="AlbumImage.Margin" Value="10,0,0,0" />
+                        <Setter Target="AlbumImage.CornerRadius" Value="8" />
                         <Setter Target="GridSongAdvancedOperation.Margin" Value="0,0,0,0" />
                         <Setter Target="GridSongAdvancedOperation.Spacing" Value="5" />
                         <Setter Target="MainBtnsGrid.Margin" Value="0,5,60,0" />

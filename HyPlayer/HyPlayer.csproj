@@ -106,6 +106,7 @@
     <Compile Include="Classes\StaticSource.cs" />
     <Compile Include="Classes\The163KeyHelper.cs" />
     <Compile Include="Classes\UpdateManager.cs" />
+    <Compile Include="Classes\UserDisplay.cs" />
     <Compile Include="Common.cs" />
     <Compile Include="Controls\ArtistSelectDialog.xaml.cs">
       <DependentUpon>ArtistSelectDialog.xaml</DependentUpon>

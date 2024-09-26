@@ -476,19 +476,17 @@ public class NCAlbum
 public class Comment
 {
     public Comment thisComment => this; //绑定回去用
-    public Uri AvatarUri;
     public string cid;
     public string content;
     public bool HasLiked;
     public bool IsMainComment = true;
     public int likedCount;
-    public string Nickname;
     public int ReplyCount;
     public string resourceId;
     public int resourceType;
     public DateTime SendTime;
-    public string uid;
-    public bool IsByMyself => uid == Common.LoginedUser?.id;
+    public NCUser CommentUser;
+    public bool IsByMyself => CommentUser.id == Common.LoginedUser?.id;
 
     public static Comment CreateFromJson(JToken comment, string resourceId, int resourceType)
     {
@@ -498,14 +496,7 @@ public class Comment
         cmt.cid = comment["commentId"].ToString();
         cmt.SendTime =
             new DateTime(Convert.ToInt64(comment["time"].ToString()) * 10000 + 621355968000000000);
-        cmt.AvatarUri = comment["user"]["avatarUrl"] is null
-            ? new Uri("ms-appx:///Assets/icon.png")
-            : new Uri(comment["user"]["avatarUrl"] + "?param=" +
-                      StaticSource.PICSIZE_COMMENTUSER_AVATAR);
-        cmt.Nickname = comment["user"]["nickname"] is null
-            ? comment["user"]["userId"].ToString()
-            : comment["user"]["nickname"].ToString();
-        cmt.uid = comment["user"]["userId"].ToString();
+        cmt.CommentUser = NCUser.CreateFromJson(comment["user"]);
         cmt.content = comment["content"].ToString();
         cmt.likedCount = comment["likedCount"].ToObject<int>();
         if (comment["showFloorComment"].HasValues)

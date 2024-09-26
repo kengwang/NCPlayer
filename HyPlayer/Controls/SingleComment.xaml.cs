@@ -42,7 +42,7 @@ public sealed partial class SingleComment : UserControl, INotifyPropertyChanged
 
 
     private ObservableCollection<Comment> floorComments = new ObservableCollection<Comment>();
-    private Uri AvatarUri;
+    public UserDisplay CommentUserDisplay;
     private string time;
 
     public SingleComment()
@@ -128,7 +128,7 @@ public sealed partial class SingleComment : UserControl, INotifyPropertyChanged
 
     private void NavToUser_Click(object sender, RoutedEventArgs e)
     {
-        Common.NavigatePage(typeof(Me), MainComment.uid);
+        Common.NavigatePage(typeof(Me), MainComment.CommentUser.id);
     }
 
     private async void SendReply_Click(object sender, RoutedEventArgs e)
@@ -175,14 +175,10 @@ public sealed partial class SingleComment : UserControl, INotifyPropertyChanged
 
     private void UserControl_Loaded(object sender, RoutedEventArgs e)
     {
-        AvatarUri = MainComment.AvatarUri;
-        if (!Common.Setting.noImage)
-        {
-            AvatarSource = new BitmapImage();
-            AvatarSource.UriSource = AvatarUri;
-        }
+        CommentUserDisplay = new(MainComment.CommentUser);
         ReplyBtn.Visibility = Visibility.Visible;
         FloorCommentsExpander.Visibility = MainComment.IsMainComment ? Visibility.Visible : Visibility.Collapsed;
+        Bindings.Update();
     }
 
     private void FloorCommentsExpander_Expanding(Microsoft.UI.Xaml.Controls.Expander sender, Microsoft.UI.Xaml.Controls.ExpanderExpandingEventArgs args)

@@ -622,20 +622,23 @@ public static class HyPlayList
         SongAppendDone();
     }
 
-    public static void LikeSong()
+    public static async void LikeSong()
     {
         var isLiked = Common.LikedSongs.Contains(NowPlayingItem.PlayItem.Id);
         switch (NowPlayingItem.ItemType)
         {
             case HyPlayItemType.Netease:
                 {
-                    _ = Api.LikeSong(NowPlayingItem.PlayItem.Id,
+                    bool res = await Api.LikeSong(NowPlayingItem.PlayItem.Id,
                         !isLiked);
-                    if (isLiked)
-                        Common.LikedSongs.Remove(NowPlayingItem.PlayItem.Id);
-                    else
-                        Common.LikedSongs.Add(NowPlayingItem.PlayItem.Id);
-                    OnSongLikeStatusChange?.Invoke(!isLiked);
+                    if (res)
+                    {
+                        if (isLiked)
+                            Common.LikedSongs.Remove(NowPlayingItem.PlayItem.Id);
+                        else
+                            Common.LikedSongs.Add(NowPlayingItem.PlayItem.Id);
+                        OnSongLikeStatusChange?.Invoke(!isLiked);
+                    }
                     break;
                 }
             case HyPlayItemType.Radio:

@@ -337,7 +337,7 @@ public sealed partial class BasePage : Page
         _ = LoadSongList();
 
         // 执行签到操作
-        DoDailySign();
+        // DoDailySign();
 
         // 播放信息记录
         HyPlayList.OnMediaEnd += Scrobble;

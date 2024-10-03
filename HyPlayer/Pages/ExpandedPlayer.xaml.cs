@@ -1412,6 +1412,10 @@ public sealed partial class ExpandedPlayer : Page, IDisposable
                             _shaderEffect.Properties["color2"] = albumColorVectors[1];
                             _shaderEffect.Properties["color3"] = albumColorVectors[2];
                             _shaderEffect.Properties["color4"] = albumColorVectors[3];
+                            var random = new Random();
+                            _shaderEffect.Properties["RandomValue1"] = (float)random.Next(-50, +50);
+                            _shaderEffect.Properties["RandomValue2"] = (float)random.Next(-50, +50);
+                            _shaderEffect.Properties["RandomValue3"] = (float)random.Next(-50, +50);
                         }
                     }
                 }
@@ -1659,6 +1663,11 @@ public sealed partial class ExpandedPlayer : Page, IDisposable
         LuminousBackground.DpiScale = Common.Setting.IsolationScale;
         _shaderEffect.Properties["Width"] = (float)LuminousBackground.ConvertDipsToPixels((float)LuminousBackground.ActualWidth, Microsoft.Graphics.Canvas.CanvasDpiRounding.Round);
         _shaderEffect.Properties["Height"] = (float)LuminousBackground.ConvertDipsToPixels((float)LuminousBackground.ActualHeight, Microsoft.Graphics.Canvas.CanvasDpiRounding.Round);
+        _shaderEffect.Properties["EnableLightWave"] = Common.Setting.IsolationLightWave;
+        var random = new Random();
+        _shaderEffect.Properties["RandomValue1"] = (float)random.Next(-50, +50);
+        _shaderEffect.Properties["RandomValue2"] = (float)random.Next(-50, +50);
+        _shaderEffect.Properties["RandomValue3"] = (float)random.Next(-50, +50);
         if (!Common.Setting.IsolationFullThrottle)
         {
             LuminousBackground.IsFixedTimeStep = true;

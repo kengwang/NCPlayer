@@ -5,10 +5,10 @@
     xmlns:classes="using:HyPlayer.Classes"
     xmlns:controls="using:Microsoft.Toolkit.Uwp.UI.Controls"
     xmlns:controls1="using:HyPlayer.Controls"
+    xmlns:converters="using:Microsoft.Toolkit.Uwp.UI.Converters"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:hyplayer="using:HyPlayer"
-    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
-    xmlns:converters="using:Microsoft.Toolkit.Uwp.UI.Converters"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:media="using:Microsoft.Toolkit.Uwp.UI.Media"
     xmlns:muxc="using:Microsoft.UI.Xaml.Controls"
     xmlns:ui="using:Microsoft.Toolkit.Uwp.UI"
@@ -147,8 +147,14 @@
                     </DataTemplate>
                 </ResourceDictionary>
             </ResourceDictionary.ThemeDictionaries>
-            <converters:BoolToObjectConverter x:Key="BoolToVisibilityInverseConverter" TrueValue="Collapsed" FalseValue="Visible" />
-            <converters:BoolToObjectConverter x:Key="BoolToOpacityConverter" TrueValue="0.5" FalseValue="0." />
+            <converters:BoolToObjectConverter
+                x:Key="BoolToVisibilityInverseConverter"
+                FalseValue="Visible"
+                TrueValue="Collapsed" />
+            <converters:BoolToObjectConverter
+                x:Key="BoolToOpacityConverter"
+                FalseValue="0."
+                TrueValue="0.5" />
         </ResourceDictionary>
 
     </Page.Resources>
@@ -166,44 +172,43 @@
                             x:Name="RectangleImageBack"
                             x:Load="{x:Bind hyplayer:Common.Setting.listHeaderAcrylicBlur}"
                             Visibility="{x:Bind hyplayer:Common.Setting.listHeaderAcrylicBlur}">
-                                <Border.Background>
-                                    <ImageBrush ImageSource="{x:Bind ImageRect.ImageSource, Mode=OneWay}" Stretch="UniformToFill" />
-                                </Border.Background>
-                            </Border>
+                            <Border.Background>
+                                <ImageBrush ImageSource="{x:Bind userDisplay.AvatarSource}" Stretch="UniformToFill" />
+                            </Border.Background>
+                        </Border>
                         <Border
                             x:Name="RectangleImageAcrylic"
                             x:Load="{x:Bind hyplayer:Common.Setting.listHeaderAcrylicBlur}"
                             Background="{ThemeResource MePageAcrylicBrush}"
                             Visibility="{x:Bind hyplayer:Common.Setting.listHeaderAcrylicBlur}" />
                     </Grid>
-                    
+
                     <Border x:Name="RectangleImageFallback" Visibility="{x:Bind hyplayer:Common.Setting.acrylicAvailabiliity, Converter={StaticResource BoolToVisibilityInverseConverter}}">
                         <Border.Background>
-                            <ImageBrush ImageSource="{x:Bind userDisplay.AvatarSource, Mode=OneWay}" Stretch="UniformToFill" />
+                            <ImageBrush ImageSource="{x:Bind userDisplay.AvatarSource}" Stretch="UniformToFill" />
                         </Border.Background>
                     </Border>
 
-                    
 
-                    
+
+
                     <controls:DockPanel
                         x:Name="GridPersonalInformation"
                         Margin="8"
                         LastChildFill="True">
                         <muxc:PersonPicture
+                            x:Name="UserAvatar"
                             Width="120"
                             Height="120"
                             Margin="20"
                             controls:DockPanel.Dock="Left"
-                            x:Name="UserAvatar"
-                            ProfilePicture="{x:Bind userDisplay.AvatarSource}"
-                            >
+                            ProfilePicture="{x:Bind userDisplay.AvatarSource}">
                             <ui:Effects.Shadow>
                                 <media:AttachedCardShadow
-                                CornerRadius="60"
-                                Opacity="0.3"
-                                Offset="0,4,1"
-                                Color="Black" />
+                                    CornerRadius="60"
+                                    Opacity="0.3"
+                                    Offset="0,4,1"
+                                    Color="Black" />
                             </ui:Effects.Shadow>
                         </muxc:PersonPicture>
                         <StackPanel
@@ -216,7 +221,7 @@
                                 IsTextSelectionEnabled="True"
                                 Style="{StaticResource TitleTextBlockStyle}"
                                 Text="{x:Bind userDisplay.UserName}"
-                                TextWrapping="NoWrap"/>
+                                TextWrapping="NoWrap" />
                             <controls1:SelectableTextBox
                                 x:Name="TextBoxSignature"
                                 FontSize="16"

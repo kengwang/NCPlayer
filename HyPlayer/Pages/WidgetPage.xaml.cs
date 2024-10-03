@@ -24,7 +24,6 @@ public sealed partial class WidgetPage : Page
 {
     private XboxGameBarWidget _widget;
     private XboxGameBarHotkeyWatcher _hotkeyWatcher;
-    private bool _pointerEntered = false;
 
 
     public WidgetPage()

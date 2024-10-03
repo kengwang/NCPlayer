@@ -31,7 +31,6 @@ namespace HyPlayer.Pages
     /// </summary>
     public sealed partial class WidgetSettingsPage : Page
     {
-        private XboxGameBarWidget _widget;
 
         public WidgetSettingsPage()
         {
@@ -49,7 +48,7 @@ namespace HyPlayer.Pages
 
         private void OnSettingsChanged(object sender, PropertyChangedEventArgs e)
         {
-            WidgetPage.Instance.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, WidgetPage.Instance.UpdateLyricViewSettings);
+            _ = WidgetPage.Instance.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, WidgetPage.Instance.UpdateLyricViewSettings);
         }
 
         private readonly GameBarSettings _settings;

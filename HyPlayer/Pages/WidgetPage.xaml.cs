@@ -24,7 +24,6 @@ public sealed partial class WidgetPage : Page
 {
     private XboxGameBarWidget _widget;
     private XboxGameBarHotkeyWatcher _hotkeyWatcher;
-    private bool _pointerEntered = false;
 
 
     public WidgetPage()
@@ -174,14 +173,12 @@ public sealed partial class WidgetPage : Page
 
     private void WidgetPage_PointerExited(object sender, PointerRoutedEventArgs e)
     {
-        _pointerEntered = false;
         BorderBackground.Visibility = Visibility.Collapsed;
         PlayBar.Visibility = Visibility.Collapsed;
     }
 
     private void WidgetPage_PointerEntered(object sender, PointerRoutedEventArgs e)
     {
-        _pointerEntered = true;
         BorderBackground.Visibility = Visibility.Visible;
         PlayBar.Visibility = Visibility.Visible;
     }

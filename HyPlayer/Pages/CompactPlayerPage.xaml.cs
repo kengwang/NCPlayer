@@ -1,7 +1,7 @@
 ﻿using HyPlayer.Classes;
 using HyPlayer.HyPlayControl;
 using LyricParser.Abstraction;
-using Microsoft.Toolkit.Uwp.UI.Media;
+using CommunityToolkit.WinUI.Media;
 using System;
 using System.Collections.Generic;
 using System.Linq;

@@ -3,12 +3,13 @@
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:classes="using:HyPlayer.Classes"
-    xmlns:controls="using:Microsoft.Toolkit.Uwp.UI.Controls"
+    xmlns:controls="using:CommunityToolkit.WinUI.Controls"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:frieren="using:Microsoft.Toolkit.Uwp.UI.Controls"
     xmlns:hy="using:HyPlayer"
     xmlns:local="using:HyPlayer.Controls"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    xmlns:media="using:Microsoft.Toolkit.Uwp.UI.Media"
+    xmlns:media="using:CommunityToolkit.WinUI.Media"
     d:DesignHeight="102.667"
     d:DesignWidth="1289"
     Background="{x:Bind hy:Common.Setting.acrylicBackgroundStatus, Mode=OneWay, Converter={StaticResource BooleanToBarPlayBarBrushesConverter}}"
@@ -198,7 +199,7 @@
             <ColumnDefinition Width="1*" />
             <ColumnDefinition Width="auto" />
         </Grid.ColumnDefinitions>
-        <controls:ImageEx
+        <frieren:ImageEx
             x:Name="PlayBarBackground"
             Grid.Column="0"
             Grid.ColumnSpan="4"
@@ -208,10 +209,10 @@
             Source="{x:Bind AlbumImage.Source, Mode=OneWay}"
             Stretch="UniformToFill"
             Visibility="{x:Bind hy:Common.Setting.playbarBackgroundAcrylic, Mode=OneWay}">
-            <controls:ImageEx.RenderTransform>
+            <frieren:ImageEx.RenderTransform>
                 <ScaleTransform x:Name="BackgroundAni" CenterX="200" CenterY="55" />
-            </controls:ImageEx.RenderTransform>
-        </controls:ImageEx>
+            </frieren:ImageEx.RenderTransform>
+        </frieren:ImageEx>
         <Rectangle
             x:Name="PlayBarAcrylic"
             Grid.Column="0"
@@ -244,7 +245,7 @@
                     BorderBrush="Transparent"
                     Click="ButtonCollapse_OnClick"
                     CornerRadius="20">
-                    <FontIcon Glyph="&#xE972;" Foreground="{x:Bind hy:Common.BrushManagement.AccentBrush, Mode=OneWay}" />
+                    <FontIcon Foreground="{x:Bind hy:Common.BrushManagement.AccentBrush, Mode=OneWay}" Glyph="&#xE972;" />
                 </Button>
                 <Button
                     x:Name="Btn_Sub"
@@ -257,7 +258,7 @@
                     CornerRadius="20"
                     ToolTipService.ToolTip="添加到歌单"
                     Visibility="{x:Bind Btn_Share.IsEnabled, Mode=OneWay}">
-                    <FontIcon Glyph="&#xE1DA;" Foreground="{x:Bind hy:Common.BrushManagement.AccentBrush, Mode=OneWay}"/>
+                    <FontIcon Foreground="{x:Bind hy:Common.BrushManagement.AccentBrush, Mode=OneWay}" Glyph="&#xE1DA;" />
                 </Button>
                 <Button
                     x:Name="Btn_Down"
@@ -270,7 +271,7 @@
                     CornerRadius="20"
                     ToolTipService.ToolTip="下载音乐"
                     Visibility="{x:Bind Btn_Share.IsEnabled, Mode=OneWay}">
-                    <FontIcon Glyph="&#xE118;" Foreground="{x:Bind hy:Common.BrushManagement.AccentBrush, Mode=OneWay}" />
+                    <FontIcon Foreground="{x:Bind hy:Common.BrushManagement.AccentBrush, Mode=OneWay}" Glyph="&#xE118;" />
                 </Button>
                 <Button
                     x:Name="Btn_Comment"
@@ -284,7 +285,7 @@
                     IsEnabled="{x:Bind Btn_Share.IsEnabled, Mode=OneWay}"
                     ToolTipService.ToolTip="查看评论"
                     Visibility="{x:Bind Mode=OneWay, Path=hy:Common.Setting.notClearMode}">
-                    <FontIcon Glyph="&#xE8F2;" Foreground="{x:Bind hy:Common.BrushManagement.AccentBrush, Mode=OneWay}" />
+                    <FontIcon Foreground="{x:Bind hy:Common.BrushManagement.AccentBrush, Mode=OneWay}" Glyph="&#xE8F2;" />
                 </Button>
                 <Button
                     x:Name="Btn_Share"
@@ -297,7 +298,7 @@
                     CornerRadius="20"
                     ToolTipService.ToolTip="分享"
                     Visibility="{x:Bind Btn_Share.IsEnabled, Mode=OneWay}">
-                    <FontIcon Glyph="&#xE72D;" Foreground="{x:Bind hy:Common.BrushManagement.AccentBrush, Mode=OneWay}" />
+                    <FontIcon Foreground="{x:Bind hy:Common.BrushManagement.AccentBrush, Mode=OneWay}" Glyph="&#xE72D;" />
                 </Button>
             </StackPanel>
             <Grid
@@ -320,34 +321,33 @@
                     Tapped="ImageContainer_Tapped">
                     <Border
                         x:Name="AlbumImageHover"
+                        Margin="{x:Bind AlbumImage.Margin}"
                         HorizontalAlignment="Stretch"
                         VerticalAlignment="Stretch"
                         Canvas.ZIndex="15"
-                        Visibility="Collapsed" 
-                        Margin="{x:Bind AlbumImage.Margin}"
                         CornerRadius="{x:Bind AlbumImage.CornerRadius}"
-                        >
+                        Visibility="Collapsed">
                         <Border.Background>
                             <media:BackdropBlurBrush Amount="10" />
                         </Border.Background>
                         <FontIcon Glyph="&#xE70E;" />
                     </Border>
-                    <controls:ImageEx
+                    <frieren:ImageEx
                         x:Name="AlbumImage"
                         EnableLazyLoading="True"
                         IsCacheEnabled="False"
                         PlaceholderStretch="Uniform"
                         Stretch="UniformToFill">
-                        <controls:ImageEx.Source>
+                        <frieren:ImageEx.Source>
                             <BitmapImage x:Name="AlbumImageSource" UriSource="/Assets/icon.png" />
-                        </controls:ImageEx.Source>
-                    </controls:ImageEx>
+                        </frieren:ImageEx.Source>
+                    </frieren:ImageEx>
                 </Grid>
                 <Grid
+                    x:Name="SongInfoText"
                     Grid.Column="1"
                     VerticalAlignment="Center"
                     RowSpacing="2"
-                    x:Name="SongInfoText"
                     Visibility="Collapsed">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto" />
@@ -490,8 +490,8 @@
                     <FontIcon
                         x:Name="IconPlayType"
                         FontSize="13"
-                        Glyph="&#xE169;"
-                        Foreground="{x:Bind hy:Common.BrushManagement.AccentBrush, Mode=OneWay}"/>
+                        Foreground="{x:Bind hy:Common.BrushManagement.AccentBrush, Mode=OneWay}"
+                        Glyph="&#xE169;" />
                 </Button>
                 <Button
                     x:Name="BtnPreviousSong"
@@ -507,8 +507,8 @@
                     <FontIcon
                         x:Name="IconPrevious"
                         FontSize="13"
-                        Glyph="&#xF8AC;"
-                        Foreground="{x:Bind hy:Common.BrushManagement.AccentBrush, Mode=OneWay}"/>
+                        Foreground="{x:Bind hy:Common.BrushManagement.AccentBrush, Mode=OneWay}"
+                        Glyph="&#xF8AC;" />
                 </Button>
                 <Button
                     x:Name="BtnPlayStateChange"
@@ -527,8 +527,8 @@
                     <FontIcon
                         x:Name="PlayStateIcon"
                         FontSize="18"
-                        Glyph="&#xF5B0;"
-                        Foreground="{x:Bind hy:Common.BrushManagement.AccentBrush, Mode=OneWay}"/>
+                        Foreground="{x:Bind hy:Common.BrushManagement.AccentBrush, Mode=OneWay}"
+                        Glyph="&#xF5B0;" />
                     <!--  EDB4  -->
                 </Button>
                 <Button
@@ -542,7 +542,10 @@
                     BorderThickness="0"
                     Click="BtnNextSong_OnClick"
                     CornerRadius="30">
-                    <FontIcon FontSize="13" Glyph="&#xF8AD;" Foreground="{x:Bind hy:Common.BrushManagement.AccentBrush, Mode=OneWay}" />
+                    <FontIcon
+                        FontSize="13"
+                        Foreground="{x:Bind hy:Common.BrushManagement.AccentBrush, Mode=OneWay}"
+                        Glyph="&#xF8AD;" />
                 </Button>
                 <Button
                     x:Name="BtnLike"
@@ -557,15 +560,14 @@
                     CornerRadius="30">
                     <Grid>
                         <FontIcon
-                        x:Name="IconLikedBackground"
-                        FontSize="14"
-                        Glyph="{x:Bind IconLiked.Glyph}" 
-                        Foreground="{x:Bind hy:Common.BrushManagement.AccentBrush, Mode=OneWay}"
-                        />
+                            x:Name="IconLikedBackground"
+                            FontSize="14"
+                            Foreground="{x:Bind hy:Common.BrushManagement.AccentBrush, Mode=OneWay}"
+                            Glyph="{x:Bind IconLiked.Glyph}" />
                         <FontIcon
-                        x:Name="IconLiked"
-                        FontSize="14"
-                        Glyph="&#xE00B;"/>
+                            x:Name="IconLiked"
+                            FontSize="14"
+                            Glyph="&#xE00B;" />
                     </Grid>
                 </Button>
             </Grid>
@@ -582,8 +584,8 @@
                     x:Name="TextBlockNowTime"
                     Grid.Column="0"
                     Margin="0,5,5,0"
-                    controls:DockPanel.Dock="Left" 
-                    Foreground="{x:Bind hy:Common.BrushManagement.AccentBrush, Mode=OneWay}"/>
+                    controls:DockPanel.Dock="Left"
+                    Foreground="{x:Bind hy:Common.BrushManagement.AccentBrush, Mode=OneWay}" />
                 <Border Grid.Column="1" Padding="5,0,5,0">
                     <Slider
                         x:Name="SliderProgress"
@@ -603,7 +605,7 @@
                     Grid.Column="3"
                     Margin="5,5,0,0"
                     controls:DockPanel.Dock="Right"
-                    Foreground="{x:Bind hy:Common.BrushManagement.AccentBrush, Mode=OneWay}"/>
+                    Foreground="{x:Bind hy:Common.BrushManagement.AccentBrush, Mode=OneWay}" />
 
             </Grid>
         </Grid>
@@ -633,8 +635,8 @@
                 <IconSourceElement
                     HorizontalAlignment="Center"
                     VerticalAlignment="Center"
-                    IconSource="{StaticResource DesktopLyricIcon}"
-                    Foreground="{x:Bind hy:Common.BrushManagement.AccentBrush, Mode=OneWay}"/>
+                    Foreground="{x:Bind hy:Common.BrushManagement.AccentBrush, Mode=OneWay}"
+                    IconSource="{StaticResource DesktopLyricIcon}" />
             </ToggleButton>
             <Button
                 x:Name="BtnVolume"
@@ -646,7 +648,10 @@
                 BorderBrush="Transparent"
                 CornerRadius="20"
                 Flyout="{StaticResource VolumeFlyout}">
-                <FontIcon x:Name="BtnVolIcon" Glyph="&#xE15D;" Foreground="{x:Bind hy:Common.BrushManagement.AccentBrush, Mode=OneWay}" />
+                <FontIcon
+                    x:Name="BtnVolIcon"
+                    Foreground="{x:Bind hy:Common.BrushManagement.AccentBrush, Mode=OneWay}"
+                    Glyph="&#xE15D;" />
                 <!--  E198  -->
             </Button>
             <Button
@@ -728,7 +733,7 @@
                         </StackPanel>
                     </Flyout>
                 </Button.Flyout>
-                <FontIcon Glyph="&#xE142;" Foreground="{x:Bind hy:Common.BrushManagement.AccentBrush, Mode=OneWay}" />
+                <FontIcon Foreground="{x:Bind hy:Common.BrushManagement.AccentBrush, Mode=OneWay}" Glyph="&#xE142;" />
             </Button>
             <controls:UniformGrid.RenderTransform>
                 <TranslateTransform x:Name="BtnsAni" />
@@ -745,7 +750,10 @@
             BorderBrush="Transparent"
             Click="ButtonExpand_OnClick"
             CornerRadius="20">
-            <FontIcon FontSize="24" Glyph="&#xE971;" Foreground="{x:Bind hy:Common.BrushManagement.AccentBrush, Mode=OneWay}" />
+            <FontIcon
+                FontSize="24"
+                Foreground="{x:Bind hy:Common.BrushManagement.AccentBrush, Mode=OneWay}"
+                Glyph="&#xE971;" />
             <Button.RenderTransform>
                 <TranslateTransform x:Name="BtnExpandAni" />
             </Button.RenderTransform>
@@ -762,7 +770,10 @@
             Click="ButtonCollapse_OnClick"
             CornerRadius="20"
             Visibility="Collapsed">
-            <FontIcon FontSize="24" Glyph="&#xE972;" Foreground="{x:Bind hy:Common.BrushManagement.AccentBrush, Mode=OneWay}" />
+            <FontIcon
+                FontSize="24"
+                Foreground="{x:Bind hy:Common.BrushManagement.AccentBrush, Mode=OneWay}"
+                Glyph="&#xE972;" />
         </Button>
         <Button
             x:Name="BtnMore"
@@ -887,7 +898,7 @@
                         Text="{x:Bind hy:Common.Setting.ABEndPointFriendlyValue, Mode=OneWay}" />
                 </MenuFlyout>
             </Button.Flyout>
-            <FontIcon Glyph="&#xE712;" Foreground="{x:Bind hy:Common.BrushManagement.AccentBrush, Mode=OneWay}"/>
+            <FontIcon Foreground="{x:Bind hy:Common.BrushManagement.AccentBrush, Mode=OneWay}" Glyph="&#xE712;" />
         </Button>
 
         <VisualStateManager.VisualStateGroups>
@@ -963,7 +974,7 @@
                         <Setter Target="MainBtnsGrid.Margin" Value="0,5,60,0" />
                     </VisualState.Setters>
                 </VisualState>
-  
+
                 <VisualState>
                     <VisualState.StateTriggers>
                         <AdaptiveTrigger MinWindowWidth="859" />

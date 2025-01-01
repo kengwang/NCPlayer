@@ -6,9 +6,9 @@
     xmlns:local="using:HyPlayer.Pages"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:muxc="using:Microsoft.UI.Xaml.Controls"
-    xmlns:media="using:Microsoft.Toolkit.Uwp.UI.Media"
+    xmlns:media="using:CommunityToolkit.WinUI.Media"
     xmlns:renderer="using:HyPlayer.LyricRenderer"
-    xmlns:ui="using:Microsoft.Toolkit.Uwp.UI"
+    xmlns:ui="using:CommunityToolkit.WinUI"
     muxc:BackdropMaterial.ApplyToRootOrPageBackground="True"
     Background="Transparent"
     mc:Ignorable="d">

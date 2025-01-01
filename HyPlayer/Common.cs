@@ -9,7 +9,7 @@ using Impressionist.Implementations;
 using Kawazu;
 using Microsoft.Gaming.XboxGameBar;
 using Microsoft.Graphics.Canvas.Effects;
-using Microsoft.Toolkit.Uwp.UI;
+using CommunityToolkit.WinUI;
 using Microsoft.UI.Xaml.Controls;
 using NeteaseCloudMusicApi;
 using Newtonsoft.Json;
@@ -41,6 +41,7 @@ using Windows.UI.Xaml.Media.Animation;
 using Windows.Web.Http;
 using Windows.Web.Http.Filters;
 using Color = Windows.UI.Color;
+using Microsoft.Toolkit.Uwp.UI;
 #if !DEBUG
 using Microsoft.AppCenter.Crashes;
 #endif

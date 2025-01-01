@@ -2,14 +2,15 @@
     x:Class="HyPlayer.Pages.ExpandedPlayer"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:ani="using:Microsoft.Toolkit.Uwp.UI.Animations"
-    xmlns:controls="using:Microsoft.Toolkit.Uwp.UI.Controls"
+    xmlns:ani="using:CommunityToolkit.WinUI.Animations"
+    xmlns:controls="using:CommunityToolkit.WinUI.Controls"
     xmlns:controls1="using:HyPlayer.Controls"
+    xmlns:frieren="using:Microsoft.Toolkit.Uwp.UI.Controls"
     xmlns:hyplayer="using:HyPlayer"
     xmlns:lyricrenderer="using:HyPlayer.LyricRenderer"
-    xmlns:media="using:Microsoft.Toolkit.Uwp.UI.Media"
+    xmlns:media="using:CommunityToolkit.WinUI.Media"
     xmlns:muxc="using:Microsoft.UI.Xaml.Controls"
-    xmlns:ui="using:Microsoft.Toolkit.Uwp.UI"
+    xmlns:ui="using:CommunityToolkit.WinUI"
     xmlns:win2d="using:Microsoft.Graphics.Canvas.UI.Xaml"
     muxc:BackdropMaterial.ApplyToRootOrPageBackground="True"
     Loaded="Page_Loaded"
@@ -312,7 +313,7 @@
                         <RowDefinition Height="10*" />
                     </Grid.RowDefinitions>
                     <Border x:Name="ShadowTarget" Grid.Row="1" />
-                    <controls:ImageEx
+                    <frieren:ImageEx
                         x:Name="ImageAlbum"
                         Grid.Row="1"
                         MaxWidth="600"
@@ -345,14 +346,14 @@
                                     Duration="0:0:20" />
                             </ani:AnimationSet>
                         </ani:Explicit.Animations>
-                        <controls:ImageEx.RenderTransform>
+                        <frieren:ImageEx.RenderTransform>
                             <TransformGroup>
                                 <ScaleTransform x:Name="ImageScale" CenterX="300" CenterY="300" />
                                 <TranslateTransform x:Name="ImagePositionOffset" />
                                 <RotateTransform x:Name="ImageRotateTransform" CenterX="280" CenterY="280" />
                             </TransformGroup>
-                        </controls:ImageEx.RenderTransform>
-                        <controls:ImageEx.ContextFlyout>
+                        </frieren:ImageEx.RenderTransform>
+                        <frieren:ImageEx.ContextFlyout>
                             <MenuFlyout>
                                 <MenuFlyoutItem
                                     Click="SaveAlbumImage_Click"
@@ -365,11 +366,11 @@
                                     Style="{StaticResource MenuFlyoutItemRevealStyle}"
                                     Text="复制歌名" />
                             </MenuFlyout>
-                        </controls:ImageEx.ContextFlyout>
-                        <controls:ImageEx.Source>
+                        </frieren:ImageEx.ContextFlyout>
+                        <frieren:ImageEx.Source>
                             <BitmapImage x:Name="ImageAlbumSource" UriSource="/Assets/icon.png" />
-                        </controls:ImageEx.Source>
-                    </controls:ImageEx>
+                        </frieren:ImageEx.Source>
+                    </frieren:ImageEx>
                     <StackPanel
                         x:Name="SongInfo"
                         Grid.Row="2"
@@ -378,7 +379,7 @@
                         IsTapEnabled="True"
                         Orientation="Vertical"
                         Spacing="5">
-                        <controls:ImageEx
+                        <frieren:ImageEx
                             x:Name="ImageAlbumImerssive"
                             MaxWidth="250"
                             MaxHeight="250"

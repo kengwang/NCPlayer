@@ -17,7 +17,6 @@
                 <ResourceDictionary Source="/Resources/ListView.xaml" />
                 <ResourceDictionary Source="/Resources/NavigationView.xaml" />
                 <ResourceDictionary Source="/Resources/ContentDialog.xaml" />
-
             </ResourceDictionary.MergedDictionaries>
             <Style x:Key="BaseStyle" TargetType="controls:ImageEx">
                 <Setter Property="IsCacheEnabled" Value="False" />

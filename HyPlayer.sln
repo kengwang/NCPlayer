@@ -15,6 +15,13 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LyricParser", "LyricParser\
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Impressionist", "Impressionist\Impressionist\Impressionist.csproj", "{0F920821-8006-4512-ABCD-1396D1916FED}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "解决方案项", "解决方案项", "{FD9060D1-CAC5-41F5-9C66-F2460442E00D}"
+	ProjectSection(SolutionItems) = preProject
+		global.json = global.json
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HyPlayer.Frieren", "HyPlayer.Frieren\HyPlayer.Frieren.csproj", "{8DB15C94-9CCA-4B40-91F4-5919BBC67ABB}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -131,6 +138,22 @@ Global
 		{0F920821-8006-4512-ABCD-1396D1916FED}.Release|x64.Build.0 = Release|Any CPU
 		{0F920821-8006-4512-ABCD-1396D1916FED}.Release|x86.ActiveCfg = Release|Any CPU
 		{0F920821-8006-4512-ABCD-1396D1916FED}.Release|x86.Build.0 = Release|Any CPU
+		{8DB15C94-9CCA-4B40-91F4-5919BBC67ABB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8DB15C94-9CCA-4B40-91F4-5919BBC67ABB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8DB15C94-9CCA-4B40-91F4-5919BBC67ABB}.Debug|ARM64.ActiveCfg = Debug|ARM64
+		{8DB15C94-9CCA-4B40-91F4-5919BBC67ABB}.Debug|ARM64.Build.0 = Debug|ARM64
+		{8DB15C94-9CCA-4B40-91F4-5919BBC67ABB}.Debug|x64.ActiveCfg = Debug|x64
+		{8DB15C94-9CCA-4B40-91F4-5919BBC67ABB}.Debug|x64.Build.0 = Debug|x64
+		{8DB15C94-9CCA-4B40-91F4-5919BBC67ABB}.Debug|x86.ActiveCfg = Debug|x86
+		{8DB15C94-9CCA-4B40-91F4-5919BBC67ABB}.Debug|x86.Build.0 = Debug|x86
+		{8DB15C94-9CCA-4B40-91F4-5919BBC67ABB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8DB15C94-9CCA-4B40-91F4-5919BBC67ABB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8DB15C94-9CCA-4B40-91F4-5919BBC67ABB}.Release|ARM64.ActiveCfg = Release|ARM64
+		{8DB15C94-9CCA-4B40-91F4-5919BBC67ABB}.Release|ARM64.Build.0 = Release|ARM64
+		{8DB15C94-9CCA-4B40-91F4-5919BBC67ABB}.Release|x64.ActiveCfg = Release|x64
+		{8DB15C94-9CCA-4B40-91F4-5919BBC67ABB}.Release|x64.Build.0 = Release|x64
+		{8DB15C94-9CCA-4B40-91F4-5919BBC67ABB}.Release|x86.ActiveCfg = Release|x86
+		{8DB15C94-9CCA-4B40-91F4-5919BBC67ABB}.Release|x86.Build.0 = Release|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

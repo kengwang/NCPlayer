@@ -7,7 +7,7 @@
     xmlns:hyPlayerPage="using:HyPlayer.Pages"
     xmlns:hyplayer="using:HyPlayer"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    xmlns:media="using:Microsoft.Toolkit.Uwp.UI.Media"
+    xmlns:media="using:CommunityToolkit.WinUI.Media"
     xmlns:muxc="using:Microsoft.UI.Xaml.Controls"
     PointerEntered="Page_PointerEntered"
     PointerExited="Page_PointerExited"

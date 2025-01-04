@@ -14,9 +14,6 @@
 [submodule "Impressionist"]
 	path = Impressionist
 	url = https://github.com/Storyteller-Studios/Impressionist
-[submodule "WindowsCommunityToolkit"]
-	path = WindowsCommunityToolkit
-	url = https://github.com/HyPlayer/WindowsCommunityToolkit
 [submodule "HyPlayer.Frieren"]
 	path = HyPlayer.Frieren
 	url = https://github.com/HyPlayer/HyPlayer.Frieren

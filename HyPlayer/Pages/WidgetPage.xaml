@@ -9,7 +9,6 @@
     xmlns:media="using:CommunityToolkit.WinUI.Media"
     xmlns:renderer="using:HyPlayer.LyricRenderer"
     xmlns:ui="using:CommunityToolkit.WinUI"
-    muxc:BackdropMaterial.ApplyToRootOrPageBackground="True"
     Background="Transparent"
     mc:Ignorable="d">
     <Page.Resources>

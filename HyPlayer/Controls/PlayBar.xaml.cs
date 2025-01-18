@@ -3,6 +3,7 @@
 using HyPlayer.Classes;
 using HyPlayer.HyPlayControl;
 using HyPlayer.Pages;
+using Impressionist.Abstractions;
 using Microsoft.Toolkit.Uwp.Notifications;
 using NeteaseCloudMusicApi;
 using System;
@@ -12,6 +13,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Windows.ApplicationModel;
 using Windows.ApplicationModel.DataTransfer;
+using Windows.Graphics.Imaging;
 using Windows.Media;
 using Windows.Media.Playback;
 using Windows.Storage;
@@ -528,6 +530,12 @@ DoubleAnimation verticalAnimation;
         Common.isExpanded = true;
         GridSongInfo.Visibility = Visibility.Collapsed;
         GridSongAdvancedOperation.Visibility = Visibility.Visible;
+        if (Common.Setting.playBarMargin)
+        {
+            GridThis.Margin = new Thickness(0);
+            LeftMargin.Width = new GridLength(16);
+            RighrMargin.Width =new GridLength(16);
+        }
     }
 
     private void ButtonExpand_OnClick(object sender, RoutedEventArgs e)
@@ -591,6 +599,12 @@ DoubleAnimation verticalAnimation;
         Common.isExpanded = false;
         using var coverStream = HyPlayList.CoverStream.CloneStream();
         await RefreshPlayBarCover(HyPlayList.NowPlayingHashCode, coverStream);
+        if (Common.Setting.playBarMargin)
+        {
+            GridThis.Margin = new Thickness(16);
+            LeftMargin.Width = new GridLength(0);
+            RighrMargin.Width = new GridLength(0);
+        }
     }
 
     private void ButtonCleanAll_OnClick(object sender, RoutedEventArgs e)
@@ -857,12 +871,12 @@ DoubleAnimation verticalAnimation;
 
     private void FlyoutBtnVolume_OnClick(object sender, RoutedEventArgs e)
     {
-        FlyoutBtnVolume.ContextFlyout?.ShowAt(BtnMore);
+        FlyoutBtnVolume.ContextFlyout?.ShowAt(GridThis);
     }
 
     private void FlyoutBtnPlayList_OnClick(object sender, RoutedEventArgs e)
     {
-        FlyoutBtnPlayList.ContextFlyout?.ShowAt(BtnMore);
+        FlyoutBtnPlayList.ContextFlyout?.ShowAt(GridThis);
         ButtonPlayList_OnClick(sender, e);
     }
     private async Task OnEnteringForeground()
@@ -958,6 +972,14 @@ DoubleAnimation verticalAnimation;
         TbSongNameScrollStoryBoard.Begin();
         */
     }
+    public static Windows.UI.Color AdjustBrightness(Windows.UI.Color color, float percentage)
+    {
+        int adjustment = (int)(255 * percentage);
+        int r = Math.Max(0, Math.Min(255, color.R + adjustment));
+        int g = Math.Max(0, Math.Min(255, color.G + adjustment));
+        int b = Math.Max(0, Math.Min(255, color.B + adjustment));
+        return Windows.UI.Color.FromArgb(color.A, (byte)r, (byte)g, (byte)b);
+    }
     public async Task RefreshPlayBarCover(int hashCode, IRandomAccessStream coverStream)
     {
         await Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, async () =>
@@ -975,6 +997,37 @@ DoubleAnimation verticalAnimation;
                 }
                 catch
                 {
+
+                }
+                if(Common.isExpanded==false)
+                {
+                    try
+                    {
+                        Windows.Storage.Streams.Buffer buffer = new Windows.Storage.Streams.Buffer(MIMEHelper.PICTURE_FILE_HEADER_CAPACITY);
+                        stream.Seek(0);
+                        await stream.ReadAsync(buffer, MIMEHelper.PICTURE_FILE_HEADER_CAPACITY, InputStreamOptions.None);
+                        var mime = MIMEHelper.GetPictureCodecFromBuffer(buffer);
+                        BitmapDecoder decoder = await BitmapDecoder.CreateAsync(mime, stream);
+                        var colors = await ImageDecoder.GetPixelColor(decoder);
+                        ThemeColorResult themeColor;
+                        themeColor = await Common.PaletteGenerator.CreateThemeColor(colors, Common.Setting.ImpressionistIgnoreWhite, Common.Setting.ImpressionistLABSpace);
+                        var accentcolor = Windows.UI.Color.FromArgb(255, (byte)themeColor.Color.X, (byte)themeColor.Color.Y, (byte)themeColor.Color.Z);
+                        if (Application.Current.RequestedTheme == ApplicationTheme.Light)
+                        {
+                            var AccentColor = AdjustBrightness(accentcolor, -0.35f);
+                            Common.BrushManagement.AccentBrush = new SolidColorBrush(AccentColor);
+                            Common.BrushManagement.SliderAccentBrush = new SolidColorBrush(AccentColor);
+                        }
+                        else
+                        {
+                            var AccentColor = AdjustBrightness(accentcolor, +0.4f);
+                            Common.BrushManagement.AccentBrush = new SolidColorBrush(AccentColor);
+                            Common.BrushManagement.SliderAccentBrush = new SolidColorBrush(AccentColor);
+                        }
+                    }
+                    catch
+                    {
+                    }
 
                 }
             }
@@ -1087,4 +1140,4 @@ DoubleAnimation verticalAnimation;
         HyPlayList.SongAppendDone();
         HyPlayList.NowPlaying = HyPlayList.List.Count - HyPlayList.NowPlaying - 1;
     }
-}
+    }

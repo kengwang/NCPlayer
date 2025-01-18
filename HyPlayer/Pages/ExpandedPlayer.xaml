@@ -306,6 +306,7 @@
                     x:Name="LeftPanel"
                     MaxWidth="600"
                     HorizontalAlignment="Stretch"
+                    VerticalAlignment="Center"
                     Tapped="LeftPanel_Tapped">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="*" />
@@ -650,7 +651,7 @@
                     </MenuFlyout>
                 </Button.Flyout>
                 <Button.Content>
-                    <FontIcon Foreground="{x:Bind hyplayer:Common.BrushManagement.AccentBrush, Mode=OneWay}" Glyph="&#xEDE3;" />
+                    <FontIcon Foreground="{x:Bind hyplayer:Common.BrushManagement.AccentBrush, Mode=OneWay}" Glyph="&#xE712;" />
                 </Button.Content>
             </Button>
         </Grid>

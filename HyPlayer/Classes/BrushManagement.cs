@@ -15,6 +15,8 @@ namespace HyPlayer.Classes
         }
         private Windows.UI.Color? karaokAccentBrush;
         private SolidColorBrush accentBrush;
+        private SolidColorBrush slideraccentBrush;
+        private SolidColorBrush collpasedAccentBrush;
         private SolidColorBrush idleBrush;
         public Windows.UI.Color KaraokAccentBrush
         {
@@ -45,16 +47,37 @@ namespace HyPlayer.Classes
                     return new SolidColorBrush(Common.Setting.pureLyricFocusingColor.Value);
                 }
 
-                return (accentBrush != null
-                    ? accentBrush
+                return (slideraccentBrush != null
+                    ? slideraccentBrush
                     : Application.Current.Resources["SystemControlPageTextBaseHighBrush"] as SolidColorBrush)!;
             }
             set
             {
-                accentBrush = value;
+                slideraccentBrush = value;
                 NotifyPropertyChanged();
             }
         }
+        public SolidColorBrush SliderAccentBrush
+        {
+            get
+
+            {
+                if (Common.Setting.pureLyricFocusingColor is not null)
+                {
+                    return new SolidColorBrush(Common.Setting.pureLyricFocusingColor.Value);
+                }
+
+                return (slideraccentBrush != null
+                    ? slideraccentBrush
+                    : Application.Current.Resources["SystemControlHighlightAccentBrush"] as SolidColorBrush)!;
+            }
+            set
+            {
+                slideraccentBrush = value;
+                NotifyPropertyChanged();
+            }
+        }
+
         public SolidColorBrush IdleBrush
         {
             get

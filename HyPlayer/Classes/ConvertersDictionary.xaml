@@ -7,7 +7,6 @@
     <classes:PlayBarMarginConverter x:Key="PlayBarMarginConverter" />
     <classes:PlayBarCornerRadiusConverter x:Key="PlayBarCornerRadiusConverter" />
     <classes:SongListSelectModeConverter x:Key="SelectModeConverter" />
-    <classes:PlayBarImageRadiusConverter x:Key="PlayBarImageRadiusConverter" />
     <classes:ImageUrlToImageSourceConverter x:Key="ImageUrlToImageSourceConverter" />
     <classes:PausedToStringConverter x:Key="PausedToStringConverter" />
     <classes:AlbumShadowConverter x:Key="ShadowConverter" />

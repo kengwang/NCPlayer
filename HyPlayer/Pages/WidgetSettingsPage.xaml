@@ -13,7 +13,10 @@
 
     <ScrollViewer VerticalScrollBarVisibility="Hidden">
         <StackPanel Margin="12">
-            <controls1:InfoBar Message="部分设置跟随应用" IsOpen="True" IsClosable="False"/>
+            <controls1:InfoBar
+                IsClosable="False"
+                IsOpen="True"
+                Message="部分设置跟随应用" />
             <controls:SettingsCard Header="显示翻译">
                 <ToggleSwitch HorizontalAlignment="Right" IsOn="{x:Bind _settings.EnableTranslation, Mode=TwoWay}" />
             </controls:SettingsCard>
@@ -62,7 +65,7 @@
                     SpinButtonPlacementMode="Inline"
                     Value="{x:Bind _settings.LyricLineSpacing, Mode=TwoWay}" />
             </controls:SettingsCard>
-            <controls:SettingsCard Header="歌词字体" Description="需重启小部件">
+            <controls:SettingsCard Description="需重启小部件" Header="歌词字体">
                 <ComboBox
                     x:Name="FontComboBox"
                     MinWidth="10"

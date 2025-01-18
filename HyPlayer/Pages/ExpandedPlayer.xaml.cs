@@ -3,6 +3,8 @@
 #nullable enable
 using ALRC.Abstraction;
 using ALRC.Converters;
+using CommunityToolkit.WinUI.Animations;
+using CommunityToolkit.WinUI.Media;
 using HyPlayer.Classes;
 using HyPlayer.Controls;
 using HyPlayer.HyPlayControl;
@@ -10,8 +12,6 @@ using HyPlayer.LyricRenderer.RollingCalculators;
 using Impressionist.Abstractions;
 using LyricParser.Abstraction;
 using Microsoft.Graphics.Canvas.Effects;
-using CommunityToolkit.WinUI.Animations;
-using CommunityToolkit.WinUI.Media;
 using NeteaseCloudMusicApi;
 using System;
 using System.Collections.Generic;
@@ -959,8 +959,14 @@ public sealed partial class ExpandedPlayer : Page, IDisposable
     private async Task<bool> IsBrightAsync(IRandomAccessStream coverStream)
     {
         using var stream = coverStream.CloneStream();
-        if (Common.Setting.lyricColor != 0 && Common.Setting.lyricColor != 3) return Common.Setting.lyricColor == 2;
-        if (Common.Setting.expandedPlayerBackgroundType >= 2)
+        var finalResult = false; //在不手动指定背景类型为2至5时需要执行颜色采样
+        var resultGenerated = false; //标志返回颜色已经生成
+        if (Common.Setting.lyricColor != 0 && Common.Setting.lyricColor != 3) 
+        { 
+            finalResult = Common.Setting.lyricColor == 2;
+            resultGenerated = true;
+        }
+        if (Common.Setting.expandedPlayerBackgroundType >= 2 && Common.Setting.expandedPlayerBackgroundType <= 5)
             // 强制颜色
             switch (Common.Setting.expandedPlayerBackgroundType)
             {
@@ -1009,12 +1015,21 @@ public sealed partial class ExpandedPlayer : Page, IDisposable
                 PageContainer.Background =
                     new SolidColorBrush(albumMainColor!.Value);
             }
-            return !themeColor.ColorIsDark;
+            if (!resultGenerated)
+            {
+                finalResult = !themeColor.ColorIsDark;
+                resultGenerated = true;
+            }
         }
         catch
         {
-            return ActualTheme == ElementTheme.Light;
+            if (!resultGenerated)
+            {
+                finalResult = ActualTheme == ElementTheme.Light;
+                resultGenerated = true;
+            }
         }
+        return finalResult;
     }
 
     public static Color GetPixel(byte[] pixels, int x, int y, uint width, uint height)

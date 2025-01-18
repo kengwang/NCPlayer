@@ -1,24 +1,12 @@
-﻿using Microsoft.Gaming.XboxGameBar;
-using Microsoft.Graphics.Canvas.Text;
-using Newtonsoft.Json.Linq;
+﻿using Microsoft.Graphics.Canvas.Text;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
-using System.Runtime.InteropServices.WindowsRuntime;
-using Windows.ApplicationModel.Core;
-using Windows.Foundation;
-using Windows.Foundation.Collections;
 using Windows.Storage;
 using Windows.UI.Core;
-using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
-using Windows.UI.Xaml.Controls.Primitives;
-using Windows.UI.Xaml.Data;
-using Windows.UI.Xaml.Input;
-using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
 using static HyPlayer.Pages.Settings;
 
@@ -156,7 +144,7 @@ namespace HyPlayer.Pages
             }
         }
 
-        private void SetValue<T>(T value,[CallerMemberName] string name = null)
+        private void SetValue<T>(T value, [CallerMemberName] string name = null)
         {
             if (name is null) return;
             _container.Values[name] = value;

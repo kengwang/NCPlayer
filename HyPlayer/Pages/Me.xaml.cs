@@ -9,13 +9,10 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Windows.Graphics.Imaging;
 using Windows.Storage;
-using Windows.Storage.Streams;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Input;
-using Windows.UI.Xaml.Media.Imaging;
 using Windows.UI.Xaml.Navigation;
 
 #endregion
@@ -73,7 +70,7 @@ public sealed partial class Me : Page, IDisposable
         if (e.Parameter != null)
         {
             uid = (string)e.Parameter;
-            ButtonLogout.Visibility = Visibility.Collapsed;            
+            ButtonLogout.Visibility = Visibility.Collapsed;
         }
         else
         {

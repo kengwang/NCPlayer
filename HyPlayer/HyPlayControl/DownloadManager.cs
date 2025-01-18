@@ -1,6 +1,7 @@
 ﻿#region
 
 using HyPlayer.Classes;
+using Microsoft.Toolkit.Uwp.Helpers;
 using NeteaseCloudMusicApi;
 using System;
 using System.Collections.Generic;
@@ -21,7 +22,6 @@ using Windows.Storage;
 using Windows.Storage.Streams;
 using Buffer = Windows.Storage.Streams.Buffer;
 using File = TagLib.File;
-using Microsoft.Toolkit.Uwp.Helpers;
 
 #endregion
 

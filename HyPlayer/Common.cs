@@ -9,7 +9,7 @@ using Impressionist.Implementations;
 using Kawazu;
 using Microsoft.Gaming.XboxGameBar;
 using Microsoft.Graphics.Canvas.Effects;
-using CommunityToolkit.WinUI;
+using Microsoft.Toolkit.Uwp.UI;
 using Microsoft.UI.Xaml.Controls;
 using NeteaseCloudMusicApi;
 using Newtonsoft.Json;
@@ -28,9 +28,7 @@ using Windows.ApplicationModel.Core;
 using Windows.Foundation;
 using Windows.Storage;
 using Windows.System.Display;
-using Windows.System.Power;
 using Windows.UI;
-using Windows.UI.Composition;
 using Windows.UI.Core;
 using Windows.UI.ViewManagement;
 using Windows.UI.Xaml;
@@ -41,7 +39,6 @@ using Windows.UI.Xaml.Media.Animation;
 using Windows.Web.Http;
 using Windows.Web.Http.Filters;
 using Color = Windows.UI.Color;
-using Microsoft.Toolkit.Uwp.UI;
 #if !DEBUG
 using Microsoft.AppCenter.Crashes;
 #endif
@@ -639,7 +636,7 @@ namespace HyPlayer
 
         public bool doScrobble
         {
-            get => GetSettings(nameof(doScrobble), true);
+            get => GetSettings(nameof(doScrobble), false);
             set
             {
                 ApplicationData.Current.LocalSettings.Values[nameof(doScrobble)] = value;

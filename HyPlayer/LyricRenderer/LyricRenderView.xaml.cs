@@ -73,8 +73,8 @@ namespace HyPlayer.LyricRenderer
 
         private bool _isTypographyChanged = true;
 
-        public void ChangeRenderColor(Color idleColor, Color focusingColor,Color? shadowColor = null)
-        {          
+        public void ChangeRenderColor(Color idleColor, Color focusingColor, Color? shadowColor = null)
+        {
             Context.PreferTypography.IdleColor = idleColor;
             Context.PreferTypography.FocusingColor = focusingColor;
             Context.PreferTypography.ShadowColor = shadowColor ?? focusingColor;

@@ -510,7 +510,6 @@
                         HorizontalAlignment="Stretch"
                         FontSize="18"
                         FontWeight="Bold"
-                        Foreground="{x:Bind hy:Common.BrushManagement.AccentBrush, Mode=OneWay}"
                         IsTextSelectionEnabled="True"
                         TextTrimming="CharacterEllipsis"
                         ToolTipService.ToolTip="{x:Bind Mode=OneWay, Path=TbSongName.Text}">
@@ -537,7 +536,6 @@
                             Padding="0"
                             VerticalAlignment="Top"
                             Click="TbSingerName_OnTapped"
-                            FontSize="12"
                             Foreground="{StaticResource SystemControlForegroundBaseMediumBrush}"
                             Style="{StaticResource TextBlockButtonStyle}">
                             <HyperlinkButton.ContextFlyout>
@@ -578,10 +576,10 @@
 
                     </StackPanel>
                     <StackPanel
-                        Grid.Row="3"
+                        Grid.Row="2"
                         Height="20"
                         Orientation="Horizontal"
-                        Spacing="10">
+                        Spacing="6">
                         <Grid
                             x:Name="SongInfoTag"
                             Padding="3,0"
@@ -601,20 +599,10 @@
                         </Grid>
                         <TextBlock
                             x:Name="TextBlockNowTime"
-                            Grid.Column="0"
-                            controls:DockPanel.Dock="Left"
-                            FontSize="12"
-                            Foreground="{x:Bind hy:Common.BrushManagement.AccentBrush, Mode=OneWay}" />
-                        <TextBlock
-                            FontSize="11"
-                            Foreground="{x:Bind hy:Common.BrushManagement.AccentBrush, Mode=OneWay}"
-                            Text="/" />
-                        <TextBlock
-                            x:Name="TextBlockTotalTime"
-                            Grid.Column="3"
-                            controls:DockPanel.Dock="Right"
-                            FontSize="12"
-                            Foreground="{x:Bind hy:Common.BrushManagement.AccentBrush, Mode=OneWay}" />
+                            Margin="4,0,0,0"
+                            controls:DockPanel.Dock="Left" />
+                        <TextBlock Opacity="0.5" Text="/" />
+                        <TextBlock x:Name="TextBlockTotalTime" controls:DockPanel.Dock="Right" />
 
                     </StackPanel>
                 </Grid>
@@ -783,7 +771,6 @@
                 <IconSourceElement
                     HorizontalAlignment="Center"
                     VerticalAlignment="Center"
-                    Foreground="{x:Bind hy:Common.BrushManagement.AccentBrush, Mode=OneWay}"
                     IconSource="{StaticResource DesktopLyricIcon}" />
             </ToggleButton>
             <Button
@@ -796,10 +783,7 @@
                 BorderBrush="Transparent"
                 CornerRadius="20"
                 Flyout="{StaticResource VolumeFlyout}">
-                <FontIcon
-                    x:Name="BtnVolIcon"
-                    Foreground="{x:Bind hy:Common.BrushManagement.AccentBrush, Mode=OneWay}"
-                    Glyph="&#xE15D;" />
+                <FontIcon x:Name="BtnVolIcon" Glyph="&#xE15D;" />
                 <!--  E198  -->
             </Button>
             <Button
@@ -881,7 +865,7 @@
                         </StackPanel>
                     </Flyout>
                 </Button.Flyout>
-                <FontIcon Foreground="{x:Bind hy:Common.BrushManagement.AccentBrush, Mode=OneWay}" Glyph="&#xE142;" />
+                <FontIcon Glyph="&#xE142;" />
             </Button>
             <controls:UniformGrid.RenderTransform>
                 <TranslateTransform x:Name="BtnsAni" />
@@ -899,10 +883,7 @@
             BorderBrush="Transparent"
             Click="ButtonExpand_OnClick"
             CornerRadius="20">
-            <FontIcon
-                FontSize="24"
-                Foreground="{x:Bind hy:Common.BrushManagement.AccentBrush, Mode=OneWay}"
-                Glyph="&#xE971;" />
+            <FontIcon FontSize="24" Glyph="&#xE971;" />
             <Button.RenderTransform>
                 <TranslateTransform x:Name="BtnExpandAni" />
             </Button.RenderTransform>

@@ -29,40 +29,40 @@ namespace HyPlayer.Pages;
 public sealed partial class CompactPlayerPage : Page, IDisposable
 {
     public static readonly DependencyProperty NowProgressProperty = DependencyProperty.Register(
-        "NowProgress", typeof(double), typeof(CompactPlayerPage), new PropertyMetadata(default(double)));
+        nameof(NowProgress), typeof(double), typeof(CompactPlayerPage), new PropertyMetadata(default(double)));
 
     public static readonly DependencyProperty TotalProgressProperty = DependencyProperty.Register(
-        "TotalProgress", typeof(double), typeof(CompactPlayerPage), new PropertyMetadata(default(double)));
+        nameof(TotalProgress), typeof(double), typeof(CompactPlayerPage), new PropertyMetadata(default(double)));
 
     public static readonly DependencyProperty ControlHoverProperty = DependencyProperty.Register(
-        "ControlHover", typeof(Brush), typeof(CompactPlayerPage),
+        nameof(ControlHover), typeof(Brush), typeof(CompactPlayerPage),
         new PropertyMetadata(new SolidColorBrush(Colors.Transparent)));
 
     public static readonly DependencyProperty LyricTextProperty =
-        DependencyProperty.Register("LyricText", typeof(string), typeof(CompactPlayerPage),
+        DependencyProperty.Register(nameof(LyricText), typeof(string), typeof(CompactPlayerPage),
             new PropertyMetadata("小窗模式"));
 
     public static readonly DependencyProperty LyricTranslationProperty =
-        DependencyProperty.Register("LyricTranslation", typeof(string), typeof(CompactPlayerPage),
+        DependencyProperty.Register(nameof(LyricTranslation), typeof(string), typeof(CompactPlayerPage),
             new PropertyMetadata("将鼠标移到窗口以查看更多功能"));
 
     public static readonly DependencyProperty LyricSoundProperty =
-        DependencyProperty.Register("LyricSound", typeof(string), typeof(CompactPlayerPage),
+        DependencyProperty.Register(nameof(LyricSound), typeof(string), typeof(CompactPlayerPage),
             new PropertyMetadata(""));
 
     public static readonly DependencyProperty NowPlayingNameProperty =
-        DependencyProperty.Register("NowPlayingName", typeof(string), typeof(CompactPlayerPage),
+        DependencyProperty.Register(nameof(NowPlayingName), typeof(string), typeof(CompactPlayerPage),
             new PropertyMetadata(string.Empty));
 
     public static readonly DependencyProperty NowPlayingArtistsProperty =
-        DependencyProperty.Register("NowPlayingArtists", typeof(string), typeof(CompactPlayerPage),
+        DependencyProperty.Register(nameof(NowPlayingArtists), typeof(string), typeof(CompactPlayerPage),
             new PropertyMetadata(string.Empty));
 
 
     private readonly SolidColorBrush TransparentBrush = new SolidColorBrush(Colors.Transparent);
     public bool _lyricIsKaraokeLyric;
     public SongLyric Lrc;
-    private List<Run> WordTextBlocks = new();
+    private List<Run> WordTextBlocks = [];
     private Dictionary<Run, Storyboard> BlockToAnimation = new();
 
     private bool disposedValue;

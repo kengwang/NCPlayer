@@ -19,7 +19,7 @@ public class RenderContext
     /// <summary>
     /// 所有歌词
     /// </summary>
-    public List<RenderingLyricLine> LyricLines { get; set; } = new();
+    public List<RenderingLyricLine> LyricLines { get; set; } = [];
 
     /// <summary>
     /// 视图宽度
@@ -57,7 +57,7 @@ public class RenderContext
     /// <summary>
     /// 在视图范围内被渲染的歌词行
     /// </summary>
-    public List<RenderingLyricLine> RenderingLyricLines { get; } = new();
+    public List<RenderingLyricLine> RenderingLyricLines { get; } = [];
 
     /// <summary>
     /// 歌词的偏移

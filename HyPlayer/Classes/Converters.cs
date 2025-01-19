@@ -161,7 +161,7 @@ namespace HyPlayer.Classes
     {
         // Using a DependencyProperty as the backing store for SecondValue.  This enables animation, styling, binding, etc...
         public static readonly DependencyProperty SecondValueProperty =
-            DependencyProperty.Register("SecondValue", typeof(double), typeof(ThumbConverter),
+            DependencyProperty.Register(nameof(SecondValue), typeof(double), typeof(ThumbConverter),
                 new PropertyMetadata(0d));
 
         public double SecondValue

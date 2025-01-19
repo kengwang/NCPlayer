@@ -214,7 +214,7 @@ public class RedirectVisualView : Control
     }
 
     public static readonly DependencyProperty ChildProperty =
-        DependencyProperty.Register("Child", typeof(UIElement), typeof(RedirectVisualView), new PropertyMetadata(null));
+        DependencyProperty.Register(nameof(Child), typeof(UIElement), typeof(RedirectVisualView), new PropertyMetadata(null));
 #nullable restore
     private void AttachVisuals()
     {

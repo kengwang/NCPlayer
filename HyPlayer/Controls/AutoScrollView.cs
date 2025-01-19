@@ -96,7 +96,7 @@ public class AutoScrollView : RedirectVisualView
     }
 
     public static readonly DependencyProperty SpacingProperty =
-        DependencyProperty.Register("Spacing", typeof(double), typeof(AutoScrollView), new PropertyMetadata(20d, (s, a) =>
+        DependencyProperty.Register(nameof(Spacing), typeof(double), typeof(AutoScrollView), new PropertyMetadata(20d, (s, a) =>
         {
             if (s is AutoScrollView sender && !Equals(a.NewValue, a.OldValue))
             {
@@ -109,7 +109,7 @@ public class AutoScrollView : RedirectVisualView
 
 
     public static readonly DependencyProperty IsPlayingProperty =
-        DependencyProperty.Register("IsPlaying", typeof(bool), typeof(AutoScrollView), new PropertyMetadata(true, (s, a) =>
+        DependencyProperty.Register(nameof(IsPlaying), typeof(bool), typeof(AutoScrollView), new PropertyMetadata(true, (s, a) =>
         {
             if (s is AutoScrollView sender && !Equals(a.NewValue, a.OldValue))
             {
@@ -119,7 +119,7 @@ public class AutoScrollView : RedirectVisualView
 
 
     public static readonly DependencyProperty ScrollingPixelsPreSecondProperty =
-        DependencyProperty.Register("ScrollingPixelsPreSecond", typeof(double), typeof(AutoScrollView), new PropertyMetadata(30d, (s, a) =>
+        DependencyProperty.Register(nameof(ScrollingPixelsPreSecond), typeof(double), typeof(AutoScrollView), new PropertyMetadata(30d, (s, a) =>
         {
             if (s is AutoScrollView sender && !Equals(a.NewValue, a.OldValue))
             {

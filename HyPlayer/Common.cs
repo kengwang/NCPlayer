@@ -74,8 +74,8 @@ namespace HyPlayer
         public static Setting Setting = new();
         public static bool ShowLyricSound = true;
         public static bool ShowLyricTrans = true;
-        public static List<string> LikedSongs = new();
-        public static List<NCPlayList> MySongLists = new();
+        public static List<string> LikedSongs = [];
+        public static List<NCPlayList> MySongLists = [];
         public static DisplayRequest DisplayRequest = new();
         public static readonly Stack<NavigationHistoryItem> NavigationHistory = new();
         public static readonly DateTime UnixEpoch = new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc).ToLocalTime();
@@ -106,8 +106,8 @@ namespace HyPlayer
         public static PlaybarVisibilityChangedEvent? OnPlaybarVisibilityChanged;
         public static readonly Queue<KeyValuePair<string, string?>> TeachingTipList = new();
 #nullable restore
-        public static List<string> ErrorMessageList = new();
-        public static ObservableCollection<string> Logs = new();
+        public static List<string> ErrorMessageList = [];
+        public static ObservableCollection<string> Logs = [];
         public static bool NavigatingBack;
         private static int _teachingTipSecondCounter = 3;
         public static int PlaybarSecondCounter = 0;
@@ -2048,7 +2048,7 @@ namespace HyPlayer
                 Common.AddToTeachingTipLists(e.Message, (e.InnerException ?? new Exception()).Message);
             }
 
-            return new List<NCSong>();
+            return [];
         }
 
         public static async Task<List<NCPlayList>> GetSonglistHistory()
@@ -2064,7 +2064,7 @@ namespace HyPlayer
                         ["n"] = 100000,
                         ["s"] = 8
                     });
-            if (queries.Count == 0) return new List<NCPlayList>();
+            if (queries.Count == 0) return [];
             var ret = new List<NCPlayList>();
             try
             {
@@ -2092,7 +2092,7 @@ namespace HyPlayer
         public static async Task<List<NCSong>> GetcurPlayingListHistory()
         {
             var retsongs = new List<NCSong>();
-            List<string> trackIds = new();
+            List<string> trackIds = [];
             if (Common.Setting.advancedMusicHistoryStorage)
                 trackIds = (await FileIO.ReadTextAsync(
                     await ApplicationData.Current.LocalCacheFolder.CreateFileAsync("songPlayHistory",
@@ -2100,7 +2100,7 @@ namespace HyPlayer
             else
                 //低级音乐存储
                 trackIds = JsonConvert.DeserializeObject<List<string>>(ApplicationData.Current.LocalSettings
-                    .Values["curPlayingListHistory"].ToString()) ?? new List<string>();
+                    .Values["curPlayingListHistory"].ToString()) ?? [];
 
             if (trackIds == null || string.IsNullOrEmpty(trackIds.FirstOrDefault()))
                 return retsongs;

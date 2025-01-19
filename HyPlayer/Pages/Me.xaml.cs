@@ -26,8 +26,8 @@ namespace HyPlayer.Pages;
 /// </summary>
 public sealed partial class Me : Page, IDisposable
 {
-    private readonly ObservableCollection<SimpleListItem> likedPlayList = new();
-    private readonly ObservableCollection<SimpleListItem> myPlayList = new();
+    private readonly ObservableCollection<SimpleListItem> likedPlayList = [];
+    private readonly ObservableCollection<SimpleListItem> myPlayList = [];
     private string uid = "";
     private bool disposedValue = false;
     private CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource();

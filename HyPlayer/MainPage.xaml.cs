@@ -248,17 +248,17 @@ public sealed partial class MainPage
             var hColor = Color.FromArgb(0, 0, 0, 0);
 
             visuals = new SpriteVisual[8];
-            colorStops = new[]
-            {
-                new []{ (0f, dColor), (0.125f, hColor) },
-                new []{ (0f, dColor), (0.125f, dColor), (0.25f, hColor) },
-                new []{ (0f, hColor), (0.125f, dColor), (0.25f, dColor), (0.375f, hColor) },
-                new []{ (0.125f, dColor), (0.25f, hColor), (0.375f, dColor), (0.5f, hColor) },
-                new []{ (0.25f, dColor), (0.375f, hColor), (0.5f, dColor), (0.625f, hColor) },
-                new []{ (0.375f, dColor), (0.5f, hColor), (0.625f, dColor), (0.75f, hColor) },
-                new []{ (0.5f, dColor), (0.625f, hColor), (0.75f, dColor), (0.875f, hColor) },
-                new []{ (0.625f, dColor), (0.75f, hColor), (0.875f, dColor), (1, hColor) },
-            };
+            colorStops =
+            [
+                [(0f, dColor), (0.125f, hColor)],
+                [(0f, dColor), (0.125f, dColor), (0.25f, hColor)],
+                [(0f, hColor), (0.125f, dColor), (0.25f, dColor), (0.375f, hColor)],
+                [(0.125f, dColor), (0.25f, hColor), (0.375f, dColor), (0.5f, hColor)],
+                [(0.25f, dColor), (0.375f, hColor), (0.5f, dColor), (0.625f, hColor)],
+                [(0.375f, dColor), (0.5f, hColor), (0.625f, dColor), (0.75f, hColor)],
+                [(0.5f, dColor), (0.625f, hColor), (0.75f, dColor), (0.875f, hColor)],
+                [(0.625f, dColor), (0.75f, hColor), (0.875f, dColor), (1, hColor)]
+            ];
 
             rootVisual = compositor.CreateSpriteVisual();
             rootVisual.RelativeSizeAdjustment = Vector2.One;
@@ -356,7 +356,7 @@ public sealed partial class MainPage
                 }
             };
 
-            var brush = compositor.CreateEffectFactory(effect, new[] { "BlurEffect.BlurAmount" })
+            var brush = compositor.CreateEffectFactory(effect, ["BlurEffect.BlurAmount"])
                 .CreateBrush();
 
             var maskBrush = compositor.CreateLinearGradientBrush();

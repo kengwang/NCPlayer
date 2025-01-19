@@ -13,16 +13,16 @@ namespace HyPlayer.Controls;
 public partial class SimpleLinerList : UserControl
 {
     public static readonly DependencyProperty ListItemsProperty = DependencyProperty.Register(
-        "ListItems", typeof(ObservableCollection<SimpleListItem>),
+        nameof(ListItems), typeof(ObservableCollection<SimpleListItem>),
         typeof(SimpleListItem),
         new PropertyMetadata(new ObservableCollection<SimpleListItem>())
     );
 
     public static readonly DependencyProperty ListHeaderProperty = DependencyProperty.Register(
-        "ListHeader", typeof(UIElement), typeof(SimpleLinerList), new PropertyMetadata(default(UIElement)));
+        nameof(ListHeader), typeof(UIElement), typeof(SimpleLinerList), new PropertyMetadata(default(UIElement)));
 
     public static readonly DependencyProperty FooterProperty = DependencyProperty.Register(
-        "Footer", typeof(UIElement), typeof(SimpleLinerList), new PropertyMetadata(default(UIElement)));
+        nameof(Footer), typeof(UIElement), typeof(SimpleLinerList), new PropertyMetadata(default(UIElement)));
 
     public SimpleLinerList()
     {

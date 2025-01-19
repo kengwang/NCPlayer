@@ -54,7 +54,7 @@ namespace HyPlayer.Pages;
 public sealed partial class ExpandedPlayer : Page, IDisposable
 {
     public static readonly DependencyProperty NowPlaybackSpeedProperty = DependencyProperty.Register(
-        "NowPlaybackSpeed", typeof(string), typeof(ExpandedPlayer),
+        nameof(NowPlaybackSpeed), typeof(string), typeof(ExpandedPlayer),
         new PropertyMetadata("x" + HyPlayList.Player.PlaybackSession.PlaybackRate));
 
 
@@ -73,7 +73,7 @@ public sealed partial class ExpandedPlayer : Page, IDisposable
 
     private int lastwidth;
 
-    public ObservableCollection<LyricItemModel> LyricList = new();
+    public ObservableCollection<LyricItemModel> LyricList = [];
     private bool ManualChangeMode;
     private int needRedesign = 1;
     private int nowheight;
@@ -950,8 +950,8 @@ public sealed partial class ExpandedPlayer : Page, IDisposable
         }
     }
 
-    private List<Vector3> albumColorVectors = new();
-    private List<Windows.UI.Color> albumColors = new();
+    private List<Vector3> albumColorVectors = [];
+    private List<Windows.UI.Color> albumColors = [];
     private SolidColorBrush? _pureIdleBrushCache;
     private Windows.UI.Color? _karaokAccentColorCache;
     private SolidColorBrush? _pureAccentBrushCache;

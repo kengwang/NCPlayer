@@ -31,7 +31,7 @@ namespace HyPlayer.Pages;
 public sealed partial class SongListDetail : Page, IDisposable
 {
     public static readonly DependencyProperty IsLoadingProperty = DependencyProperty.Register(
-        "IsLoading", typeof(bool), typeof(SongListDetail), new PropertyMetadata(true));
+        nameof(IsLoading), typeof(bool), typeof(SongListDetail), new PropertyMetadata(true));
 
     private int page;
     public NCPlayList playList;
@@ -46,7 +46,7 @@ public sealed partial class SongListDetail : Page, IDisposable
     public SongListDetail()
     {
         InitializeComponent();
-        Songs = new ObservableCollection<NCSong>();
+        Songs = [];
         _dataTransferManager.DataRequested += DataTransferManagerOnDataRequested;
         _cancellationToken = _cancellationTokenSource.Token;
     }

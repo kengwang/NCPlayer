@@ -194,11 +194,11 @@ public sealed partial class BasePage : Page
     {
         try
         {
-            if (Common.Setting.LoadCookies())
+            if (Common.Setting.LoadCookies() || Common.ncapi?.AdditionalParameters.Cookies.Count > 0)
             {
                 try
                 {
-                    await Common.ncapi?.RequestAsync(CloudMusicApiProviders.LoginStatus);
+                    await Common.ncapi!.RequestAsync(CloudMusicApiProviders.LoginStatus);
                     await LoginDone();
                 }
                 catch

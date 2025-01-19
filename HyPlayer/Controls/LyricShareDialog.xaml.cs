@@ -14,11 +14,11 @@ namespace HyPlayer.Controls;
 public sealed partial class LyricShareDialog : ContentDialog
 {
     public static readonly DependencyProperty LyricsProperty = DependencyProperty.Register(
-        "Lyrics", typeof(List<SongLyric>), typeof(LyricShareDialog),
+        nameof(Lyrics), typeof(List<SongLyric>), typeof(LyricShareDialog),
         new PropertyMetadata(default(List<SongLyric>)));
 
     public static readonly DependencyProperty ShareLyricItemProperty = DependencyProperty.Register(
-        "ShareLyricItem", typeof(ObservableCollection<LyricShareItem>), typeof(LyricShareDialog),
+        nameof(ShareLyricItem), typeof(ObservableCollection<LyricShareItem>), typeof(LyricShareDialog),
         new PropertyMetadata(new ObservableCollection<LyricShareItem>()));
 
     public Dictionary<SongLyric, string> OutputLines = new();

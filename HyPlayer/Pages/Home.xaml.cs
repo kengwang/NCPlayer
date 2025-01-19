@@ -26,11 +26,11 @@ namespace HyPlayer.Pages;
 /// </summary>
 public sealed partial class Home : Page, IDisposable
 {
-    private static List<string> RandomSlogen = new()
-    {
+    private static List<string> RandomSlogen =
+    [
         "用音乐开启新的一天吧",
         "戴上耳机 享受新的一天吧"
-    };
+    ];
     private CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource();
     private CancellationToken _cancellationToken;
     private Task _rankListLoaderTask;

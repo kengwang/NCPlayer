@@ -22,7 +22,7 @@ namespace HyPlayer.Pages;
 /// </summary>
 public sealed partial class History : Page, IDisposable
 {
-    private readonly ObservableCollection<NCSong> Songs = new();
+    private readonly ObservableCollection<NCSong> Songs = [];
     private bool disposedValue = false;
     private CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource();
     private CancellationToken _cancellationToken;

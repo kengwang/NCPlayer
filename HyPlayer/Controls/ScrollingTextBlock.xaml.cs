@@ -13,7 +13,7 @@ public sealed partial class ScrollingTextBlock : UserControl
 {
     // Using a DependencyProperty as the backing store for Horizontalofset.  This enables animation, styling, binding, etc...
     public static readonly DependencyProperty HorizontalofsetProperty =
-        DependencyProperty.Register("Horizontalofset", typeof(double), typeof(ScrollingTextBlock),
+        DependencyProperty.Register(nameof(Horizontalofset), typeof(double), typeof(ScrollingTextBlock),
             new PropertyMetadata(0, PropertyChangedCallback));
 
 

@@ -131,8 +131,8 @@ public class NCFmItem : NCSong
             Type = HyPlayItemType.Radio,
             sid = song["mainTrackId"].ToString(),
             songname = song["name"].ToString(),
-            Artist = new List<NCArtist>
-            {
+            Artist =
+            [
                 new()
                 {
                     Type = HyPlayItemType.Radio,
@@ -140,7 +140,7 @@ public class NCFmItem : NCSong
                     name = song["dj"]["nickname"].ToString(),
                     avatar = song["dj"]["avatarUrl"].ToString()
                 }
-            },
+            ],
             Album = new NCAlbum
             {
                 AlbumType = HyPlayItemType.Radio,
@@ -218,7 +218,7 @@ public class NCSong
             TrackId = song["no"]?.ToObject<int>() ?? -1,
             songname = song["name"].ToString(),
             CDName = song["cd"]?.ToString() ?? "01",
-            Artist = new List<NCArtist>(),
+            Artist = [],
             LengthInMilliseconds = double.Parse(song[dtpath].ToString())
         };
         if (song[arpath].HasValues)

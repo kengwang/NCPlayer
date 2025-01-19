@@ -162,9 +162,9 @@ namespace HyPlayer.LyricRenderer
                 _keyFrameRendered[renderingLyricLine.EndTime] = false;
                 // 设置对照表
                 if (!_targetingKeyFrames.ContainsKey(renderingLyricLine.StartTime))
-                    _targetingKeyFrames[renderingLyricLine.StartTime] = new List<RenderingLyricLine>();
+                    _targetingKeyFrames[renderingLyricLine.StartTime] = [];
                 if (!_targetingKeyFrames.ContainsKey(renderingLyricLine.EndTime))
-                    _targetingKeyFrames[renderingLyricLine.EndTime] = new List<RenderingLyricLine>();
+                    _targetingKeyFrames[renderingLyricLine.EndTime] = [];
                 _targetingKeyFrames[renderingLyricLine.StartTime].Add(renderingLyricLine);
                 _targetingKeyFrames[renderingLyricLine.EndTime].Add(renderingLyricLine);
                 if (renderingLyricLine.KeyFrames is not { Count: > 0 }) continue;
@@ -173,7 +173,7 @@ namespace HyPlayer.LyricRenderer
                 foreach (var renderOptionsKey in renderingLyricLine.KeyFrames)
                 {
                     if (!_targetingKeyFrames.ContainsKey(renderOptionsKey))
-                        _targetingKeyFrames[renderOptionsKey] = new List<RenderingLyricLine>();
+                        _targetingKeyFrames[renderOptionsKey] = [];
                     _targetingKeyFrames[renderOptionsKey].Add(renderingLyricLine);
                     _keyFrameRendered[renderOptionsKey] = false;
                 }

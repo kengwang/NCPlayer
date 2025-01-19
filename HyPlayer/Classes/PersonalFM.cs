@@ -86,19 +86,19 @@ internal static class PersonalFM
                                                 id = "126368130",
                                                 name = "私人 DJ 推荐语"
                                             },
-                                            Artist = new List<NCArtist>()
-                                                                               {
-                                                                                   new NCArtist
-                                                                                   {
-                                                                                       alias = "私人 DJ",
-                                                                                       avatar =
-                                                                                           "https://p1.music.126.net/kMuXXbwHbduHpLYDmHXrlA==/109951168152833223.jpg",
-                                                                                       id = "1",
-                                                                                       name = "私人 DJ",
-                                                                                       transname = null,
-                                                                                       Type = HyPlayItemType.Netease
-                                                                                   }
-                                                                               },
+                                            Artist =
+                                            [
+                                                new NCArtist
+                                                {
+                                                    alias = "私人 DJ",
+                                                    avatar =
+                                                        "https://p1.music.126.net/kMuXXbwHbduHpLYDmHXrlA==/109951168152833223.jpg",
+                                                    id = "1",
+                                                    name = "私人 DJ",
+                                                    transname = null,
+                                                    Type = HyPlayItemType.Netease
+                                                }
+                                            ],
                                             Bitrate = 0,
                                             CDName = null,
                                             Id = "-1",

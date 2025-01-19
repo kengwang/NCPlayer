@@ -13,7 +13,7 @@ namespace HyPlayer.Controls;
 internal class PivotView : Control
 {
     public static readonly DependencyProperty PivotProperty =
-        DependencyProperty.Register("Pivot", typeof(PivotEx), typeof(PivotView), new PropertyMetadata(null, (s, a) =>
+        DependencyProperty.Register(nameof(Pivot), typeof(PivotEx), typeof(PivotView), new PropertyMetadata(null, (s, a) =>
         {
             if (s is PivotView sender)
             {
@@ -29,10 +29,10 @@ internal class PivotView : Control
         }));
 
     public static readonly DependencyProperty HeaderProperty =
-        DependencyProperty.Register("Header", typeof(UIElement), typeof(PivotView), new PropertyMetadata(null));
+        DependencyProperty.Register(nameof(Header), typeof(UIElement), typeof(PivotView), new PropertyMetadata(null));
 
     public static readonly DependencyProperty MaxHeaderScrollOffsetProperty =
-        DependencyProperty.Register("MaxHeaderScrollOffset", typeof(double?), typeof(PivotView), new PropertyMetadata(
+        DependencyProperty.Register(nameof(MaxHeaderScrollOffset), typeof(double?), typeof(PivotView), new PropertyMetadata(
             null, (s, a) =>
             {
                 if (s is PivotView sender)
@@ -44,7 +44,7 @@ internal class PivotView : Control
 
 
     public static readonly DependencyProperty HeaderHeightProperty =
-        DependencyProperty.Register("HeaderHeight", typeof(double), typeof(PivotView), new PropertyMetadata(0d,
+        DependencyProperty.Register(nameof(HeaderHeight), typeof(double), typeof(PivotView), new PropertyMetadata(0d,
             (s, a) =>
             {
                 if (s is PivotView sender)
@@ -56,7 +56,7 @@ internal class PivotView : Control
 
 
     public static readonly DependencyProperty HeaderScrollProgressProperty =
-        DependencyProperty.Register("HeaderScrollProgress", typeof(double), typeof(PivotView), new PropertyMetadata(0d,
+        DependencyProperty.Register(nameof(HeaderScrollProgress), typeof(double), typeof(PivotView), new PropertyMetadata(0d,
             (s, a) =>
             {
                 if (s is PivotView sender)

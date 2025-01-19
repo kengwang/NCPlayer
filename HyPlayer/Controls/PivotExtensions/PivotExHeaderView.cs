@@ -10,7 +10,7 @@ namespace HyPlayer.Controls;
 public class PivotExHeaderView : ListView
 {
     public static readonly DependencyProperty PivotProperty =
-        DependencyProperty.Register("Pivot", typeof(PivotEx), typeof(PivotExHeaderView), new PropertyMetadata(null,
+        DependencyProperty.Register(nameof(Pivot), typeof(PivotEx), typeof(PivotExHeaderView), new PropertyMetadata(null,
             (s, a) =>
             {
                 if (s is PivotExHeaderView sender)

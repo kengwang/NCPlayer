@@ -29,7 +29,7 @@ public sealed partial class RadioPage : Page, IDisposable
     private CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource();
     private CancellationToken _cancellationToken;
 
-    public ObservableCollection<NCSong> Songs = new();
+    public ObservableCollection<NCSong> Songs = [];
 
     public RadioPage()
     {

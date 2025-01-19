@@ -26,12 +26,12 @@ namespace HyPlayer.Pages;
 public sealed partial class Search : Page, IDisposable
 {
     public static readonly DependencyProperty HasNextPageProperty = DependencyProperty.Register(
-        "HasNextPage", typeof(bool), typeof(Search), new PropertyMetadata(default(bool)));
+        nameof(HasNextPage), typeof(bool), typeof(Search), new PropertyMetadata(default(bool)));
 
     public static readonly DependencyProperty HasPreviousPageProperty = DependencyProperty.Register(
-        "HasPreviousPage", typeof(bool), typeof(Search), new PropertyMetadata(default(bool)));
+        nameof(HasPreviousPage), typeof(bool), typeof(Search), new PropertyMetadata(default(bool)));
 
-    private readonly ObservableCollection<NCSong> SongResults = new ObservableCollection<NCSong>();
+    private readonly ObservableCollection<NCSong> SongResults = [];
     private int page;
     private string searchText = "";
     private bool disposedValue = false;
@@ -390,7 +390,7 @@ public sealed partial class Search : Page, IDisposable
                 Title = singerjson["name"].ToString(),
                 LineOne = singerjson["trans"].ToString(),
                 LineTwo = string.Join(" / ",
-                    (singerjson["alia"]?.ToList() ?? new List<JToken>()).Select(t => t.ToString())),
+                    (singerjson["alia"]?.ToList() ?? []).Select(t => t.ToString())),
                 LineThree = $"专辑数 {singerjson["albumSize"]} | MV 数 {singerjson["mvSize"]}",
                 ResourceId = "ar" + singerjson["id"],
                 CoverLink = singerjson["img1v1Url"].ToString(),

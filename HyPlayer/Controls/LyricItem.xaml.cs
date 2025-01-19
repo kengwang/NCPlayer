@@ -28,7 +28,7 @@ public sealed partial class LyricItem : UserControl, IDisposable
 
     public bool _lyricIsOnShow = true;
 
-    private List<Run> WordTextBlocks = new();
+    private List<Run> WordTextBlocks = [];
 
     private Dictionary<Run, KaraokeWordInfo> KaraokeDictionary = new();
 

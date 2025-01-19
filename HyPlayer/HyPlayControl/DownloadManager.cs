@@ -214,10 +214,10 @@ internal sealed class DownloadObject : INotifyPropertyChanged
                 pic = new Picture(ByteVector.FromStream(outputStream.AsStreamForRead()));
                 DownloadManager.AlbumPicturesCache[ncsong.Album.id] = pic;
 
-                file.Tag.Pictures = new IPicture[]
-                {
+                file.Tag.Pictures =
+                [
                     pic
-                };
+                ];
                 file.Tag.Pictures[0].MimeType = "image/jpeg";
                 file.Tag.Pictures[0].Description = "cover.jpg";
             }
@@ -301,7 +301,7 @@ internal sealed class DownloadObject : INotifyPropertyChanged
 
     private static string GetSize(double size)
     {
-        string[] units = { "B", "KB", "MB", "GB", "TB", "PB" };
+        string[] units = ["B", "KB", "MB", "GB", "TB", "PB"];
         const double mod = 1024.0;
         var i = 0;
         while (size >= mod)
@@ -483,9 +483,9 @@ internal static class DownloadManager
 {
     private static readonly Timer _timer = new(1000);
     private static bool Timered;
-    public static ObservableCollection<DownloadObject> DownloadLists = new();
+    public static ObservableCollection<DownloadObject> DownloadLists = [];
     public static BackgroundDownloader Downloader = new();
-    public static List<Task> WritingTasks = new();
+    public static List<Task> WritingTasks = [];
     public static Dictionary<string, Picture> AlbumPicturesCache = new();
 
     public static bool CheckDownloadAbilityAndToast()

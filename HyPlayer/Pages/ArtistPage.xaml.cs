@@ -26,10 +26,10 @@ namespace HyPlayer.Pages;
 public sealed partial class ArtistPage : Page, IDisposable
 {
     public static readonly DependencyProperty SongHasMoreProperty = DependencyProperty.Register(
-        "SongHasMore", typeof(bool), typeof(ArtistPage), new PropertyMetadata(default(bool)));
+        nameof(SongHasMore), typeof(bool), typeof(ArtistPage), new PropertyMetadata(default(bool)));
 
-    private readonly ObservableCollection<NCSong> allSongs = new();
-    private readonly ObservableCollection<NCSong> hotSongs = new();
+    private readonly ObservableCollection<NCSong> allSongs = [];
+    private readonly ObservableCollection<NCSong> hotSongs = [];
     private NCArtist artist;
     private int page;
     private CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource();

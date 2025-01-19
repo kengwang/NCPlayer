@@ -1361,7 +1361,7 @@
                             <controls3:SettingsCard Description="可能会提高内存占用" Header="启用安全本地文件访问">
                                 <CheckBox Margin="0,0,-100,0" IsChecked="{x:Bind hyplayer:Common.Setting.safeFileAccess, Mode=TwoWay}" />
                             </controls3:SettingsCard>
-                            <controls3:SettingsCard Description="将会把听歌数据上传网易云音乐同步" Header="进行听歌打卡">
+                            <controls3:SettingsCard Description="将会把听歌数据上传网易云音乐同步 (请勿开启)" Header="进行听歌打卡">
                                 <CheckBox Margin="0,0,-100,0" IsChecked="{x:Bind hyplayer:Common.Setting.doScrobble, Mode=TwoWay}" />
                             </controls3:SettingsCard>
                             <controls3:SettingsCard Description="使用「热词」时需开启" Header="SMTC 更新进度条">
@@ -1386,7 +1386,7 @@
                                     Margin="0,0,-100,0"
                                     IsChecked="{x:Bind hyplayer:Common.Setting.tileBackgroundAvailability, Mode=TwoWay}" />
                             </controls3:SettingsCard>
-                            <controls3:SettingsCard Description="Windows 10需打开此项才会显示磁贴" Header="磁贴背景缓存至本地">
+                            <controls3:SettingsCard Description="Windows 10 需打开此项才会显示磁贴" Header="磁贴背景缓存至本地">
                                 <CheckBox
                                     x:Name="SaveTileBackgroundToLocalFolder"
                                     Margin="0,0,-100,0"
@@ -1423,7 +1423,6 @@
                                     <TextBlock x:Name="BtnXboxReserve" Text="Xbox 进后台模式" />
                                 </controls3:SettingsCard.Header>
                             </controls3:SettingsCard>
-
                         </StackPanel>
                     </ScrollViewer>
                 </PivotItem>

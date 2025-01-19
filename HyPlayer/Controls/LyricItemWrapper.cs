@@ -8,7 +8,7 @@ namespace HyPlayer.Controls;
 public class LyricItemWrapper : ContentPresenter
 {
     public static readonly DependencyProperty SongLyricProperty =
-        DependencyProperty.Register("SongLyric", typeof(SongLyric), typeof(LyricItemWrapper), new PropertyMetadata(null,
+        DependencyProperty.Register(nameof(SongLyric), typeof(SongLyric), typeof(LyricItemWrapper), new PropertyMetadata(null,
             (s, a) =>
             {
                 if (!Equals(a.NewValue, a.OldValue) && s is LyricItemWrapper sender)
@@ -35,7 +35,7 @@ public class LyricItemWrapper : ContentPresenter
 
     // Using a DependencyProperty as the backing store for IsShow.  This enables animation, styling, binding, etc...
     public static readonly DependencyProperty IsShowProperty =
-        DependencyProperty.Register("IsShow", typeof(bool), typeof(LyricItemWrapper), new PropertyMetadata(false,
+        DependencyProperty.Register(nameof(IsShow), typeof(bool), typeof(LyricItemWrapper), new PropertyMetadata(false,
             (s, a) =>
             {
                 if (!Equals(a.NewValue, a.OldValue) && s is LyricItemWrapper sender)

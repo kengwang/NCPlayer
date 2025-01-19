@@ -83,10 +83,10 @@ public static class HyPlayList
 
     public static int NowPlaying;
     private static readonly System.Timers.Timer SecTimer = new(1000); // 公用秒表
-    public static readonly List<HyPlayItem> List = new();
-    public static readonly List<int> ShuffleList = new();
+    public static readonly List<HyPlayItem> List = [];
+    public static readonly List<int> ShuffleList = [];
     public static int ShufflingIndex = -1;
-    public static List<SongLyric> Lyrics = new();
+    public static List<SongLyric> Lyrics = [];
     public static TimeSpan LyricOffset = TimeSpan.Zero;
     public static PropertySet AudioEffectsProperties = new PropertySet();
 
@@ -164,7 +164,7 @@ public static class HyPlayList
             VolumeChangeProcess();
         }
     }
-    public static List<TimeSpan> TargetSeekingTimeSpans = new List<TimeSpan>();
+    public static List<TimeSpan> TargetSeekingTimeSpans = [];
     public static TimeSpan RunningTimeSpan = TimeSpan.Zero;
     public static bool LockSeeking = false;
     public static int IntervalCounter = 0;
@@ -2419,7 +2419,7 @@ public static class HyPlayList
         ShufflingIndex = 0;
         if (List.Count != 0)
         {
-            HashSet<int> shuffledNumbers = new();
+            HashSet<int> shuffledNumbers = [];
             bool hasSpecifiedCorrectCurrentSong = false;
             if (currentSongId != "-1")
             {

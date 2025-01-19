@@ -12,7 +12,7 @@ namespace HyPlayer.Controls;
 public class PivotEx : Pivot
 {
     public static readonly DependencyProperty MaxHeaderScrollOffsetProperty =
-        DependencyProperty.Register("MaxHeaderScrollOffset", typeof(double), typeof(PivotEx), new PropertyMetadata(0d,
+        DependencyProperty.Register(nameof(MaxHeaderScrollOffset), typeof(double), typeof(PivotEx), new PropertyMetadata(0d,
             (s, a) =>
             {
                 if (s is PivotEx sender)
@@ -24,7 +24,7 @@ public class PivotEx : Pivot
             }));
 
     public static readonly DependencyProperty HeaderScrollOffsetProperty =
-        DependencyProperty.Register("HeaderScrollOffset", typeof(double), typeof(PivotEx), new PropertyMetadata(0d,
+        DependencyProperty.Register(nameof(HeaderScrollOffset), typeof(double), typeof(PivotEx), new PropertyMetadata(0d,
             (s, a) =>
             {
                 if (s is PivotEx sender)

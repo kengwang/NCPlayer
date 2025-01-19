@@ -23,28 +23,28 @@ namespace HyPlayer.Controls;
 public sealed partial class GroupedSongsList : IDisposable
 {
     public static readonly DependencyProperty GroupedSongsProperty = DependencyProperty.Register(
-        "GroupedSongs", typeof(CollectionViewSource), typeof(GroupedSongsList),
+        nameof(GroupedSongs), typeof(CollectionViewSource), typeof(GroupedSongsList),
         new PropertyMetadata(default(CollectionViewSource)));
 
     public static readonly DependencyProperty ListSourceProperty = DependencyProperty.Register(
-        "ListSource", typeof(string),
+        nameof(ListSource), typeof(string),
         typeof(GroupedSongsList),
         new PropertyMetadata(null)
     );
 
 
     public static readonly DependencyProperty IsMySongListProperty = DependencyProperty.Register(
-        "IsMySongList", typeof(bool)
+        nameof(IsMySongList), typeof(bool)
         ,
         typeof(GroupedSongsList),
         new PropertyMetadata(null)
     );
 
     public static readonly DependencyProperty ListHeaderProperty = DependencyProperty.Register(
-        "ListHeader", typeof(UIElement), typeof(GroupedSongsList), new PropertyMetadata(default(UIElement)));
+        nameof(ListHeader), typeof(UIElement), typeof(GroupedSongsList), new PropertyMetadata(default(UIElement)));
 
     public static readonly DependencyProperty FooterProperty = DependencyProperty.Register(
-        "Footer", typeof(UIElement), typeof(GroupedSongsList), new PropertyMetadata(default(UIElement)));
+        nameof(Footer), typeof(UIElement), typeof(GroupedSongsList), new PropertyMetadata(default(UIElement)));
     private bool disposedValue;
 
     public GroupedSongsList()
@@ -168,7 +168,7 @@ public sealed partial class GroupedSongsList : IDisposable
         var playItems = HyPlayList.AppendNcSongRange(SongContainer.SelectedItems.Cast<NCSong>().ToList(), HyPlayList.NowPlaying + 1);
         if (HyPlayList.NowPlayType == PlayMode.Shuffled)
         {
-            List<int> playItemIndexes = new List<int>();
+            List<int> playItemIndexes = [];
             foreach (var item in playItems)
             {
                 var index = HyPlayList.List.IndexOf(item);

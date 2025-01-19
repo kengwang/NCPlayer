@@ -27,45 +27,45 @@ namespace HyPlayer.Controls;
 public sealed partial class SongsList : UserControl, IDisposable
 {
     public static readonly DependencyProperty MultiSelectProperty =
-        DependencyProperty.Register("MultiSelect", typeof(bool), typeof(SongsList), new PropertyMetadata(false));
+        DependencyProperty.Register(nameof(MultiSelect), typeof(bool), typeof(SongsList), new PropertyMetadata(false));
 
 
     public static readonly DependencyProperty IsSearchEnabledProperty = DependencyProperty.Register(
-        "IsSearchEnabled", typeof(bool),
+        nameof(IsSearchEnabled), typeof(bool),
         typeof(SongsList),
         new PropertyMetadata(null)
     );
 
     public static readonly DependencyProperty SongsProperty = DependencyProperty.Register(
-        "Songs", typeof(ObservableCollection<NCSong>),
+        nameof(Songs), typeof(ObservableCollection<NCSong>),
         typeof(SongsList),
         new PropertyMetadata(null)
     );
 
     public static readonly DependencyProperty ListSourceProperty = DependencyProperty.Register(
-        "ListSource", typeof(string),
+        nameof(ListSource), typeof(string),
         typeof(SongsList),
         new PropertyMetadata(null)
     );
 
 
     public static readonly DependencyProperty IsMySongListProperty = DependencyProperty.Register(
-        "IsMySongList", typeof(bool)
+        nameof(IsMySongList), typeof(bool)
         ,
         typeof(SongsList),
         new PropertyMetadata(null)
     );
 
     public static readonly DependencyProperty ListHeaderProperty = DependencyProperty.Register(
-        "ListHeader", typeof(UIElement), typeof(SongsList), new PropertyMetadata(default(UIElement)));
+        nameof(ListHeader), typeof(UIElement), typeof(SongsList), new PropertyMetadata(default(UIElement)));
 
     public static readonly DependencyProperty FooterProperty = DependencyProperty.Register(
-        "Footer", typeof(UIElement), typeof(SongsList), new PropertyMetadata(default(UIElement)));
+        nameof(Footer), typeof(UIElement), typeof(SongsList), new PropertyMetadata(default(UIElement)));
 
-    private readonly ObservableCollection<NCSong> VisibleSongs = new();
+    private readonly ObservableCollection<NCSong> VisibleSongs = [];
 
     public static readonly DependencyProperty CanViewCommentsProperty = DependencyProperty.Register(
-        "CanViewComments", typeof(bool), typeof(SongsList), new PropertyMetadata(false));
+        nameof(CanViewComments), typeof(bool), typeof(SongsList), new PropertyMetadata(false));
     //public bool IsManualSelect = true;
 
     public SongsList()
@@ -258,7 +258,7 @@ public sealed partial class SongsList : UserControl, IDisposable
         var playItems = HyPlayList.AppendNcSongRange(SongContainer.SelectedItems.Cast<NCSong>().ToList(), HyPlayList.NowPlaying + 1);
         if (HyPlayList.NowPlayType == PlayMode.Shuffled)
         {
-            List<int> playItemIndexes = new List<int>();
+            List<int> playItemIndexes = [];
             foreach (var item in playItems)
             {
                 var index = HyPlayList.List.IndexOf(item);

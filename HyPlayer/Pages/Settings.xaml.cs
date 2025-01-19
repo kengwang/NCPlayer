@@ -50,7 +50,7 @@ public sealed partial class Settings : Page, IDisposable
 
 
     public static readonly DependencyProperty IsAdvancedLyricColorSettingsShowProperty = DependencyProperty.Register(
-        "IsAdvancedLyricColorSettingsShow", typeof(bool), typeof(Settings), new PropertyMetadata(default(bool)));
+        nameof(IsAdvancedLyricColorSettingsShow), typeof(bool), typeof(Settings), new PropertyMetadata(default(bool)));
 
     public bool IsAdvancedLyricColorSettingsShow
     {
@@ -114,7 +114,7 @@ public sealed partial class Settings : Page, IDisposable
     private List<FontInfo> GetAllFonts()
     {
         var names = CanvasTextFormat.GetSystemFontFamilies();
-        var displayNames = CanvasTextFormat.GetSystemFontFamilies(new[] { "zh-cn" });
+        var displayNames = CanvasTextFormat.GetSystemFontFamilies(["zh-cn"]);
         var models = new List<FontInfo>();
         for (var i = 0; i < names.Length; i++)
         {
@@ -520,7 +520,7 @@ public sealed partial class Settings : Page, IDisposable
 
     private void ApplyNewAcrylic()
     {
-        var Brush = new Microsoft.UI.Xaml.Media.AcrylicBrush()
+        var brush = new Microsoft.UI.Xaml.Media.AcrylicBrush()
         {
             BackgroundSource = AcrylicBackgroundSource.HostBackdrop,
             TintColor = (Windows.UI.Color)Application.Current.Resources["SystemRevealAltHighColor"],
@@ -528,7 +528,7 @@ public sealed partial class Settings : Page, IDisposable
             TintLuminosityOpacity = TintOpacityLuminositySlider.Value,
             FallbackColor = (Windows.UI.Color)Application.Current.Resources["SystemRevealAltHighColor"],
         };
-        PreviewAcrylic.Fill = Brush;
+        PreviewAcrylic.Fill = brush;
     }
 
     private void TintOpacity_ValueChanged(object sender, RangeBaseValueChangedEventArgs e)

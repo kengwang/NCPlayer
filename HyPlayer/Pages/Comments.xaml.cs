@@ -35,8 +35,8 @@ public sealed partial class Comments : Page, IDisposable
     private int sortType = 1;
     private bool IsShiftingPage = false;
     private ScrollViewer MainScroll, HotCommentsScroll;
-    private ObservableCollection<Comment> hotComments = new ObservableCollection<Comment>();
-    private ObservableCollection<Comment> normalComments = new ObservableCollection<Comment>();
+    private ObservableCollection<Comment> hotComments = [];
+    private ObservableCollection<Comment> normalComments = [];
     private CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource();
     private CancellationToken _cancellationToken;
     private Task _commentLoaderTask;

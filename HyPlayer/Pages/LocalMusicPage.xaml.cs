@@ -26,8 +26,8 @@ namespace HyPlayer.Pages;
 /// </summary>
 public sealed partial class LocalMusicPage : Page, INotifyPropertyChanged, IDisposable
 {
-    private static readonly string[] supportedFormats = { ".flac", ".mp3", ".ncm", ".ape", ".m4a", ".wav" };
-    private readonly ObservableCollection<HyPlayItem> localHyItems = new();
+    private static readonly string[] supportedFormats = [".flac", ".mp3", ".ncm", ".ape", ".m4a", ".wav"];
+    private readonly ObservableCollection<HyPlayItem> localHyItems = [];
     private string _notificationText;
     private Task CurrentFileScanTask;
     private CancellationTokenSource cancellationTokenSource = new();

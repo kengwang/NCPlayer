@@ -8,23 +8,23 @@ namespace HyPlayer.Controls;
 public sealed partial class ExpandableTextBox : UserControl
 {
     public static readonly DependencyProperty ButtonTextProperty = DependencyProperty.Register(
-        "ButtonText", typeof(string), typeof(ExpandableTextBox), new PropertyMetadata("展开"));
+        nameof(ButtonText), typeof(string), typeof(ExpandableTextBox), new PropertyMetadata("展开"));
 
     public static readonly DependencyProperty SelectableProperty = DependencyProperty.Register(
-        "Selectable", typeof(bool), typeof(SelectableTextBox), new PropertyMetadata(true));
+        nameof(Selectable), typeof(bool), typeof(SelectableTextBox), new PropertyMetadata(true));
 
     public static readonly DependencyProperty TextProperty = DependencyProperty.Register(
-        "Text", typeof(string), typeof(SelectableTextBox), new PropertyMetadata(default(string)));
+        nameof(Text), typeof(string), typeof(SelectableTextBox), new PropertyMetadata(default(string)));
 
     public static readonly DependencyProperty MaxLinesProperty = DependencyProperty.Register(
-        "MaxLines", typeof(int), typeof(SelectableTextBox), new PropertyMetadata(3));
+        nameof(MaxLines), typeof(int), typeof(SelectableTextBox), new PropertyMetadata(3));
 
     public static readonly DependencyProperty TextWrappingProperty = DependencyProperty.Register(
-        "TextWrapping", typeof(TextWrapping), typeof(SelectableTextBox),
+        nameof(TextWrapping), typeof(TextWrapping), typeof(SelectableTextBox),
         new PropertyMetadata(default(TextWrapping)));
 
     private static readonly DependencyProperty ActualMaxLineProperty = DependencyProperty.Register(
-        "ActualMaxLine", typeof(int), typeof(ExpandableTextBox), new PropertyMetadata(7));
+        nameof(ActualMaxLine), typeof(int), typeof(ExpandableTextBox), new PropertyMetadata(7));
 
     private bool _isExpanded;
 

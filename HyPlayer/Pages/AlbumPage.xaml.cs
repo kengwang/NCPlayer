@@ -28,11 +28,11 @@ namespace HyPlayer.Pages;
 /// </summary>
 public sealed partial class AlbumPage : Page, IDisposable
 {
-    private readonly ObservableCollection<NCSong> AlbumSongs = new();
+    private readonly ObservableCollection<NCSong> AlbumSongs = [];
     private NCAlbum Album;
     private string albumid;
     private readonly CollectionViewSource AlbumSongsViewSource = new() { IsSourceGrouped = true };
-    private List<NCArtist> artists = new();
+    private List<NCArtist> artists = [];
     private CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource();
     private CancellationToken _cancellationToken;
     private Task _albumDynamicLoaderTask;

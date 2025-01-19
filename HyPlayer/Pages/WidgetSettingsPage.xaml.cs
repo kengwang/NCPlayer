@@ -44,7 +44,7 @@ namespace HyPlayer.Pages
         private List<FontInfo> GetAllFonts()
         {
             var names = CanvasTextFormat.GetSystemFontFamilies();
-            var displayNames = CanvasTextFormat.GetSystemFontFamilies(new[] { "zh-cn" });
+            var displayNames = CanvasTextFormat.GetSystemFontFamilies(["zh-cn"]);
             var models = new List<FontInfo>();
             for (var i = 0; i < names.Length; i++)
             {

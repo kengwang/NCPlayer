@@ -26,10 +26,10 @@ namespace HyPlayer.Controls;
 public sealed partial class SingleComment : UserControl, INotifyPropertyChanged
 {
     public static readonly DependencyProperty AvatarSourceProperty =
-        DependencyProperty.Register("AvatarSource", typeof(BitmapImage), typeof(SingleComment),
+        DependencyProperty.Register(nameof(AvatarSource), typeof(BitmapImage), typeof(SingleComment),
             new PropertyMetadata(null));
     public static readonly DependencyProperty MainCommentProperty =
-    DependencyProperty.Register("MainComment", typeof(Comment), typeof(SingleComment),
+    DependencyProperty.Register(nameof(MainComment), typeof(Comment), typeof(SingleComment),
         new PropertyMetadata(null));//主评论
 
     public event PropertyChangedEventHandler PropertyChanged;
@@ -41,7 +41,7 @@ public sealed partial class SingleComment : UserControl, INotifyPropertyChanged
     }
 
 
-    private ObservableCollection<Comment> floorComments = new ObservableCollection<Comment>();
+    private ObservableCollection<Comment> floorComments = [];
     public UserDisplay CommentUserDisplay;
     private string time;
 

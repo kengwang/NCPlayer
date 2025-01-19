@@ -40,7 +40,7 @@ public sealed partial class PlayBar
     private bool _isSliding = false;
     public PlayMode NowPlayType = PlayMode.DefaultRoll;
     private TimeSpan StartingTimeSpan = TimeSpan.Zero;
-    public ObservableCollection<HyPlayItem> PlayItems = new();
+    public ObservableCollection<HyPlayItem> PlayItems = [];
 #nullable enable
     private ManipulationStartedRoutedEventArgs? _slidingEventArgs = null;
 #nullable restore

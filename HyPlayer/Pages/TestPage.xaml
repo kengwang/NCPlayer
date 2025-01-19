@@ -8,25 +8,29 @@
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}"
     NavigationCacheMode="Disabled"
     mc:Ignorable="d">
-
-    <StackPanel Orientation="Vertical">
-        <TextBlock Text="此页面仅用于调试使用，如果你不知道此页面的用途，请返回上一页 | This page is for debugging use only, if you do not know the purpose of this page, please go back" />
-        <Button Click="TestTeachingTip_OnClick">TestTeachingTips</Button>
-        <Button Click="DumpDebugInfo_Click">Dump Debug Info</Button>
-        <StackPanel Orientation="Horizontal">
-            <TextBlock Text="ResourceId" />
-            <TextBox Text="{x:Bind ResourceId, Mode=TwoWay}" />
-            <Button Click="NavigateResourceId" Content="Navigate" />
-            <Button Click="PlayResourceId" Content="Play" />
-            <Button
-                x:Name="DisablePopUp"
-                Click="DisablePopUpButton_Click"
-                Content="停用警告弹窗" />
-            <Button
-                x:Name="ForceGC"
-                Click="ForceGC_Click"
-                Content="强制执行GC" />
+    <ScrollViewer VerticalScrollMode="Auto" Margin="0,0,0,150">
+        <StackPanel Orientation="Vertical">
+            <TextBlock
+                Text="此页面仅用于调试使用，如果你不知道此页面的用途，请返回上一页 | This page is for debugging use only, if you do not know the purpose of this page, please go back" />
+            <Button Click="TestTeachingTip_OnClick">TestTeachingTips</Button>
+            <Button Click="DumpDebugInfo_Click">Dump Debug Info</Button>
+            <StackPanel Orientation="Vertical">
+                <TextBlock Text="ResourceId" />
+                <TextBox Text="{x:Bind ResourceId, Mode=TwoWay}" />
+                <Button Click="NavigateResourceId" Content="Navigate" />
+                <Button Click="PlayResourceId" Content="Play" />
+                <Button
+                    x:Name="DisablePopUp"
+                    Click="DisablePopUpButton_Click"
+                    Content="停用警告弹窗" />
+                <Button
+                    x:Name="ForceGC"
+                    Click="ForceGC_Click"
+                    Content="强制执行GC" />
+                <TextBlock Text="AdditionalApiParameters" />
+                <TextBox Height="500" x:Name="TbAdditionalApiParameters" AcceptsReturn="True" />
+                <Button Click="SaveApiAdditionalParameters_OnClick">Save AdditionalApiParameters</Button>
+            </StackPanel>
         </StackPanel>
-        <ListView ItemsSource="{x:Bind hyplayer:Common.Logs}" />
-    </StackPanel>
+    </ScrollViewer>
 </Page>

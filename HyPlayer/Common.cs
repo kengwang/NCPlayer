@@ -82,7 +82,10 @@ namespace HyPlayer
 
         public static void InitializeHttpClientAndAPI()
         {
-            ncapi = new CloudMusicApi(Setting.EnableProxy);
+            ncapi = new CloudMusicApi(Setting.EnableProxy)
+            {
+                AdditionalParameters = Setting.ApiAdditionalParameters
+            };
             HttpBaseProtocolFilter = new HttpBaseProtocolFilter
             {
                 UseProxy = Setting.EnableProxy
@@ -824,7 +827,11 @@ namespace HyPlayer
             }
         }
 
-
+        public AdditionalParameters ApiAdditionalParameters
+        {
+            get => JsonConvert.DeserializeObject<AdditionalParameters>(GetSettings(nameof(ApiAdditionalParameters), "{}")) ?? new AdditionalParameters();
+            set => ApplicationData.Current.LocalSettings.Values[nameof(ApiAdditionalParameters)] = JsonConvert.SerializeObject(value);
+        }
 
         public bool noImage
         {

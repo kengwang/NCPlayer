@@ -981,6 +981,7 @@ public sealed partial class ExpandedPlayer : Page, IDisposable
         if (HyPlayList.NowPlayingItem.PlayItem == null) return false;
 
         if (lastSongForBrush == HyPlayList.NowPlayingItem.PlayItem) return Common.BrushManagement.AccentBrush.Color.R == 0;
+        lastSongForBrush = HyPlayList.NowPlayingItem.PlayItem;
         try
         {
             Buffer buffer = new Buffer(MIMEHelper.PICTURE_FILE_HEADER_CAPACITY);
@@ -1009,7 +1010,6 @@ public sealed partial class ExpandedPlayer : Page, IDisposable
                 albumMainColor = Windows.UI.Color.FromArgb(255, (byte)themeColor.Color.X, (byte)themeColor.Color.Y, (byte)themeColor.Color.Z);
                 albumColorVectors = palette.Palette.Select(t => t / 255).ToList();
             }
-            lastSongForBrush = HyPlayList.NowPlayingItem.PlayItem;
             if (Common.Setting.expandedPlayerBackgroundType is 1)
             {
                 PageContainer.Background =

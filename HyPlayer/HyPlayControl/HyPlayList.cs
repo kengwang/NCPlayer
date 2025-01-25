@@ -164,11 +164,8 @@ public static class HyPlayList
             VolumeChangeProcess();
         }
     }
-    public static List<TimeSpan> TargetSeekingTimeSpans = new List<TimeSpan>();
-    public static TimeSpan RunningTimeSpan = TimeSpan.Zero;
     public static bool LockSeeking = false;
-    public static int IntervalCounter = 0;
-    public static int CurrentRunningSeekingHandler = 0;
+    public static bool PlaybackErrorHandling = false;
 
     /*********        基本       ********/
     public static PlayMode NowPlayType
@@ -282,50 +279,12 @@ public static class HyPlayList
 
     private static void PlaybackSession_SeekCompleted(MediaPlaybackSession sender, object args)
     {
-        if (CurrentRunningSeekingHandler > 0) return;
-        CurrentRunningSeekingHandler++;
-        DecreaseRunningSeekingHandler();
     }
-    public static async void DecreaseRunningSeekingHandler()
-    {
-        await Task.Delay(750);
-        while (TargetSeekingTimeSpans.Count != 0 && TargetSeekingTimeSpans.Last() != RunningTimeSpan)
-        {
-            Seek(null, true);
-            await Task.Delay(500);
-        }
-        TargetSeekingTimeSpans.Clear();
-        if (CurrentRunningSeekingHandler >= 1) CurrentRunningSeekingHandler--;
-        IntervalCounter = 0;
-    }
-    public static void Seek(TimeSpan? targetTimeSpan, bool isHandler = false)
-    {
-        lock (TargetSeekingTimeSpans)
-        {
-            if (isHandler)
-            {
-                var timespan = TargetSeekingTimeSpans.Last();
-                RunningTimeSpan = timespan;
-                Player.PlaybackSession.Position = timespan;
-                IntervalCounter++;
-            }
-            else
-            {
 
-                if (_playerLoaderTask != null && _playerLoaderTask.IsCompleted == false) return;
-                if (TargetSeekingTimeSpans.Count == 0 && !LockSeeking)
-                {
-                    TargetSeekingTimeSpans.Add(targetTimeSpan.Value);
-                    RunningTimeSpan = targetTimeSpan.Value;
-                    Player.PlaybackSession.Position = targetTimeSpan.Value;
-                    IntervalCounter++;
-                }
-                else
-                {
-                    TargetSeekingTimeSpans.Add(targetTimeSpan.Value);
-                }
-            }
-        }
+    public static void Seek(TimeSpan targetTimeSpan)
+    {
+        if (LockSeeking) return;
+        Player.PlaybackSession.Position = targetTimeSpan;
     }
     public static void FireLyricColorChangeEvent()
     {
@@ -367,16 +326,31 @@ public static class HyPlayList
         Common.AddToTeachingTipLists($"播放失败 切到下一曲 \n 歌曲: {NowPlayingItem.PlayItem.Name}\n{reason}");
         SongMoveNext();
     }
-    private async static void PlayerOnMediaFailed(MediaPlayer sender, MediaPlayerFailedEventArgs args)
+    private static async void PlayerOnMediaFailed(MediaPlayer sender, MediaPlayerFailedEventArgs args)
     {
         if ((uint)args.ExtendedErrorCode.HResult == 0xC00D36FA)
         {
             Common.AddToTeachingTipLists("播放失败", "无法创建媒体接收器，请检查设备是否有声音输出设备！");
             return;
         }
-        if ((uint)args.ExtendedErrorCode.HResult == 0x80004004)
+        if ((uint)args.ExtendedErrorCode.HResult == 0x80004004 
+            || (uint)args.ExtendedErrorCode.HResult == 0xC00D36BB 
+            || (uint)args.ExtendedErrorCode.HResult == 0x80004005)
         {
-            await Task.Delay(500);
+            if (PlaybackErrorHandling) return;
+            PlaybackErrorHandling = true;
+            Common.AddToTeachingTipLists("播放错误", "操作过快，请稍候...");
+            LockSeeking = true;
+            await Task.Delay(1000);
+            var position = Player.PlaybackSession.Position;
+            Player.AutoPlay = false;
+            Player.Source = _mediaSource;
+            Player.PlaybackSession.Position = position;
+            Player.Play();
+            Player.AutoPlay = true;
+            LockSeeking = false;
+            PlaybackErrorHandling = false;
+            return;
         }
         Common.ErrorMessageList.Add($"歌曲播放失败: {NowPlayingItem.PlayItem.Name}\n{args.ErrorMessage}\n{args.ExtendedErrorCode}");
         Common.AddToTeachingTipLists($"播放失败 切到下一曲 \n 歌曲: {NowPlayingItem.PlayItem.Name}\n{args.ErrorMessage}\n{args.ExtendedErrorCode}");
@@ -1189,10 +1163,6 @@ public static class HyPlayList
             MoveSongPointer();
             return;
         }
-        RunningTimeSpan = TimeSpan.Zero;
-        IntervalCounter = 0;
-        CurrentRunningSeekingHandler = 0;
-        TargetSeekingTimeSpans.Clear();
         NowPlayingHashCode = 0;
         if (CoverStream.Size != 0)
         {
@@ -1213,7 +1183,6 @@ public static class HyPlayList
 
         try
         {
-            LockSeeking = true;
             Player.Source = null;
             _mediaSource?.Dispose();
             switch (targetItem.ItemType)
@@ -1347,9 +1316,6 @@ public static class HyPlayList
             }
 
             Player.Source = _mediaSource;
-            await Task.Delay(750);
-            if (TargetSeekingTimeSpans.Count != 0 && !(TargetSeekingTimeSpans.Last() == RunningTimeSpan)) Seek(null, true);
-            LockSeeking = false;
         }
         catch (Exception e)
         {

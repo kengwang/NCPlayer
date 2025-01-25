@@ -45,9 +45,7 @@ namespace HyPlayer.Classes
                     return new SolidColorBrush(Common.Setting.pureLyricFocusingColor.Value);
                 }
 
-                return (accentBrush != null
-                    ? accentBrush
-                    : Application.Current.Resources["SystemControlPageTextBaseHighBrush"] as SolidColorBrush)!;
+                return (accentBrush ?? Application.Current.Resources["SystemControlPageTextBaseHighBrush"] as SolidColorBrush);
             }
             set
             {
@@ -64,9 +62,7 @@ namespace HyPlayer.Classes
                     return new SolidColorBrush(Common.Setting.pureLyricIdleColor.Value);
                 }
 
-                return (idleBrush != null
-                    ? idleBrush
-                    : Application.Current.Resources["TextFillColorTertiaryBrush"] as SolidColorBrush)!;
+                return (idleBrush ?? Application.Current.Resources["TextFillColorTertiaryBrush"] as SolidColorBrush);
             }
             set
             {

@@ -358,6 +358,15 @@ namespace HyPlayer
 
     internal class Setting : INotifyPropertyChanged
     {
+        public bool EnablePreLoad
+        {
+            get => GetSettings(nameof(EnablePreLoad), false);
+            set
+            {
+                ApplicationData.Current.LocalSettings.Values[nameof(EnablePreLoad)] = value;
+                OnPropertyChanged();
+            }
+        }
 
         public int lyricPaddingTopRatio
         {

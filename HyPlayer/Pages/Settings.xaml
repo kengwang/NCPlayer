@@ -1328,6 +1328,9 @@
                             <controls3:SettingsCard Description="可能造成无法播放, 请勿轻易开启" Header="开启播放缓存">
                                 <CheckBox Margin="0,0,-100,0" IsChecked="{x:Bind hyplayer:Common.Setting.enableCache, Mode=TwoWay}" />
                             </controls3:SettingsCard>
+                            <controls3:SettingsCard Description="提前将曲目加载至内存, 在网络环境较差情况下可能需要较长时间加载" Header="开启播放预加载">
+                                <CheckBox Margin="0,0,-100,0" IsChecked="{x:Bind hyplayer:Common.Setting.EnablePreLoad, Mode=TwoWay}" />
+                            </controls3:SettingsCard>
                             <controls3:SettingsCard Header="本地文件扫描渐进式加载 (Progressive Loading)">
                                 <CheckBox Margin="0,0,-100,0" IsChecked="{x:Bind hyplayer:Common.Setting.localProgressiveLoad, Mode=TwoWay}" />
                             </controls3:SettingsCard>

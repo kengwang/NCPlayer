@@ -102,7 +102,7 @@ public static class HyPlayList
         RandomAccessStreamReference.CreateFromStream(CoverStream);
 
     public static int NowPlayingHashCode = 0;
-    private static InMemoryRandomAccessStream _ncmPlayableStream;
+    private static InMemoryRandomAccessStream _ncmPlayableStream = new();
     private static string _ncmPlayableStreamMIMEType = string.Empty;
     private static MediaSource _mediaSource;
     private static Task _playerLoaderTask;
@@ -255,7 +255,6 @@ public static class HyPlayList
         Player.CurrentStateChanged += Player_CurrentStateChanged;
         //Player.VolumeChanged += Player_VolumeChanged;
         Player.PlaybackSession.PositionChanged += PlaybackSession_PositionChanged;
-        Player.PlaybackSession.SeekCompleted += PlaybackSession_SeekCompleted;
         if (Common.Setting.progressInSMTC)
         {
             MediaSystemControls.PlaybackPositionChangeRequested += MediaSystemControls_PlaybackPositionChangeRequested;
@@ -275,10 +274,6 @@ public static class HyPlayList
         if (!Common.Setting.EnableAudioGain) AudioEffectsProperties["AudioGain_Disabled"] = true;
         Player.AddAudioEffect(typeof(AudioGainEffect).FullName, true, AudioEffectsProperties);
         Common.IsInFm = false;
-    }
-
-    private static void PlaybackSession_SeekCompleted(MediaPlaybackSession sender, object args)
-    {
     }
 
     public static void Seek(TimeSpan targetTimeSpan)
@@ -1272,7 +1267,20 @@ public static class HyPlayList
                         else
                         {
                             var playUrl = await GetNowPlayingUrl(targetItem);
-                            _mediaSource = MediaSource.CreateFromUri(new Uri(playUrl));
+                            if (Common.Setting.EnablePreLoad)
+                            {
+                                var reference = RandomAccessStreamReference.CreateFromUri(new Uri(playUrl));
+                                using var stream = await reference.OpenReadAsync();
+                                var buffer = new Buffer((uint)stream.Size);
+                                await stream.ReadAsync(buffer, (uint)stream.Size, InputStreamOptions.None);
+                                _ncmPlayableStream = new InMemoryRandomAccessStream();
+                                await _ncmPlayableStream.WriteAsync(buffer);
+                                _mediaSource = MediaSource.CreateFromStream(_ncmPlayableStream, stream.ContentType);
+                            }
+                            else
+                            {
+                                _mediaSource = MediaSource.CreateFromUri(new Uri(playUrl));
+                            }
                         }
                     }
 

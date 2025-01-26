@@ -589,8 +589,7 @@ DoubleAnimation verticalAnimation;
         Common.PageMain.ExpandedPlayer.Visibility = Visibility.Collapsed;
         Window.Current.SetTitleBar(Common.PageBase.AppTitleBar);
         Common.isExpanded = false;
-        using var coverStream = HyPlayList.CoverStream.CloneStream();
-        await RefreshPlayBarCover(HyPlayList.NowPlayingHashCode, coverStream);
+        await RefreshPlayBarCover(HyPlayList.NowPlayingHashCode, HyPlayList.CoverBuffer);
     }
 
     private void ButtonCleanAll_OnClick(object sender, RoutedEventArgs e)
@@ -868,8 +867,7 @@ DoubleAnimation verticalAnimation;
     private async Task OnEnteringForeground()
     {
         LoadPlayingFile(HyPlayList.NowPlayingItem);
-        using var coverStream = HyPlayList.CoverStream.CloneStream();
-        await RefreshPlayBarCover(HyPlayList.NowPlayingHashCode, coverStream);
+        await RefreshPlayBarCover(HyPlayList.NowPlayingHashCode, HyPlayList.CoverBuffer);
     }
     private async void UserControl_Loaded(object sender, RoutedEventArgs e)
     {
@@ -958,11 +956,13 @@ DoubleAnimation verticalAnimation;
         TbSongNameScrollStoryBoard.Begin();
         */
     }
-    public async Task RefreshPlayBarCover(int hashCode, IRandomAccessStream coverStream)
+    public async Task RefreshPlayBarCover(int hashCode, IBuffer coverStream)
     {
         await Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, async () =>
         {
-            using var stream = coverStream.CloneStream();
+            using var stream = new InMemoryRandomAccessStream();
+            await stream.WriteAsync(coverStream);
+            stream.Seek(0);
             if (GridSongInfo.Visibility == Visibility.Visible && Opacity != 0)
             {
                 try

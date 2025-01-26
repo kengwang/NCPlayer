@@ -123,8 +123,7 @@ public sealed partial class MainPage
             //lyricstoryboard.Begin();
 
             PointerInAni.Begin();
-            using var coverStream = HyPlayList.CoverStream.CloneStream();
-            await Common.BarPlayBar.RefreshPlayBarCover(HyPlayList.NowPlayingHashCode, coverStream);
+            await Common.BarPlayBar.RefreshPlayBarCover(HyPlayList.NowPlayingHashCode, HyPlayList.CoverBuffer);
             var BlankAni = new DoubleAnimation
             {
                 To = 0,

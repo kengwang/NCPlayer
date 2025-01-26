@@ -79,7 +79,7 @@ public static class HyPlayList
 
     public delegate void SongLikeStatusChanged(bool isLiked);
 
-    public delegate Task SongCoverChanged(int hashCode, IRandomAccessStream coverStream);
+    public delegate Task SongCoverChanged(int hashCode, IBuffer coverStream);
 
     public static int NowPlaying;
     private static readonly System.Timers.Timer SecTimer = new(1000); // 公用秒表
@@ -97,7 +97,7 @@ public static class HyPlayList
     private static readonly BackgroundDownloader Downloader = new();
     private static Dictionary<HyPlayItem, DownloadOperation> DownloadOperations = new();
     public static InMemoryRandomAccessStream CoverStream = new InMemoryRandomAccessStream();
-
+    public static IBuffer CoverBuffer;
     public static RandomAccessStreamReference CoverStreamReference =
         RandomAccessStreamReference.CreateFromStream(CoverStream);
 
@@ -1405,7 +1405,10 @@ public static class HyPlayList
                 if ((hashCodeWhenRequested == NowPlayingHashCode) && !Common.Setting.noImage)
                 {
                     CoverStream.Seek(0);
-                    OnSongCoverChanged?.Invoke(hashCodeWhenRequested, CoverStream);
+                    var buffer = new Buffer((uint)CoverStream.Size);
+                    await CoverStream.ReadAsync(buffer, (uint)CoverStream.Size, InputStreamOptions.None);
+                    CoverBuffer = buffer;
+                    OnSongCoverChanged?.Invoke(hashCodeWhenRequested, buffer);
                 }
             }
 

@@ -475,8 +475,7 @@ public sealed partial class ExpandedPlayer : Page, IDisposable
         try
         {
             OnSongChange(HyPlayList.List[HyPlayList.NowPlaying]);
-            using var coverStream = HyPlayList.CoverStream.CloneStream();
-            await RefreshAlbumCover(HyPlayList.NowPlayingHashCode, coverStream);
+            await RefreshAlbumCover(HyPlayList.NowPlayingHashCode, HyPlayList.CoverBuffer);
             ChangeWindowMode();
             needRedesign++;
         }
@@ -641,8 +640,7 @@ public sealed partial class ExpandedPlayer : Page, IDisposable
     public async Task OnEnteringForeground()
     {
         OnSongChange(HyPlayList.NowPlayingItem);
-        using var coverStream = HyPlayList.CoverStream.CloneStream();
-        await RefreshAlbumCover(HyPlayList.NowPlayingHashCode, coverStream);
+        await RefreshAlbumCover(HyPlayList.NowPlayingHashCode, HyPlayList.CoverBuffer);
         if (!_lyricHasBeenLoaded) HyPlayList_OnLyricLoaded();
     }
 
@@ -1303,11 +1301,13 @@ public sealed partial class ExpandedPlayer : Page, IDisposable
     }
 
 
-    public async Task RefreshAlbumCover(int hashCode, IRandomAccessStream coverStream)
+    public async Task RefreshAlbumCover(int hashCode, IBuffer coverStream)
     {
         await Dispatcher.RunAsync(CoreDispatcherPriority.Normal, async () =>
         {
-            using var stream = coverStream.CloneStream();
+            using var stream = new InMemoryRandomAccessStream();
+            await stream.WriteAsync(coverStream);
+            stream.Seek(0);
             if (!Common.Setting.noImage)
             {
                 try

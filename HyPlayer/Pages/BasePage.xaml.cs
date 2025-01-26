@@ -83,7 +83,7 @@ public sealed partial class BasePage : Page
         // Window.Current.CoreWindow.Dispatcher.AcceleratorKeyActivated += Dispatcher_AcceleratorKeyActivated;
     }
 
-    private async Task HyPlayList_OnSongCoverChanged(int hashCode, IRandomAccessStream coverStream)
+    private async Task HyPlayList_OnSongCoverChanged(int hashCode, IBuffer coverStream)
     {
         await RefreshNavItemCover(hashCode, coverStream);
     }
@@ -899,11 +899,13 @@ public sealed partial class BasePage : Page
         });
     }
 
-    public async Task RefreshNavItemCover(int hashCode, IRandomAccessStream coverStream)
+    public async Task RefreshNavItemCover(int hashCode, IBuffer coverStream)
     {
         await Dispatcher.RunAsync(CoreDispatcherPriority.Normal, async () =>
         {
-            using var stream = coverStream.CloneStream();
+            using var stream = new InMemoryRandomAccessStream();
+            await stream.WriteAsync(coverStream);
+            stream.Seek(0);
             if (NavItemBlank.Opacity != 0 && !Common.isExpanded && !Common.Setting.noImage && stream.Size != 0)
             {
                 try

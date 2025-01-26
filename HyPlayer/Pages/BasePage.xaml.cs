@@ -901,6 +901,7 @@ public sealed partial class BasePage : Page
 
     public async Task RefreshNavItemCover(int hashCode, IBuffer coverStream)
     {
+        if (HyPlayList.CoverStream.Size == 0) return;
         await Dispatcher.RunAsync(CoreDispatcherPriority.Normal, async () =>
         {
             using var stream = new InMemoryRandomAccessStream();

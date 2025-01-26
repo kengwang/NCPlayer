@@ -85,6 +85,7 @@ public sealed partial class CompactPlayerPage : Page, IDisposable
 
     private async Task HyPlayList_OnSongCoverChanged(int hashCode, IBuffer coverStream)
     {
+        if (HyPlayList.CoverStream.Size == 0) return;
         await Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, async () =>
         {
             using var stream = new InMemoryRandomAccessStream();

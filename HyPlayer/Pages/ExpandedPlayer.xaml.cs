@@ -1303,6 +1303,7 @@ public sealed partial class ExpandedPlayer : Page, IDisposable
 
     public async Task RefreshAlbumCover(int hashCode, IBuffer coverStream)
     {
+        if (HyPlayList.CoverStream.Size == 0) return;
         await Dispatcher.RunAsync(CoreDispatcherPriority.Normal, async () =>
         {
             using var stream = new InMemoryRandomAccessStream();

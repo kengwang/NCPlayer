@@ -70,7 +70,6 @@ namespace HyPlayer
         public static PixelShaderEffect? PixelShaderShareEffect;
 #nullable restore
         public static BrushManagement BrushManagement = new();
-        public static KMeansPaletteGenerator PaletteGenerator = new();
         public static Setting Setting = new();
         public static bool ShowLyricSound = true;
         public static bool ShowLyricTrans = true;
@@ -358,6 +357,16 @@ namespace HyPlayer
 
     internal class Setting : INotifyPropertyChanged
     {
+        public int ColorGeneratorType
+        {
+            get => GetSettings(nameof(ColorGeneratorType), 0);
+            set
+            {
+                ApplicationData.Current.LocalSettings.Values[nameof(ColorGeneratorType)] = value;
+                OnPropertyChanged();
+            }
+        }
+
         public bool EnablePreLoad
         {
             get => GetSettings(nameof(EnablePreLoad), false);

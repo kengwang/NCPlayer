@@ -752,7 +752,13 @@
                                             <ComboBoxItem Content="流光溢彩 (实验, Isolation)" />
                                         </ComboBox>
                                     </controls3:SettingsCard>
-                                    <controls3:SettingsCard Description="关闭则为RGB空间" Header="Impressionist (背景取色) 使用LAB空间">
+                                    <controls3:SettingsCard Header="背景取色设置">
+                                        <ComboBox HorizontalAlignment="Right" SelectedIndex="{x:Bind hyplayer:Common.Setting.ColorGeneratorType, Mode=TwoWay}">
+                                            <ComboBoxItem Content="KMeans" />
+                                            <ComboBoxItem Content="OctTree" />
+                                        </ComboBox>
+                                    </controls3:SettingsCard>
+                                    <controls3:SettingsCard Description="关闭则为RGB空间，仅在KMeans模式下生效" Header="Impressionist (背景取色) 使用LAB空间">
                                         <ToggleSwitch
                                             MinWidth="10"
                                             HorizontalAlignment="Right"
@@ -764,7 +770,7 @@
                                             HorizontalAlignment="Right"
                                             IsOn="{x:Bind hyplayer:Common.Setting.ImpressionistIgnoreWhite, Mode=TwoWay}" />
                                     </controls3:SettingsCard>
-                                    <controls3:SettingsCard Description="关闭则随机颜色进行初始化" Header="Impressionist (背景取色) 使用KMeans++算法初始化颜色">
+                                    <controls3:SettingsCard Description="关闭则随机颜色进行初始化，仅在KMeans模式下生效" Header="Impressionist (背景取色) 使用KMeans++算法初始化颜色">
                                         <ToggleSwitch
                                             MinWidth="10"
                                             HorizontalAlignment="Right"

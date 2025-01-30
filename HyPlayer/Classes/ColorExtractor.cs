@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Impressionist.Abstractions;
+using Impressionist.Implementations;
+using System;
 using System.Threading.Tasks;
 using Windows.Graphics.Imaging;
 using Windows.Storage.Streams;
@@ -16,7 +18,16 @@ namespace HyPlayer.Classes
             var mime = MIMEHelper.GetPictureCodecFromBuffer(buffer);
             var decoder = await BitmapDecoder.CreateAsync(mime, stream);
             var colors = await ImageDecoder.GetPixelColor(decoder);
-            var color = await Common.PaletteGenerator.CreateThemeColor(colors);
+            ThemeColorResult color;
+
+            if (Common.Setting.ColorGeneratorType is 0)
+            {
+                color = await PaletteGenerators.KMeansPaletteGenerator.CreateThemeColor(colors, Common.Setting.ImpressionistIgnoreWhite, Common.Setting.ImpressionistLABSpace);
+            }
+            else
+            {
+                color = await PaletteGenerators.OctTreePaletteGenerator.CreateThemeColor(colors, Common.Setting.ImpressionistIgnoreWhite);
+            }
             return Color.FromArgb(255, (byte)color.Color.X, (byte)color.Color.Y, (byte)color.Color.Z);
         }
     }

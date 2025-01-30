@@ -10,6 +10,7 @@ using HyPlayer.Controls;
 using HyPlayer.HyPlayControl;
 using HyPlayer.LyricRenderer.RollingCalculators;
 using Impressionist.Abstractions;
+using Impressionist.Implementations;
 using LyricParser.Abstraction;
 using Microsoft.Graphics.Canvas.Effects;
 using NeteaseCloudMusicApi;
@@ -992,16 +993,32 @@ public sealed partial class ExpandedPlayer : Page, IDisposable
             PaletteResult palette;
             if (Common.Setting.expandedPlayerBackgroundType != 6 && Common.Setting.expandedPlayerBackgroundType != 7)
             {
-                themeColor = await Common.PaletteGenerator.CreateThemeColor(colors, Common.Setting.ImpressionistIgnoreWhite, Common.Setting.ImpressionistLABSpace);
+                if(Common.Setting.ColorGeneratorType is 0)
+                {
+                    themeColor = await PaletteGenerators.KMeansPaletteGenerator.CreateThemeColor(colors, Common.Setting.ImpressionistIgnoreWhite, Common.Setting.ImpressionistLABSpace);
+                }
+                else
+                {
+                    themeColor = await PaletteGenerators.OctTreePaletteGenerator.CreateThemeColor(colors, Common.Setting.ImpressionistIgnoreWhite);
+                }
                 albumMainColor = Windows.UI.Color.FromArgb(255, (byte)themeColor.Color.X, (byte)themeColor.Color.Y, (byte)themeColor.Color.Z);
             }
             else
             {
-                palette = await Common.PaletteGenerator.CreatePalette(colors,
-                    Common.Setting.expandedPlayerBackgroundType is 6 ? 9 : 4,
-                    Common.Setting.ImpressionistIgnoreWhite,
-                    Common.Setting.ImpressionistLABSpace,
-                    Common.Setting.ImpressionistUseKMeansPP);
+                if (Common.Setting.ColorGeneratorType is 0)
+                {
+                    palette = await PaletteGenerators.KMeansPaletteGenerator.CreatePalette(colors,
+                                                                                           Common.Setting.expandedPlayerBackgroundType is 6 ? 9 : 4,
+                                                                                           Common.Setting.ImpressionistIgnoreWhite,
+                                                                                           Common.Setting.ImpressionistLABSpace,
+                                                                                           Common.Setting.ImpressionistUseKMeansPP);
+                }
+                else
+                {
+                    palette = await PaletteGenerators.OctTreePaletteGenerator.CreatePalette(colors,
+                                                                                           Common.Setting.expandedPlayerBackgroundType is 6 ? 9 : 4,
+                                                                                           Common.Setting.ImpressionistIgnoreWhite);
+                }
                 themeColor = palette.ThemeColor;
                 albumColors = palette.Palette.Select(quantizedColor => Windows.UI.Color.FromArgb(255, (byte)quantizedColor.X, (byte)quantizedColor.Y, (byte)quantizedColor.Z))
                     .ToList();

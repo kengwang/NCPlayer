@@ -328,8 +328,8 @@ public static class HyPlayList
             Common.AddToTeachingTipLists("播放失败", "无法创建媒体接收器，请检查设备是否有声音输出设备！");
             return;
         }
-        if ((uint)args.ExtendedErrorCode.HResult == 0x80004004 
-            || (uint)args.ExtendedErrorCode.HResult == 0xC00D36BB 
+        if ((uint)args.ExtendedErrorCode.HResult == 0x80004004
+            || (uint)args.ExtendedErrorCode.HResult == 0xC00D36BB
             || (uint)args.ExtendedErrorCode.HResult == 0x80004005)
         {
             if (PlaybackErrorHandling) return;

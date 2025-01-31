@@ -5,7 +5,6 @@ using HyPlayer.Classes;
 using HyPlayer.Controls;
 using HyPlayer.HyPlayControl;
 using HyPlayer.Pages;
-using Impressionist.Implementations;
 using Kawazu;
 using Microsoft.Gaming.XboxGameBar;
 using Microsoft.Graphics.Canvas.Effects;

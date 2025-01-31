@@ -960,8 +960,8 @@ public sealed partial class ExpandedPlayer : Page, IDisposable
         using var stream = coverStream.CloneStream();
         var finalResult = false; //在不手动指定背景类型为2至5时需要执行颜色采样
         var resultGenerated = false; //标志返回颜色已经生成
-        if (Common.Setting.lyricColor != 0 && Common.Setting.lyricColor != 3) 
-        { 
+        if (Common.Setting.lyricColor != 0 && Common.Setting.lyricColor != 3)
+        {
             finalResult = Common.Setting.lyricColor == 2;
             resultGenerated = true;
         }
@@ -993,7 +993,7 @@ public sealed partial class ExpandedPlayer : Page, IDisposable
             PaletteResult palette;
             if (Common.Setting.expandedPlayerBackgroundType != 6 && Common.Setting.expandedPlayerBackgroundType != 7)
             {
-                if(Common.Setting.ColorGeneratorType is 0)
+                if (Common.Setting.ColorGeneratorType is 0)
                 {
                     themeColor = await PaletteGenerators.KMeansPaletteGenerator.CreateThemeColor(colors, Common.Setting.ImpressionistIgnoreWhite, Common.Setting.ImpressionistLABSpace);
                 }

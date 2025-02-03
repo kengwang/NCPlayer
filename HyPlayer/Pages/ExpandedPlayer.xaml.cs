@@ -1202,10 +1202,12 @@ public sealed partial class ExpandedPlayer : Page, IDisposable
         {
             luminousColorsRotateStoryBoard.Resume();
         }
-        if (HyPlayList.IsPlaying && LuminousBackground != null)
+        if (LuminousBackground != null)
         {
-            LuminousBackground.Paused = false;
+            LuminousBackground.Paused = false;//先初始化
+
         }
+
         LoadLyricsBox();
     }
 
@@ -1725,6 +1727,10 @@ public sealed partial class ExpandedPlayer : Page, IDisposable
             {
                 session.DrawImage(_shaderEffect);
             }
+        }
+        if (!HyPlayList.IsPlaying)
+        {
+            LuminousBackground.Paused = true;
         }
     }
 

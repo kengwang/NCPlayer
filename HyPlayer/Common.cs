@@ -10,7 +10,6 @@ using Microsoft.Gaming.XboxGameBar;
 using Microsoft.Graphics.Canvas.Effects;
 using Microsoft.Toolkit.Uwp.UI;
 using Microsoft.UI.Xaml.Controls;
-using NeteaseCloudMusicApi;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
@@ -64,7 +63,7 @@ namespace HyPlayer
         public static KawazuConverter? KawazuConv;
         public static HttpBaseProtocolFilter? HttpBaseProtocolFilter;
         public static HttpClient? HttpClient;
-        public static CloudMusicApi? ncapi;
+        public static NeteaseProvider.NeteaseProvider NeteaseAPI = new();
         public static XboxGameBarWidget? XboxGameBarWidget;
         public static PixelShaderEffect? PixelShaderShareEffect;
 #nullable restore
@@ -80,7 +79,6 @@ namespace HyPlayer
 
         public static void InitializeHttpClientAndAPI()
         {
-            ncapi = new CloudMusicApi(Setting.EnableProxy);
             HttpBaseProtocolFilter = new HttpBaseProtocolFilter
             {
                 UseProxy = Setting.EnableProxy
@@ -1683,10 +1681,6 @@ namespace HyPlayer
             set
             {
                 ApplicationData.Current.LocalSettings.Values[nameof(UseHttp)] = value;
-                if (Common.ncapi != null)
-                {
-                    Common.ncapi.UseHttp = value;
-                }
                 OnPropertyChanged();
             }
         }
@@ -1814,8 +1808,8 @@ namespace HyPlayer
         public bool LastFMLogined => LastFMManager.LastfmLogined;
         public bool SaveCookies()
         {
-            var container = ApplicationData.Current.LocalSettings.CreateContainer("Cookies", ApplicationDataCreateDisposition.Always);
-            if (Common.ncapi?.Cookies.Count != 0)
+            var container = ApplicationData.Current.LocalSettings.CreateContainer("LoginedUser", ApplicationDataCreateDisposition.Always);
+            if (Common.NeteaseAPI.LoginedUser != null)
             {
                 container.Values.Clear();
                 container.Values["CookieCount"] = Common.ncapi?.Cookies.Count;

@@ -1,6 +1,5 @@
 #region
 
-using NeteaseCloudMusicApi;
 using System.Collections.Generic;
 using Windows.UI.Xaml.Controls;
 

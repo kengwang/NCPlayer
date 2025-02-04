@@ -1,6 +1,3 @@
-[submodule "NeteaseCloudMusicApi"]
-	path = NeteaseCloudMusicApi
-	url = https://github.com/HyPlayer/NeteaseCloudMusicApi.git
 [submodule "Kawazu"]
 	path = Kawazu
 	url = https://github.com/HyPlayer/Kawazu.git
@@ -17,3 +14,6 @@
 [submodule "HyPlayer.Frieren"]
 	path = HyPlayer.Frieren
 	url = https://github.com/HyPlayer/HyPlayer.Frieren
+[submodule "HyPlayer.NeteaseProvider"]
+	path = HyPlayer.NeteaseProvider
+	url = https://github.com/HyPlayer/HyPlayer.NeteaseProvider

@@ -13,7 +13,6 @@ using Impressionist.Abstractions;
 using Impressionist.Implementations;
 using LyricParser.Abstraction;
 using Microsoft.Graphics.Canvas.Effects;
-using NeteaseCloudMusicApi;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;

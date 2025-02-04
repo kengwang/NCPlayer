@@ -5,7 +5,6 @@ using HyPlayer.Controls;
 using HyPlayer.HyPlayControl;
 using Microsoft.AppCenter.Crashes;
 using Microsoft.UI.Xaml.Controls;
-using NeteaseCloudMusicApi;
 using Newtonsoft.Json.Linq;
 using QRCoder;
 using System;

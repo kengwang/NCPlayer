@@ -1,8 +1,5 @@
 ﻿#region
-
-using NeteaseCloudMusicApi;
-using System;
-using System.Collections.Generic;
+using HyPlayer.NeteaseApi.ApiContracts;
 using System.Threading.Tasks;
 
 #endregion
@@ -13,18 +10,16 @@ internal class Api
 {
     public static async Task<bool> LikeSong(string songid, bool like)
     {
-        try
+        var requestData = new LikeRequest() { TrackId = songid, Like = like };
+        var requestResult = await Common.NeteaseAPI.RequestAsync(NeteaseApis.LikeApi, requestData);
+        if (requestResult.IsSuccess)
         {
-            var requestResult = await Common.ncapi?.RequestAsync(CloudMusicApiProviders.Like,
-                new Dictionary<string, object> { { "id", songid }, { "like", like ? "true" : "false" } });
-            if (requestResult["code"].ToString() != "200")
-                throw new Exception(requestResult.ToString());
+            return true;
         }
-        catch (Exception ex)
+        else
         {
-            Common.AddToTeachingTipLists(ex.Message, (ex.InnerException ?? new Exception()).Message);
+            Common.AddToTeachingTipLists(requestResult.Error.Message);
             return false;
         }
-        return true;
     }
 }

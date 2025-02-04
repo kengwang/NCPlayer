@@ -2,12 +2,12 @@
 
 using AudioEffectComponent;
 using HyPlayer.Classes;
+using HyPlayer.NeteaseApi.ApiContracts;
 using Kawazu;
 using LyricParser.Abstraction;
 using LyricParser.Implementation;
 using Microsoft.Toolkit.Uwp.Helpers;
 using Microsoft.Toolkit.Uwp.Notifications;
-using NeteaseCloudMusicApi;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
@@ -611,9 +611,9 @@ public static class HyPlayList
                     break;
                 }
             case HyPlayItemType.Radio:
-                _ = Common.ncapi?.RequestAsync(CloudMusicApiProviders.ResourceLike,
-                    new Dictionary<string, object>
-                        { { "type", "4" }, { "t", "1" }, { "id", NowPlayingItem.PlayItem.Id } });
+                throw new NotImplementedException();
+                var likeRequest = new LikeRequest() { Like = !isLiked, TrackId = NowPlayingItem.PlayItem.Id };
+                _ = Common.NeteaseAPI.RequestAsync(NeteaseApis.LikeApi, likeRequest);
                 OnSongLikeStatusChange?.Invoke(!isLiked);
                 break;
         }
@@ -1049,64 +1049,62 @@ public static class HyPlayList
             Common.Setting.songUrlLazyGet) && targetItem.PlayItem.Id != "-1")
             try
             {
-                var json = await Common.ncapi?.RequestAsync(
-                    CloudMusicApiProviders.SongUrlV1,
-                    new Dictionary<string, object>
-                    {
-                        { "id", targetItem.PlayItem.Id },
-                        { "level", Common.Setting.audioRate }
-                    });
-                if (json["data"]?[0]?["code"]?.ToString() == "200")
+                var songRequest = new SongUrlRequest { Level = Common.Setting.audioRate, Id = targetItem.PlayItem.Id };
+                var songResult = await Common.NeteaseAPI.RequestAsync(NeteaseApis.SongUrlApi, songRequest);
+                if (songResult.IsSuccess)
                 {
-                    if (json["data"]?[0]?["freeTrialInfo"]?.HasValues == true && Common.Setting.jumpVipSongPlaying)
+                    if (songResult.Value.SongUrls[0].Code == 200)
                     {
-                        throw new Exception("当前歌曲为 VIP 试听, 已自动跳过");
-                    }
-
-                    playUrl = json["data"][0]["url"]?.ToString();
-                    if (Common.Setting.UseHttpWhenGettingSongs && playUrl.Contains("https://"))
-                    {
-                        playUrl = playUrl.Replace("https://", "http://");
-                    }
-                    var tag = json["data"]?[0]?["level"]?.ToString() switch
-                    {
-                        "standard" => "标准",
-                        "higher" => "较高",
-                        "exhigh" => "极高",
-                        "lossless" => "无损",
-                        "hires" => "Hi-Res",
-                        "jyeffect" => "高清环绕声",
-                        "sky" => "沉浸环绕声",
-                        "jymaster" => "超清母带",
-                        _ => "在线"
-                    };
-                    targetItem.PlayItem.Tag = tag;
-                    AudioEffectsProperties["AudioGain_GainValue"] = float.Parse(json["data"]?[0]?["gain"].ToString());
-                    _ = Common.Invoke(() =>
-                    {
-                        Common.BarPlayBar.TbSongTag.Text = tag;
-                        if (tag.Length > 2)
+                        if (!string.IsNullOrEmpty(songResult.Value.SongUrls[0].FreeTrialInfo) && Common.Setting.jumpVipSongPlaying)
                         {
-                            var backgroundbrush = new LinearGradientBrush();
-                            backgroundbrush.StartPoint = new Windows.Foundation.Point(0, 0);
-                            backgroundbrush.EndPoint = new Windows.Foundation.Point(1, 1);
-
-                            backgroundbrush.GradientStops.Add(new GradientStop { Offset = 0, Color = Color.FromArgb(255, 251, 251, 206) });
-                            backgroundbrush.GradientStops.Add(new GradientStop { Offset = 1, Color = Color.FromArgb(255, 223, 155, 28) });
-
-                            Common.BarPlayBar.SongInfoTag.Background = backgroundbrush;
-                            Common.BarPlayBar.SongInfoTag.BorderBrush = new SolidColorBrush(Color.FromArgb(0, 0, 0, 0));
-                            Common.BarPlayBar.TbSongTag.Foreground = new SolidColorBrush(Color.FromArgb(255, 0, 0, 0));
+                            throw new Exception("当前歌曲为 VIP 试听, 已自动跳过");
                         }
-                        else
+
+                        playUrl = songResult.Value.SongUrls[0].Url;
+                        if (Common.Setting.UseHttpWhenGettingSongs && playUrl.Contains("https://"))
                         {
-                            var brush = new SolidColorBrush(Colors.Red);
-                            Common.BarPlayBar.SongInfoTag.BorderBrush = brush;
-                            Common.BarPlayBar.SongInfoTag.Background = null;
-                            Common.BarPlayBar.TbSongTag.Foreground = brush;
+                            playUrl = playUrl.Replace("https://", "http://");
                         }
-                    });
-                    json.RemoveAll();
+                        var tag = songResult.Value.SongUrls[0]?.Level
+                            switch
+                        {
+                            "standard" => "标准",
+                            "higher" => "较高",
+                            "exhigh" => "极高",
+                            "lossless" => "无损",
+                            "hires" => "Hi-Res",
+                            "jyeffect" => "高清环绕声",
+                            "sky" => "沉浸环绕声",
+                            "jymaster" => "超清母带",
+                            _ => "在线"
+                        };
+                        targetItem.PlayItem.Tag = tag;
+                        AudioEffectsProperties["AudioGain_GainValue"] = songResult.Value.SongUrls[0]?.Gain ?? 0f;
+                        _ = Common.Invoke(() =>
+                        {
+                            Common.BarPlayBar.TbSongTag.Text = tag;
+                            if (tag.Length > 2)
+                            {
+                                var backgroundbrush = new LinearGradientBrush();
+                                backgroundbrush.StartPoint = new Windows.Foundation.Point(0, 0);
+                                backgroundbrush.EndPoint = new Windows.Foundation.Point(1, 1);
+
+                                backgroundbrush.GradientStops.Add(new GradientStop { Offset = 0, Color = Color.FromArgb(255, 251, 251, 206) });
+                                backgroundbrush.GradientStops.Add(new GradientStop { Offset = 1, Color = Color.FromArgb(255, 223, 155, 28) });
+
+                                Common.BarPlayBar.SongInfoTag.Background = backgroundbrush;
+                                Common.BarPlayBar.SongInfoTag.BorderBrush = new SolidColorBrush(Color.FromArgb(0, 0, 0, 0));
+                                Common.BarPlayBar.TbSongTag.Foreground = new SolidColorBrush(Color.FromArgb(255, 0, 0, 0));
+                            }
+                            else
+                            {
+                                var brush = new SolidColorBrush(Colors.Red);
+                                Common.BarPlayBar.SongInfoTag.BorderBrush = brush;
+                                Common.BarPlayBar.SongInfoTag.Background = null;
+                                Common.BarPlayBar.TbSongTag.Foreground = brush;
+                            }
+                        });
+                    }
                 }
                 else
                 {
@@ -1858,9 +1856,8 @@ public static class HyPlayList
 
                 if (Common.Setting.karaokLyric)
                 {
-                    json = await Common.ncapi?.RequestAsync(
-                        CloudMusicApiProviders.LyricNew,
-                        new Dictionary<string, object> { { "id", ncp.PlayItem.Id } });
+                    var lyricRequest = new LyricRequest() { Id = ncp.PlayItem.Id };
+                    var lyricResult = Common.NeteaseAPI.GetSingleSongById;
                     string lrc, romaji, karaoklrc, translrc, yrromaji, yrtranslrc;
                     if (json["yrc"] is null)
                     {

@@ -4,7 +4,6 @@ using HyPlayer.Classes;
 using HyPlayer.HyPlayControl;
 using HyPlayer.Pages;
 using Microsoft.Toolkit.Uwp.Notifications;
-using NeteaseCloudMusicApi;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;

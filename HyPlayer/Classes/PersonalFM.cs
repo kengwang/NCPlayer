@@ -1,7 +1,6 @@
 ﻿#region
 
 using HyPlayer.HyPlayControl;
-using NeteaseCloudMusicApi;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;

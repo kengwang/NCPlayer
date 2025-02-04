@@ -1,7 +1,6 @@
 ﻿#region
 
 using HyPlayer.Classes;
-using NeteaseCloudMusicApi;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;

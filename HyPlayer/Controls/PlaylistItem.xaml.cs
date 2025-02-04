@@ -3,7 +3,6 @@
 using HyPlayer.Classes;
 using HyPlayer.HyPlayControl;
 using HyPlayer.Pages;
-using NeteaseCloudMusicApi;
 using System;
 using System.Collections.Generic;
 using Windows.UI.Xaml;

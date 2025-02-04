@@ -1,8 +1,8 @@
 ﻿#region
 
 using HyPlayer.Classes;
+using HyPlayer.NeteaseApi.ApiContracts;
 using Microsoft.Toolkit.Uwp.Helpers;
-using NeteaseCloudMusicApi;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -249,52 +249,48 @@ internal sealed class DownloadObject : INotifyPropertyChanged
         //下载歌词
         return Task.Run(async () =>
         {
-            try
+            var lyricRequest = new LyricRequest() { Id = ncsong.sid };
+            var lyricResult = await Common.NeteaseAPI.RequestAsync(NeteaseApis.LyricApi, lyricRequest);
+            if (lyricResult.IsSuccess)
             {
-                var json = await Common.ncapi?.RequestAsync(CloudMusicApiProviders.Lyric,
-                    new Dictionary<string, object> { { "id", ncsong.sid } });
-                if (!(json.ContainsKey("nolyric") && json["nolyric"].ToString().ToLower() == "true") &&
-                    !(json.ContainsKey("uncollected") && json["uncollected"].ToString().ToLower() == "true"))
+                var data = lyricResult.Value;
+                if (data.Lyric == null) return;
+                if (data.Lyric.Lyric == "[99:00.00]纯音乐，请欣赏") return;
+                var lrc = Utils.ConvertPureLyric(data.Lyric.Lyric);
+                if (Common.Setting.downloadTranslation && data.TranslationLyric != null)
                 {
-                    if (json["lrc"]["lyric"].ToString().Contains("[99:00.00]纯音乐，请欣赏"))
-                        // 这个也是纯音乐
-                        return;
-
-                    var lrc = Utils.ConvertPureLyric(json["lrc"]["lyric"].ToString());
-                    if (Common.Setting.downloadTranslation && json["tlyric"]?["lyric"] != null)
-                        Utils.ConvertTranslation(json["tlyric"]["lyric"].ToString(), lrc);
-                    var lrctxt = string.Join("\r\n", lrc.Select(t =>
-                    {
-                        if (t.HaveTranslation && !string.IsNullOrWhiteSpace(t.Translation))
-                            return "[" + t.LyricLine.StartTime.ToString(@"mm\:ss\.ff") + "]" + t.LyricLine.CurrentLyric + " 「" +
-                                   t.Translation + "」";
-                        return "[" + t.LyricLine.StartTime.ToString(@"mm\:ss\.ff") + "]" + t.LyricLine.CurrentLyric;
-                    }));
-                    if (string.IsNullOrWhiteSpace(lrctxt)) return;
-                    var sf = await (await StorageFolder.GetFolderFromPathAsync(Path.GetDirectoryName(FullPath)))
-                        .CreateFileAsync(
-                            Path.GetFileName(Path.ChangeExtension(FullPath, "lrc")),
-                            CreationCollisionOption.ReplaceExisting);
-                    if (Common.Setting.usingGBK)
-                        await FileIO.WriteBytesAsync(sf,
-                            Encoding.Convert(Encoding.UTF8, Encoding.GetEncoding("GBK"),
-                                Encoding.UTF8.GetBytes(lrctxt)));
-                    else
-                        await FileIO.WriteTextAsync(sf, lrctxt);
+                    Utils.ConvertTranslation(data.TranslationLyric.Lyric, lrc);
                 }
-                json.RemoveAll();
+                var lrctxt = string.Join("\r\n", lrc.Select(t =>
+                {
+                    if (t.HaveTranslation && !string.IsNullOrWhiteSpace(t.Translation))
+                        return "[" + t.LyricLine.StartTime.ToString(@"mm\:ss\.ff") + "]" + t.LyricLine.CurrentLyric + " 「" +
+                               t.Translation + "」";
+                    return "[" + t.LyricLine.StartTime.ToString(@"mm\:ss\.ff") + "]" + t.LyricLine.CurrentLyric;
+                }));
+                if (string.IsNullOrWhiteSpace(lrctxt)) return;
+                var sf = await (await StorageFolder.GetFolderFromPathAsync(Path.GetDirectoryName(FullPath)))
+                    .CreateFileAsync(
+                        Path.GetFileName(Path.ChangeExtension(FullPath, "lrc")),
+                        CreationCollisionOption.ReplaceExisting);
+                if (Common.Setting.usingGBK)
+                    await FileIO.WriteBytesAsync(sf,
+                        Encoding.Convert(Encoding.UTF8, Encoding.GetEncoding("GBK"),
+                            Encoding.UTF8.GetBytes(lrctxt)));
+                else
+                    await FileIO.WriteTextAsync(sf, lrctxt);
             }
-            catch (Exception ex)
+            else
             {
                 Status = DownloadStatus.Error;
                 _ = Common.Invoke(() =>
                 {
-                    Message = "下载歌词错误: " + ex.Message;
+                    Message = "下载歌词错误: " + lyricResult.Error.Message;
                     HasError = true;
                     HasPaused = true;
                     Progress = 100;
                 });
-                Common.AddToTeachingTipLists("下载歌词错误: " + ex.Message, (ex.InnerException ?? new Exception()).Message);
+                Common.AddToTeachingTipLists("下载歌词错误: " + lyricResult.Error.Message);
             }
         });
     }
@@ -396,10 +392,10 @@ internal sealed class DownloadObject : INotifyPropertyChanged
                 HasPaused = false;
                 Message = "正在获取下载链接";
             });
-            var json = await Common.ncapi?.RequestAsync(CloudMusicApiProviders.SongUrlV1,
-                new Dictionary<string, object> { { "id", ncsong.sid }, { "level", Common.Setting.downloadAudioRate } });
+            var urlRequest = new SongUrlRequest() { Id = ncsong.sid , Level = Common.Setting.downloadAudioRate};
+            var urlResult = await Common.NeteaseAPI.RequestAsync(NeteaseApis.SongUrlApi, urlRequest);
 
-            if (json["data"]?[0]?["code"]?.ToString() != "200")
+            if (urlResult.IsError)
             {
                 Status = DownloadStatus.Error;
                 _ = Common.Invoke(() =>
@@ -412,7 +408,7 @@ internal sealed class DownloadObject : INotifyPropertyChanged
                 return;
             }
 
-            if (json["data"]?[0]?["freeTrialInfo"]?.HasValues == true && Common.Setting.jumpVipSongDownloading)
+            if (!string.IsNullOrEmpty(urlResult.Value.SongUrls[0].FreeTrialInfo) && Common.Setting.jumpVipSongDownloading)
             {
                 Status = DownloadStatus.Paused;
                 _ = Common.Invoke(() =>
@@ -424,27 +420,27 @@ internal sealed class DownloadObject : INotifyPropertyChanged
                 return;
             }
 
-            FileName += "." + json?["data"]?[0]?["type"]?.ToString().ToLowerInvariant();
+            FileName += "." + urlResult.Value.SongUrls[0].Type.ToLowerInvariant();
             DontUsePlayItem = new PlayItem
             {
-                Bitrate = json["data"][0]["br"].ToObject<int>(),
+                Bitrate = Convert.ToInt32(urlResult.Value.SongUrls[0].BitRate),
                 Tag = "下载",
                 Album = ncsong.Album,
                 Artist = ncsong.Artist,
-                SubExt = json["data"][0]["type"].ToString().ToLowerInvariant(),
+                SubExt = urlResult.Value.SongUrls[0].Type.ToLowerInvariant(),
                 Id = ncsong.sid,
                 Name = ncsong.songname,
                 Type = HyPlayItemType.Netease,
                 TrackId = ncsong.TrackId,
                 CDName = ncsong.CDName,
-                Url = json["data"][0]["url"].ToString(),
+                Url = urlResult.Value.SongUrls[0].Url,
                 LengthInMilliseconds = ncsong.LengthInMilliseconds,
-                Size = json["data"][0]["size"].ToString()
+                Size = urlResult.Value.SongUrls[0].Size.ToString(),
                 //md5 = json["data"][0]["md5"].ToString()
             };
 
             _downloadOperation = DownloadManager.Downloader.CreateDownload(
-                new Uri(json["data"][0]["url"].ToString()),
+                new Uri(urlResult.Value.SongUrls[0].Url),
                 await nowFolder.CreateFileAsync(Path.GetFileName(FileName))
             );
             FullPath = _downloadOperation.ResultFile.Path;
@@ -453,7 +449,6 @@ internal sealed class DownloadObject : INotifyPropertyChanged
             //DownloadStartToast(FileName);
             await _downloadOperation.StartAsync().AsTask(process);
             Wc_DownloadFileCompleted();
-            json.RemoveAll();
         }
         catch (Exception ex)
         {

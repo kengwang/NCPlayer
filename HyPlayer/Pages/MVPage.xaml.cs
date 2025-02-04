@@ -2,7 +2,6 @@
 
 using HyPlayer.Classes;
 using HyPlayer.HyPlayControl;
-using NeteaseCloudMusicApi;
 using System;
 using System.Collections.Generic;
 using System.Linq;

@@ -2,6 +2,7 @@
 
 using System.Collections.Generic;
 using Windows.UI.Xaml.Controls;
+using HyPlayer.NeteaseApi.ApiContracts;
 
 #endregion
 
@@ -21,12 +22,13 @@ public sealed partial class SongListSelect : ContentDialog
 
     private async void ListViewSongList_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
     {
-        await Common.ncapi?.RequestAsync(CloudMusicApiProviders.PlaylistTracks, new Dictionary<string, object>
-        {
-            { "op", "add" },
-            { "pid", Common.MySongLists[ListViewSongList.SelectedIndex].plid },
-            { "tracks", sid }
-        });
+        await Common.NeteaseAPI?.RequestAsync(NeteaseApis.PlaylistTracksEditApi, 
+            new PlaylistTracksEditRequest
+            {
+                IsAdd = true,
+                PlaylistId = Common.MySongLists[ListViewSongList.SelectedIndex].plid,
+                Id = sid,
+            });
         Hide();
     }
 }

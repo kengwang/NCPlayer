@@ -1,4 +1,5 @@
 ﻿#region
+
 using HyPlayer.NeteaseApi.ApiContracts;
 using System.Threading.Tasks;
 
@@ -10,8 +11,8 @@ internal class Api
 {
     public static async Task<bool> LikeSong(string songid, bool like)
     {
-        var requestData = new LikeRequest() { TrackId = songid, Like = like };
-        var requestResult = await Common.NeteaseAPI.RequestAsync(NeteaseApis.LikeApi, requestData);
+        var requestResult = await Common.NeteaseAPI.RequestAsync(NeteaseApis.LikeApi,
+            new LikeRequest() { TrackId = songid, Like = like });
         if (requestResult.IsSuccess)
         {
             return true;

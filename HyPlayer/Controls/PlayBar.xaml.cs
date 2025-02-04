@@ -26,6 +26,7 @@ using Windows.UI.Xaml.Controls.Primitives;
 using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Media.Animation;
+using HyPlayer.NeteaseApi.ApiContracts;
 
 #endregion
 
@@ -649,8 +650,11 @@ DoubleAnimation verticalAnimation;
         }
         else
         {
-            _ = Common.ncapi?.RequestAsync(CloudMusicApiProviders.FmTrash,
-                new Dictionary<string, object> { { "id", HyPlayList.NowPlayingItem.PlayItem.Id } });
+            _ = Common.NeteaseAPI.RequestAsync(NeteaseApis.PersonalFmTrashApi,
+                new FmTrashRequest
+                {
+                    Id = HyPlayList.NowPlayingItem.PlayItem.Id
+                });
             PersonalFM.LoadNextFM();
         }
     }

@@ -15,10 +15,11 @@
     mc:Ignorable="d">
 
     <StackPanel>
-        <TextBox
-            x:Name="SonglistTitle"
-            MaxLength="20"
-            PlaceholderText="歌单名称" />
-        <CheckBox x:Name="PrivateCheckBox" Content="设置为隐私歌单" />
+        <TextBlock FontWeight="Bold">由于网易云音乐风控, 不再支持创建歌单.</TextBlock>
+        <!-- <TextBox -->
+        <!--     x:Name="SonglistTitle" -->
+        <!--     MaxLength="20" -->
+        <!--     PlaceholderText="歌单名称" /> -->
+        <!-- <CheckBox x:Name="PrivateCheckBox" Content="设置为隐私歌单" /> -->
     </StackPanel>
 </ContentDialog>

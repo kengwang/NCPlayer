@@ -22,8 +22,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HyPlayer.Frieren", "HyPlaye
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HyPlayer.NeteaseApi", "HyPlayer.NeteaseProvider\HyPlayer.NeteaseApi\HyPlayer.NeteaseApi.csproj", "{A9FAC26E-7651-4EC5-9CA6-8B3CEF6412E9}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HyPlayer.NeteaseProvider", "HyPlayer.NeteaseProvider\HyPlayer.NeteaseProvider\HyPlayer.NeteaseProvider.csproj", "{E82499A9-2A3E-46C5-842D-D6DF107A5830}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|ARM64 = Debug|ARM64
@@ -92,14 +90,6 @@ Global
 		{A9FAC26E-7651-4EC5-9CA6-8B3CEF6412E9}.Release|ARM64.Build.0 = Release|Any CPU
 		{A9FAC26E-7651-4EC5-9CA6-8B3CEF6412E9}.Release|x64.ActiveCfg = Release|Any CPU
 		{A9FAC26E-7651-4EC5-9CA6-8B3CEF6412E9}.Release|x64.Build.0 = Release|Any CPU
-		{E82499A9-2A3E-46C5-842D-D6DF107A5830}.Debug|ARM64.ActiveCfg = Debug|Any CPU
-		{E82499A9-2A3E-46C5-842D-D6DF107A5830}.Debug|ARM64.Build.0 = Debug|Any CPU
-		{E82499A9-2A3E-46C5-842D-D6DF107A5830}.Debug|x64.ActiveCfg = Debug|Any CPU
-		{E82499A9-2A3E-46C5-842D-D6DF107A5830}.Debug|x64.Build.0 = Debug|Any CPU
-		{E82499A9-2A3E-46C5-842D-D6DF107A5830}.Release|ARM64.ActiveCfg = Release|Any CPU
-		{E82499A9-2A3E-46C5-842D-D6DF107A5830}.Release|ARM64.Build.0 = Release|Any CPU
-		{E82499A9-2A3E-46C5-842D-D6DF107A5830}.Release|x64.ActiveCfg = Release|Any CPU
-		{E82499A9-2A3E-46C5-842D-D6DF107A5830}.Release|x64.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

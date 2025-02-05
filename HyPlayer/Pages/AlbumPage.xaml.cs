@@ -97,7 +97,7 @@ public sealed partial class AlbumPage : Page, IDisposable
             new AlbumDetailDynamicRequest() { Id = albumid});
         if (json.IsError)
         {
-            Common.AddToTeachingTipLists("获取歌单失败", json.Error.Message);
+            Common.AddToTeachingTipLists("获取专辑动态失败", json.Error.Message);
             return;
         }
             BtnSub.IsChecked = json.Value.IsSub;
@@ -113,7 +113,7 @@ public sealed partial class AlbumPage : Page, IDisposable
             new AlbumRequest() { Id = albumid });
             if (json.IsError)
             {
-                Common.AddToTeachingTipLists("获取歌单失败", json.Error.Message);
+                Common.AddToTeachingTipLists("获取专辑信息失败", json.Error.Message);
                 return;
             }
             Album = json.Value.Album.MapToNcAlbum();
@@ -134,15 +134,32 @@ public sealed partial class AlbumPage : Page, IDisposable
             TextBlockDesc.Text = (string.Join(" / ", json.Value.Album.Alias)) + json.Value.Album.Alias != null ?  "\r\n" : string.Empty + json.Value.Album.Description;
             var idx = 0;
             SongContainer.ListSource = "al" + Album.id;
-            /*
-            foreach (var song in json["songs"].ToArray())
+            
+            AlbumSongsViewSource.Source = json.Value.Songs.Select(song =>
             {
-                var ncSong = NCSong.CreateFromJson(song);
-                ncSong.Order = idx++;
-                AlbumSongs.Add(ncSong);
-            }
-            */
-            AlbumSongsViewSource.Source = json.Value.Songs.Select(t=>t.MapToNcSong()).ToList();
+                return new NCAlbumSong
+                {
+                    Album = song.Album.MapToNcAlbum(),
+                    alias = song.Alias is not null ? string.Join(",", song.Alias) : null,
+                    Artist = song.Artists?.Select(artist => artist.MapToNcArtist())
+                         .ToList() ??
+                     [],
+                    DiscName = song.CdName,
+                    CDName = song.CdName,
+                    IsCloud = song.Sid is not "0",
+                    IsVip = song.Fee is 1,
+                    LengthInMilliseconds = song.Duration,
+                    mvid = song.MvId,
+                    sid = song.Id,
+                    Order = ++idx,
+                    songname = song.Name,
+                    TrackId = song.TrackNumber,
+                    transname = song.Translations is not null ? string.Join(",", song.Translations) : null,
+                    IsAvailable = true,
+                    Type = HyPlayItemType.Netease,
+                };
+            }).GroupBy(t => t.DiscName).OrderBy(t => t.Key)
+                .Select(t => new DiscSongs(t) { Key = t.Key }).ToList();
         }
         catch (Exception ex)
         {

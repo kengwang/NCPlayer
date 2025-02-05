@@ -134,7 +134,7 @@ public sealed partial class Comments : Page, IDisposable
                 _ => CommentSortType.Recommend
             },
             PageSize = 20,
-            PageNo = 0,
+            PageNo = page,
             Cursor = page != 1 && type == 3 ? cursor : null
         }, _cancellationToken);
         
@@ -151,9 +151,12 @@ public sealed partial class Comments : Page, IDisposable
         foreach (var comment in result.Value?.Data?.Comments ?? [])
         {
             _cancellationToken.ThrowIfCancellationRequested();
+            var cmt = comment.MapToComment();
+            cmt.resourceType = resourcetype;
+            cmt.resourceId = resourceid;
             if (type == 2 && isHotCommentsPage)
-                hotComments.Add(comment.MapToComment());
-            else normalComments.Add(comment.MapToComment());
+                hotComments.Add(cmt);
+            else normalComments.Add(cmt);
         }
         
         if (type == 3)

@@ -1886,7 +1886,7 @@ public static class HyPlayList
                         .Where(t => !t.StartsWith("{")).ToArray());
                 }
 
-                if (lyricResult.Value?.YunLyric is null)
+                if (lyricResult.Value?.YunLyric?.Lyric is null)
                 {
                     lrc = CleanLrc(lyricResult.Value?.Lyric?.Lyric);
                     romaji = lyricResult.Value?.RomajiLyric?.Lyric;

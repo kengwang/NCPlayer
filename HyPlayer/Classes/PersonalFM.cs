@@ -83,11 +83,8 @@ internal static class PersonalFM
 
                         foreach (var aiDjContentRcmdInfoResource in result.Value.Data.AiDjResources)
                         {
-                            if (aiDjContentRcmdInfoResource.Type is "audio")
+                            if (aiDjContentRcmdInfoResource is AiDjContentRcmdInfoResponse.AiDjContentRcmdInfoData.AiDjContentRcmdAudioResource audioValue)
                             {
-                                var audioValue =
-                                    (AiDjContentRcmdInfoResponse.AiDjContentRcmdInfoData.AiDjContentRcmdAudioResource)
-                                    aiDjContentRcmdInfoResource;
                                 foreach (var audioItem in audioValue.Value?.Audio ?? [])
                                 {
                                     var playItem = new HyPlayItem()
@@ -132,11 +129,8 @@ internal static class PersonalFM
                                     HyPlayList.List.Add(playItem);
                                 }
                             }
-                            else if (aiDjContentRcmdInfoResource.Type is "song")
+                            else if (aiDjContentRcmdInfoResource is AiDjContentRcmdInfoResponse.AiDjContentRcmdInfoData.AiDjContentRcmdAudioSong songValue)
                             {
-                                var songValue =
-                                    (AiDjContentRcmdInfoResponse.AiDjContentRcmdInfoData.AiDjContentRcmdAudioSong)
-                                    aiDjContentRcmdInfoResource;
                                 var ncSong = songValue.Value?.SongName?.MapToNcSong();
                                 if (ncSong is not null)
                                 {

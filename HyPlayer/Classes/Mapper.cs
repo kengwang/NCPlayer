@@ -5,6 +5,7 @@ using System.Text.Json.Nodes;
 using HyPlayer.NeteaseApi.ApiContracts;
 using HyPlayer.NeteaseApi.Models;
 using HyPlayer.NeteaseApi.Models.ResponseModels;
+using static HyPlayer.NeteaseApi.ApiContracts.ArtistDetailResponse.ArtistDetailResponseData;
 
 namespace HyPlayer.Classes;
 
@@ -55,7 +56,7 @@ public static class Mapper
             Type = HyPlayItemType.Netease,
         };
     }
-    
+
     public static NCMlog MapToNcMlog(this ArtistVideoResponse.ArtistVideoResponseData.ArtistVideoResponseDataRecord.ArtistVideoResponseResource.ArtistVideoResponseBaseData mlog)
     {
         return new NCMlog
@@ -96,7 +97,7 @@ public static class Mapper
     {
         return new NCSong
         {
-            Album = song.Album.MapToNcAlbum(),
+            Album = song.Album?.MapToNcAlbum() ?? new(),
             alias = song.Alias is not null ? string.Join(",", song.Alias) : null,
             Artist = song.Artists?.Select(artist => artist.MapToNcArtist())
                          .ToList() ??
@@ -163,7 +164,20 @@ public static class Mapper
             Type = HyPlayItemType.Netease
         };
     }
-    
+
+    public static NCArtist MapToNcArtist(this ArtistDetailDto artist)
+    {
+        return new NCArtist
+        {
+            alias = artist.Translation,
+            avatar = artist.Img1v1Url,
+            id = artist.Id,
+            name = artist.Name,
+            transname = artist.Translation,
+            Type = HyPlayItemType.Netease
+        };
+    }
+
     public static NCFmItem MapToNCFmItem(this DjRadioProgramDto dto)
     {
         return new NCFmItem
@@ -230,7 +244,7 @@ public static class Mapper
         var ncp = new NCPlayList
         {
             cover = dto.CoverUrl,
-            creater = dto.Creator.MapToNcUser(),
+            creater = dto.Creator?.MapToNcUser() ?? new(),
             desc = dto.Description,
             name = dto.Name,
             plid = dto.Id,

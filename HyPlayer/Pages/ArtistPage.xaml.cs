@@ -272,7 +272,7 @@ public sealed partial class ArtistPage : Page, IDisposable
                 AlbumContainer.ListItems.Add(new SimpleListItem
                 {
                     Title = album.Name,
-                    LineOne = string.Join("/", album.Artists?.Select(t=>t.Name).ToString()),
+                    LineOne = string.Join("/", album.Artists?.Select(t=>t.Name)),
                     LineTwo = album.Alias != null
                         ? string.Join(" / ", album.Alias)
                         : "",

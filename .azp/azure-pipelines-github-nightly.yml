@@ -23,10 +23,10 @@ steps:
 
 # Add this Command to Include the .NET 6 SDK
 - task: UseDotNet@2
-  displayName: Use .NET 6.0
+  displayName: 'Use .NET'
   inputs:
     packageType: 'sdk'
-    version: '6.0.x'
+    useGlobalJson: true
 
 # Add a Command To List the Current .NET SDKs (Sanity Check)
 - task: CmdLine@2

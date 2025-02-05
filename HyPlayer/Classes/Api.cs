@@ -39,7 +39,7 @@ internal class Api
                 {
                     PlaylistId = songList,
                     SongId = randomSong,
-                    StartMusicId = HyPlayList.NowPlayingItem.PlayItem.Id,
+                    StartMusicId = HyPlayList.NowPlayingItem.PlayItem?.Id ?? randomSong,
                     Count = Common.LikedSongs.Count
                 }, cancellationToken);
             
@@ -51,6 +51,7 @@ internal class Api
 
             foreach (var item in jsoon.Value?.Data ?? [])
             {
+                if (item.SongInfo is null) continue;
                 var ncSong = item.SongInfo.MapNcSong();
                 var playItem = HyPlayList.NCSongToPlayItem(ncSong);
                 playItem.InfoTag = item.Recommended ? "为你推荐" : "我的喜欢";

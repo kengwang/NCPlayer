@@ -24,9 +24,10 @@ steps:
     submodules: true
 
   - task: UseDotNet@2
-    displayName: 'Use .NET 6'
+    displayName: 'Use .NET'
     inputs:
-      version: 6.0.x
+      packageType: 'sdk'
+      useGlobalJson: true
 
   - task: NuGetToolInstaller@1
   

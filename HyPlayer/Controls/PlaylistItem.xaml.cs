@@ -100,12 +100,13 @@ public sealed partial class PlaylistItem : UserControl, IDisposable
         if (Common.Setting.noImage) ImageContainer.Source = null;
         else
         {
-            ImageContainerSource.UriSource =
+            if (playList.cover is not null)
+                ImageContainerSource.UriSource =
                 new Uri(playList.cover + "?param=" + StaticSource.PICSIZE_PLAYLIST_ITEM_COVER);
         }
 
         TextBlockPLName.Text = playList.name;
-        TextBlockPLAuthor.Text = playList.creater.name;
+        TextBlockPLAuthor.Text = playList.creater.name ?? "网易云音乐";
         StoryboardIn.Begin();
     }
 

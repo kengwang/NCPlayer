@@ -43,7 +43,7 @@ public sealed partial class SingleComment : UserControl, INotifyPropertyChanged
 
     private ObservableCollection<Comment> floorComments = new ObservableCollection<Comment>();
     public UserDisplay CommentUserDisplay;
-    private string time;
+    private string time = "0";
 
     public SingleComment()
     {
@@ -83,7 +83,7 @@ public sealed partial class SingleComment : UserControl, INotifyPropertyChanged
                     ParentCommentId = MainComment.cid,
                     ResourceId = MainComment.resourceId ,
                     ResourceType = MainComment.resourceType,
-                    Time = IsLoadMoreComments ? 0 : long.Parse(time)
+                    Time = !IsLoadMoreComments ? 0 : long.Parse(time ?? "0")
                 }
                 );
             if (result.IsError)

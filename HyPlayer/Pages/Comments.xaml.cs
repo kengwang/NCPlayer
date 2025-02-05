@@ -117,6 +117,8 @@ public sealed partial class Comments : Page, IDisposable
 
     private async Task LoadComments(int type)
     {
+        throw new NotImplementedException();
+        /*
         // type 1:按推荐排序,2:按热度排序,3:按时间排序
         if (string.IsNullOrEmpty(resourceid)) return;
         if (IsShiftingPage) return;
@@ -166,6 +168,7 @@ public sealed partial class Comments : Page, IDisposable
             if (ex.GetType() != typeof(TaskCanceledException) && ex.GetType() != typeof(OperationCanceledException))
                 Common.AddToTeachingTipLists(ex.Message, (ex.InnerException ?? new Exception()).Message);
         }
+        */
     }
 
 
@@ -185,6 +188,8 @@ public sealed partial class Comments : Page, IDisposable
 
     private async void SendComment_Click(object sender, RoutedEventArgs e)
     {
+        throw new NotImplementedException();
+        /*
         if (!string.IsNullOrWhiteSpace(CommentEdit.Text) && Common.Logined)
         {
             try
@@ -229,6 +234,7 @@ public sealed partial class Comments : Page, IDisposable
             var dlg = new MessageDialog("请先登录");
             await dlg.ShowAsync();
         }
+        */
     }
 
     private void ComboBoxSortType_OnSelectionChanged(object sender, SelectionChangedEventArgs e)

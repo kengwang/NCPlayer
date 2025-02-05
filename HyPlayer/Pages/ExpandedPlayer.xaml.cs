@@ -9,6 +9,7 @@ using HyPlayer.Classes;
 using HyPlayer.Controls;
 using HyPlayer.HyPlayControl;
 using HyPlayer.LyricRenderer.RollingCalculators;
+using HyPlayer.NeteaseApi.ApiContracts;
 using Impressionist.Abstractions;
 using Impressionist.Implementations;
 using LyricParser.Abstraction;
@@ -539,15 +540,11 @@ public sealed partial class ExpandedPlayer : Page, IDisposable
     public async void InitializeBPM()
     {
         bpmAniStoryboard.Stop();
-        if (Common.ncapi is null || HyPlayList.NowPlayingItem.ItemType != HyPlayItemType.Netease ||
+        if (HyPlayList.NowPlayingItem.ItemType != HyPlayItemType.Netease ||
             string.IsNullOrEmpty(HyPlayList.NowPlayingItem.PlayItem.Id))
             return;
-        var json = await Common.ncapi.RequestAsync(CloudMusicApiProviders.SongWikiSummary,
-            new()
-            {
-                { "id", HyPlayList.NowPlayingItem.PlayItem.Id }
-            });
-        if (json["code"]?.ToString() != "200") return;
+        var json = await Common.NeteaseAPI.RequestAsync(NeteaseApis.SongWikiSummaryApi, new SongWikiSummaryRequest() { SongId = HyPlayList.NowPlayingItem.PlayItem.Id });
+        if (json.IsError) return;
         // 寻找 BPM 的 Node
         var blocks = json["data"]?["blocks"]?.ToArray();
         if (blocks is null) return;

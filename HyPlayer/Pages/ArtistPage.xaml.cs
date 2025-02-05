@@ -2,12 +2,15 @@
 
 using HyPlayer.Classes;
 using HyPlayer.HyPlayControl;
+using HyPlayer.NeteaseApi.ApiContracts;
+using Newtonsoft.Json.Schema;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using TagLib;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Media.Imaging;
@@ -54,19 +57,27 @@ public sealed partial class ArtistPage : Page, IDisposable
         base.OnNavigatedTo(e);
         try
         {
-            var res = await Common.ncapi?.RequestAsync(CloudMusicApiProviders.ArtistDetail,
-                new Dictionary<string, object> { { "id", (string)e.Parameter } });
-            if (res["code"].ToString() == "404")
+            var res = await Common.NeteaseAPI.RequestAsync(NeteaseApis.ArtistDetailApi,
+                new ArtistDetailRequest() { ArtistId = (string)e.Parameter});
+            if(res.IsError)
             {
-                TextBoxArtistName.Text = "未知艺人";
-                TextboxArtistNameTranslated.Visibility = Visibility.Collapsed;
-                TextBlockDesc.Text = "艺人不存在";
-                TextBlockInfo.Text = "无信息";
-                Common.AddToTeachingTipLists("艺人不存在", null);
-                return;
+                if (res.Error.ErrorCode.ToString() == "404")
+                {
+                    TextBoxArtistName.Text = "未知艺人";
+                    TextboxArtistNameTranslated.Visibility = Visibility.Collapsed;
+                    TextBlockDesc.Text = "艺人不存在";
+                    TextBlockInfo.Text = "无信息";
+                    Common.AddToTeachingTipLists("艺人不存在", null);
+                    return;
+                }
+                else
+                {
+                    Common.AddToTeachingTipLists("获取艺人信息出错", res.Error.Message);
+                    return;
+                }
             }
-            artist = NCArtist.CreateFromJson(res["data"]["artist"]);
-            if (res["data"]["artist"]["cover"].ToString().StartsWith("http"))
+            artist = res.Value.Data.Artist.MapToNcArtist();
+            if (res.Value.Data.Artist.PicUrl.StartsWith("http"))
             {
                 if (Common.Setting.noImage)
                 {
@@ -74,19 +85,19 @@ public sealed partial class ArtistPage : Page, IDisposable
                 }
                 BitmapImage image = new BitmapImage();
                 ImageRect.ImageSource = ImageRect1.ImageSource = image;
-                image.UriSource = new Uri(res["data"]["artist"]["cover"] + "?param=" +
+                image.UriSource = new Uri(res.Value.Data.Artist.PicUrl + "?param=" +
                                                   StaticSource.PICSIZE_ARTIST_DETAIL_COVER);
             }
-            TextBoxArtistName.Text = res["data"]["artist"]["name"].ToString();
-            if (res["data"]["artist"]["transNames"].HasValues)
+            TextBoxArtistName.Text = res.Value.Data.Artist.Name;
+            if (res.Value.Data.Artist.TransNames != null)
                 TextboxArtistNameTranslated.Text =
-                    "译名: " + string.Join(",", res["data"]["artist"]["transNames"].ToObject<string[]>());
+                    "译名: " + string.Join(",", res.Value.Data.Artist.TransNames);
             else
                 TextboxArtistNameTranslated.Visibility = Visibility.Collapsed;
-            TextBlockDesc.Text = res["data"]["artist"]["briefDesc"].ToString();
-            TextBlockInfo.Text = "歌曲数: " + res["data"]["artist"]["musicSize"] + " | 专辑数: " +
-                                 res["data"]["artist"]["albumSize"] + " | 视频数: " +
-                                 res["data"]["artist"]["mvSize"];
+            TextBlockDesc.Text = res.Value.Data.Artist.BriefDesc;
+            TextBlockInfo.Text = "歌曲数: " + res.Value.Data.Artist.MusicSize + " | 专辑数: " +
+                                 res.Value.Data.Artist.AlbumSize + " | 视频数: " +
+                                 res.Value.Data.Artist.MvSize;
             HotSongContainer.ListSource = "sh" + artist.id;
             AllSongContainer.ListSource = "content";
             _hotSongsLoaderTask = LoadHotSongs();
@@ -143,25 +154,27 @@ public sealed partial class ArtistPage : Page, IDisposable
         _cancellationToken.ThrowIfCancellationRequested();
         try
         {
-            var j1 = await Common.ncapi?.RequestAsync(CloudMusicApiProviders.ArtistTopSong,
-                new Dictionary<string, object> { { "id", artist.id } });
+            var j1 = await Common.NeteaseAPI.RequestAsync(NeteaseApis.ArtistTopSongApi,
+                new ArtistTopSongRequest() { ArtistId = artist.id});
 
             hotSongs.Clear();
             var idx = 0;
-            var json = await Common.ncapi?.RequestAsync(CloudMusicApiProviders.SongDetail,
-                new Dictionary<string, object>
-                { ["ids"] = string.Join(",", j1["songs"].ToList().Select(t => t["id"])) }, false);
-            foreach (var jToken in json["songs"])
+            var json = await Common.NeteaseAPI.RequestAsync(NeteaseApis.SongDetailApi,
+                new SongDetailRequest() { IdList = j1.Value.Songs.Select(t=>t.Id).ToList()});
+            if (json.IsError)
+            {
+                Common.AddToTeachingTipLists("获取歌手热门歌曲失败", json.Error.Message);
+                return;
+            }
+            foreach (var item in json.Value.Songs)
             {
                 _cancellationToken.ThrowIfCancellationRequested();
-                var ncSong = NCSong.CreateFromJson(jToken);
+                var ncSong = item.MapToNcSong();
                 ncSong.IsAvailable =
-                    json["privileges"][idx][
-                        "st"].ToString() == "0";
+                    json.Value.Privileges[idx].St == 0;
                 ncSong.Order = idx++;
                 hotSongs.Add(ncSong);
             }
-            json.RemoveAll();
         }
         catch (Exception ex)
         {
@@ -176,26 +189,31 @@ public sealed partial class ArtistPage : Page, IDisposable
         _cancellationToken.ThrowIfCancellationRequested();
         try
         {
-            var j1 = await Common.ncapi?.RequestAsync(CloudMusicApiProviders.ArtistSongs,
-                new Dictionary<string, object> { { "id", artist.id }, { "limit", 50 }, { "offset", page * 50 } });
+            var j1 = await Common.NeteaseAPI.RequestAsync(NeteaseApis.ArtistSongsApi, new ArtistSongsRequest() { ArtistId = artist.id, Limit=50,Offset = page * 50});
             var idx = 0;
+            if (j1.IsError)
+            {
+                Common.AddToTeachingTipLists("获取歌手热门歌曲失败", j1.Error.Message);
+            }
             try
             {
-                var json = await Common.ncapi?.RequestAsync(CloudMusicApiProviders.SongDetail,
-                    new Dictionary<string, object>
-                    { ["ids"] = string.Join(",", j1["songs"].ToList().Select(t => t["id"])) });
-                foreach (var jToken in json["songs"])
+                var json = await Common.NeteaseAPI.RequestAsync(NeteaseApis.SongDetailApi,
+                    new SongDetailRequest() { IdList = j1.Value.Songs.Select(t => t.Id).ToList() });
+                if (json.IsError)
+                {
+                    Common.AddToTeachingTipLists("获取歌手热门歌曲失败", json.Error.Message);
+                    return;
+                }
+                foreach (var item in json.Value.Songs)
                 {
                     _cancellationToken.ThrowIfCancellationRequested();
-                    var ncSong = NCSong.CreateFromJson(jToken);
+                    var ncSong = item.MapToNcSong();
                     ncSong.IsAvailable =
-                        json["privileges"][idx][
-                            "st"].ToString() == "0";
+                        json.Value.Privileges[idx].St== 0;
                     ncSong.Order = page * 50 + idx++;
                     allSongs.Add(ncSong);
                 }
-                SongHasMore = int.Parse(j1["total"].ToString()) >= (page + 1) * 50;
-                json.RemoveAll();
+                SongHasMore = j1.Value.HasMore;
             }
             catch (Exception ex)
             {
@@ -240,29 +258,32 @@ public sealed partial class ArtistPage : Page, IDisposable
         _cancellationToken.ThrowIfCancellationRequested();
         try
         {
-            var j1 = await Common.ncapi?.RequestAsync(CloudMusicApiProviders.ArtistAlbum,
-                new Dictionary<string, object> { { "id", artist.id }, { "limit", 50 }, { "offset", page * 50 } });
-
+            var j1 = await Common.NeteaseAPI.RequestAsync(NeteaseApis.ArtistAlbumsApi,new ArtistAlbumsRequest() { ArtistId = artist.id, Limit = 50, Start = page * 50});
+            if (j1.IsError)
+            {
+                Common.AddToTeachingTipLists("获取歌手专辑失败", j1.Error.Message);
+                return;
+            }
             AlbumContainer.ListItems.Clear();
             var i = 0;
-            foreach (var albumjson in j1["hotAlbums"].ToArray())
+            foreach (var album in j1.Value.Albums)
             {
                 _cancellationToken.ThrowIfCancellationRequested();
                 AlbumContainer.ListItems.Add(new SimpleListItem
                 {
-                    Title = albumjson["name"].ToString(),
-                    LineOne = albumjson["artist"]["name"].ToString(),
-                    LineTwo = albumjson["alias"] != null
-                        ? string.Join(" / ", albumjson["alias"].ToArray().Select(t => t.ToString()))
+                    Title = album.Name,
+                    LineOne = string.Join("/", album.Artists.Select(t=>t.Name).ToString()),
+                    LineTwo = album.Alias != null
+                        ? string.Join(" / ", album.Alias)
                         : "",
-                    LineThree = albumjson.Value<bool>("paid") ? "付费专辑" : "",
-                    ResourceId = "al" + albumjson["id"],
-                    CoverLink = albumjson["picUrl"].ToString(),
+                    LineThree = album.Paid ? "付费专辑" : "",
+                    ResourceId = "al" + album.Id,
+                    CoverLink = album.PictureUrl,
                     Order = page * 50 + i++,
                     CanPlay = true
                 });
             }
-            if (int.Parse(j1["artist"]["albumSize"].ToString()) >= (page + 1) * 50)
+            if (j1.Value.HasMore)
                 NextPage.Visibility = Visibility.Visible;
             else
                 NextPage.Visibility = Visibility.Collapsed;

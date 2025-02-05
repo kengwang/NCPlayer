@@ -1,5 +1,7 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Text.Json.Nodes;
 using HyPlayer.NeteaseApi.Models;
 using HyPlayer.NeteaseApi.Models.ResponseModels;
 
@@ -148,5 +150,69 @@ public static class Mapper
             transname = artist.Translation,
             Type = HyPlayItemType.Netease
         };
+    }
+    
+    public static NCFmItem MapToNCFmItem(this DjRadioProgramDto dto)
+    {
+        return new NCFmItem
+        {
+            Type = HyPlayItemType.Radio,
+            sid = dto.MainSong?.Id,
+            songname = dto.Name,
+            Artist = dto.Owner.MapToNCArtists(),
+            Album = dto.Radio.MapToNcAlbum(),
+            LengthInMilliseconds = dto.Duration,
+            mvid = "-1",
+            alias = null,
+            transname = null,
+            fmId = dto.Id,
+            description = dto.Description,
+            RadioId = dto.Radio.Id,
+            RadioName = dto.Radio.Name
+        };
+    }
+
+    public static List<NCArtist> MapToNCArtists(this UserInfoDto dto)
+    {
+        return new List<NCArtist>
+        {
+            new()
+            {
+                Type = HyPlayItemType.Radio,
+                id = dto.UserId,
+                name = dto.Nickname,
+                avatar = dto.AvatarUrl
+            }
+        };
+    }
+
+    public static NCAlbum MapToNcAlbum(this DjRadioChannelDto dto)
+    {
+        return new NCAlbum
+        {
+            AlbumType = HyPlayItemType.Radio,
+            id = dto.Id,
+            name = dto.Name,
+            cover = dto.CoverUrl,
+            alias = dto.Id, //咱放在这个奇怪的位置
+            description = dto.Description
+        };
+    }
+    public static NCPlayList MapToNCPlayList(this PlaylistDto dto)
+    {
+        var ncp = new NCPlayList
+        {
+            cover = dto.CoverUrl,
+            creater = dto.Creator.MapToNcUser(),
+            desc = dto.Description,
+            name = dto.Name,
+            plid = dto.Id,
+            subscribed = dto.Subscribed,
+            playCount = dto.PlayCount,
+            trackCount = dto.TrackCount,
+            bookCount = dto.BookCount,
+            updateTime = DateConverter.GetDateTimeFromTimeStamp(dto.UpdateTime)
+        };
+        return ncp;
     }
 }

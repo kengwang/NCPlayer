@@ -74,6 +74,8 @@ public sealed partial class SingleComment : UserControl, INotifyPropertyChanged
 
     private async Task LoadFloorComments(bool IsLoadMoreComments)
     {
+        throw new NotImplementedException();
+        /*
         try
         {
             if (!IsLoadMoreComments) floorComments.Clear();
@@ -112,6 +114,7 @@ public sealed partial class SingleComment : UserControl, INotifyPropertyChanged
         {
             Common.AddToTeachingTipLists(ex.Message, (ex.InnerException ?? new Exception()).Message);
         }
+        */
     }
 
     private async void Like_Click(object sender, RoutedEventArgs e)

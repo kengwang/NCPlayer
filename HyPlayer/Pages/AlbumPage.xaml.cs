@@ -3,6 +3,7 @@
 using HyPlayer.Classes;
 using HyPlayer.Controls;
 using HyPlayer.HyPlayControl;
+using HyPlayer.NeteaseApi.ApiContracts;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
@@ -92,22 +93,30 @@ public sealed partial class AlbumPage : Page, IDisposable
     {
         if (disposedValue) throw new ObjectDisposedException(nameof(AlbumPage));
         _cancellationToken.ThrowIfCancellationRequested();
-        var json = await Common.ncapi?.RequestAsync(CloudMusicApiProviders.AlbumDetailDynamic,
-            new Dictionary<string, object> { { "id", albumid } });
-        BtnSub.IsChecked = json["isSub"].ToObject<bool>();
-        json.RemoveAll();
+        var json = await Common.NeteaseAPI.RequestAsync(NeteaseApis.AlbumDetailDynamicApi,
+            new AlbumDetailDynamicRequest() { Id = albumid});
+        if (json.IsError)
+        {
+            Common.AddToTeachingTipLists("获取歌单失败", json.Error.Message);
+            return;
+        }
+            BtnSub.IsChecked = json.Value.IsSub;
     }
 
     private async Task LoadAlbumInfo()
     {
         if (disposedValue) throw new ObjectDisposedException(nameof(AlbumPage));
         _cancellationToken.ThrowIfCancellationRequested();
-        JObject json;
         try
         {
-            json = await Common.ncapi?.RequestAsync(CloudMusicApiProviders.Album,
-                new Dictionary<string, object> { { "id", albumid } });
-            Album = NCAlbum.CreateFromJson(json["album"]);
+            var json = await Common.NeteaseAPI.RequestAsync(NeteaseApis.AlbumApi,
+            new AlbumRequest() { Id = albumid });
+            if (json.IsError)
+            {
+                Common.AddToTeachingTipLists("获取歌单失败", json.Error.Message);
+                return;
+            }
+            Album = json.Value.Album.MapToNcAlbum();
             if (Common.Setting.noImage) ImageRect.ImageSource = null;
             else
             {
@@ -117,22 +126,12 @@ public sealed partial class AlbumPage : Page, IDisposable
             }
             TextBoxAlbumName.Text = Album.name;
 
-            TextBoxAlbumName.Text = json["album"]["name"].ToString();
-            artists = json["album"]["artists"].ToArray().Select(t => new NCArtist
-            {
-                avatar = t["picUrl"].ToString(),
-                id = t["id"].ToString(),
-                name = t["name"].ToString()
-            }).ToList();
+            TextBoxAlbumName.Text = json.Value.Album.Name.ToString();
+            artists = json.Value.Album.Artists.Select(t=>t.MapToNcArtist()).ToList();
             TextBoxAuthor.Content = string.Join(" / ", artists.Select(t => t.name));
             var converter = new DateConverter();
-            TextBlockPublishTime.Text = converter.Convert((long)json["album"]["publishTime"], null, null, null).ToString();
-            TextBlockDesc.Text = (json["album"]["alias"].HasValues
-                                     ? string.Join(" / ",
-                                           json["album"]["alias"].ToArray().Select(t => t.ToString())) +
-                                       "\r\n"
-                                     : "")
-                                 + json["album"]["description"];
+            TextBlockPublishTime.Text = converter.Convert(json.Value.Album.PublishTime, null, null, null).ToString();
+            TextBlockDesc.Text = (string.Join(" / ", json.Value.Album.Alias)) + json.Value.Album.Alias != null ?  "\r\n" : string.Empty + json.Value.Album.Description;
             var idx = 0;
             SongContainer.ListSource = "al" + Album.id;
             /*
@@ -143,28 +142,7 @@ public sealed partial class AlbumPage : Page, IDisposable
                 AlbumSongs.Add(ncSong);
             }
             */
-            AlbumSongsViewSource.Source = json["songs"].ToArray().Select(jsonSong => new NCAlbumSong
-            {
-                Album = Album,
-                alias = string.Join(" / ", jsonSong["alia"].ToArray().Select(t => t.ToString())),
-                Artist = jsonSong["ar"].Select(NCArtist.CreateFromJson).ToList(),
-                IsAvailable = jsonSong["privilege"]["st"].ToString() == "0",
-                IsVip = jsonSong["fee"]?.ToString() == "1",
-                LengthInMilliseconds = double.Parse(jsonSong["dt"].ToString()),
-                mvid = jsonSong["mv"]?.ToObject<string>() ?? "",
-                Order = ++idx,
-                sid = jsonSong["id"].ToString(),
-                songname = jsonSong["name"].ToString(),
-                transname = string.Join(" / ",
-                        jsonSong["tns"]?.ToArray().Select(t => t.ToString()) ?? Array.Empty<string>()),
-                Type = HyPlayItemType.Netease,
-                IsCloud = false,
-                CDName = jsonSong["cd"].ToString(),
-                DiscName = jsonSong["cd"].ToString(),
-                TrackId = jsonSong["no"].ToObject<int>()
-            }).ToList().GroupBy(t => t.DiscName).OrderBy(t => t.Key)
-                .Select(t => new DiscSongs(t) { Key = t.Key });
-            json.RemoveAll();
+            AlbumSongsViewSource.Source = json.Value.Songs.Select(t=>t.MapToNcSong()).ToList();
         }
         catch (Exception ex)
         {
@@ -217,9 +195,8 @@ public sealed partial class AlbumPage : Page, IDisposable
     private void BtnSub_Click(object sender, RoutedEventArgs e)
     {
         if (disposedValue) throw new ObjectDisposedException(nameof(AlbumPage));
-        _ = Common.ncapi?.RequestAsync(CloudMusicApiProviders.AlbumSubscribe,
-            new Dictionary<string, object>
-                { { "id", albumid }, { "t", BtnSub.IsChecked.GetValueOrDefault(false) ? "1" : "0" } });
+        _ = Common.NeteaseAPI?.RequestAsync(NeteaseApis.AlbumSubscribeApi,
+            new AlbumSubscribeRequest() { Id = albumid, IsSubscribe = BtnSub.IsChecked ?? false});
     }
 
     private async void BtnAddAll_Clicked(object sender, RoutedEventArgs e)

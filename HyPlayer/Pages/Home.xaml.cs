@@ -3,6 +3,7 @@
 using HyPlayer.Classes;
 using HyPlayer.Controls;
 using HyPlayer.HyPlayControl;
+using HyPlayer.NeteaseApi.ApiContracts;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -98,8 +99,7 @@ public sealed partial class Home : Page, IDisposable
         //我们直接Batch吧
         try
         {
-            var ret = await Common.ncapi?.RequestAsync(
-                CloudMusicApiProviders.Batch,
+            var ret = await Common.NeteaseAPI.RequestAsync(NeteaseApis.ToplistApi);
                 new Dictionary<string, object>
                 {
                     { "/api/toplist", "{}" }
@@ -141,7 +141,7 @@ public sealed partial class Home : Page, IDisposable
             //推荐歌单加载部分 - 优先级稍微靠后下
             try
             {
-                var ret1 = await Common.ncapi?.RequestAsync(CloudMusicApiProviders.RecommendResource);
+                var ret1 = await Common.NeteaseAPI.RequestAsync(CloudMusicApiProviders.RecommendResource);
                 _ = Common.Invoke(() =>
                 {
                     _cancellationToken.ThrowIfCancellationRequested();
@@ -169,7 +169,7 @@ public sealed partial class Home : Page, IDisposable
         _cancellationToken.ThrowIfCancellationRequested();
         try
         {
-            var json = await Common.ncapi?.RequestAsync(CloudMusicApiProviders.Toplist);
+            var json = await Common.NeteaseAPI.RequestAsync(CloudMusicApiProviders.Toplist);
 
             foreach (var PlaylistItemJson in json["list"].ToArray())
             {
@@ -229,9 +229,9 @@ public sealed partial class Home : Page, IDisposable
         HyPlayList.RemoveAllSong();
         try
         {
-            var jsoon = await Common.ncapi?.RequestAsync(CloudMusicApiProviders.PlaylistDetail,
+            var jsoon = await Common.NeteaseAPI.RequestAsync(CloudMusicApiProviders.PlaylistDetail,
                 new Dictionary<string, object> { { "id", Common.MySongLists[0].plid } });
-            var jsona = await Common.ncapi?.RequestAsync(
+            var jsona = await Common.NeteaseAPI.RequestAsync(
                 CloudMusicApiProviders.PlaymodeIntelligenceList,
                 new Dictionary<string, object>
                 {

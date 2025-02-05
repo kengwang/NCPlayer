@@ -32,6 +32,7 @@ using Windows.Storage.Streams;
 using Windows.UI;
 using Windows.UI.Notifications;
 using Windows.UI.Xaml.Media;
+using IF.Lastfm.Core.Api;
 using Buffer = Windows.Storage.Streams.Buffer;
 using File = TagLib.File;
 
@@ -2202,7 +2203,7 @@ public static class HyPlayList
                     hasMore = json.Value is { More: true };
                     if (json.Value?.Programs is { Length: > 0 })
                         AppendNcSongs(
-                            json.Value.Programs.Select(t => (NCSong)NCFmItem.CreateFromJson(t)).ToList(),
+                            json.Value.Programs.Select(t => (NCSong)t.MapToNCFmItem()).ToList(),
                             false);
                 }
                 catch (Exception ex)
@@ -2225,32 +2226,40 @@ public static class HyPlayList
     {
         try
         {
-            var json = await Common.ncapi?.RequestAsync(CloudMusicApiProviders.PlaylistDetail,
-                new Dictionary<string, object> { { "id", playlistId } });
+            var detailResponse = await Common.NeteaseAPI.RequestAsync(NeteaseApis.PlaylistDetailApi,
+                new PlaylistDetailRequest(){Id = playlistId});
 
             var nowIndex = 0;
-            var trackIds = (json["playlist"]?["trackIds"] ?? new JArray()).Select(t => (string)t["id"])
-                .ToList();
+            if (detailResponse.IsError)
+            {
+                Common.AddToTeachingTipLists("获取歌单失败", detailResponse.Error.Message);
+                return false;
+            }
+            var trackIds = detailResponse.Value.Playlists!.Select(t=>t.Id).ToList();
             while (nowIndex * 500 < trackIds.Count)
             {
                 var nowIds = trackIds.GetRange(nowIndex * 500,
                     Math.Min(500, trackIds.Count - nowIndex * 500));
                 try
                 {
-                    json = await Common.ncapi?.RequestAsync(CloudMusicApiProviders.SongDetail,
-                        new Dictionary<string, object> { ["ids"] = string.Join(",", nowIds) });
-                    nowIndex++;
-                    var i = 0;
-                    var ncSongs = (json["songs"] ?? new JArray()).Select(t =>
+                   var songResponse = await Common.NeteaseAPI.RequestAsync(NeteaseApis.SongDetailApi,
+                        new SongDetailRequest(){IdList = nowIds});
+                    if (songResponse.IsError) 
                     {
-                        if (json["privileges"] == null) return null;
-                        if (json["privileges"].ToList()[i++]["st"]?.ToString() == "0")
-                            return NCSong.CreateFromJson(t);
-
-                        return null;
-                    }).ToList();
-                    ncSongs.RemoveAll(t => t == null);
-                    AppendNcSongs(ncSongs, false);
+                        Common.AddToTeachingTipLists("获取歌曲失败", songResponse.Error.Message);
+                    }
+                    var privileges = songResponse.Value.Privileges;
+                    var songs = songResponse.Value.Songs;
+                    var result = new List<NCSong>();
+                    if (privileges is null) return false;
+                    for (var i = 0; i < privileges.Length; i++)
+                    {
+                        if (privileges[i].St == 0)
+                        {
+                            result.Add(songs[i].MapToNcSong());
+                        }
+                    }
+                    AppendNcSongs(result, false);
                 }
                 catch (Exception ex)
                 {
@@ -2258,8 +2267,6 @@ public static class HyPlayList
                         (ex.InnerException ?? new Exception()).Message);
                 }
             }
-
-            json.RemoveAll();
             return true;
         }
         catch (Exception ex)

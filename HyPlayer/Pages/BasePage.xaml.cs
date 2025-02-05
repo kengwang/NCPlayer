@@ -591,52 +591,7 @@ public sealed partial class BasePage : Page
 
     private async Task LoadHeartBeat()
     {
-        throw new NotImplementedException();
-        /*
-        HyPlayList.RemoveAllSong();
-        try
-        {
-            var jsoon = await Common.NeteaseAPI.RequestAsync(NeteaseApis.PlaylistDetailApi,
-                                                         new PlaylistDetailRequest() { Id = Common.MySongLists[0].plid });
-            if (jso.IsError)
-            {
-                Common.AddToTeachingTipLists("获取歌手热门歌曲失败", jsoon.Error.Message);
-                return;
-            }
-            var jsona = await Common.NeteaseAPI.RequestAsync(
-                CloudMusicApiProviders.PlaymodeIntelligenceList,
-                new Dictionary<string, object>
-                {
-                    { "pid", Common.MySongLists[0].plid },
-                    { "id", jsoon["playlist"]["trackIds"][0]["id"].ToString() }
-                });
-
-            var Songs = new List<NCSong>();
-            foreach (var token in jsona["data"])
-            {
-                var ncSong = NCSong.CreateFromJson(token["songInfo"]);
-                Songs.Add(ncSong);
-            }
-
-            try
-            {
-                HyPlayList.AppendNcSongs(Songs);
-                HyPlayList.SongMoveTo(0);
-            }
-            catch (Exception ex)
-            {
-                Common.AddToTeachingTipLists(ex.Message, (ex.InnerException ?? new Exception()).Message);
-            }
-
-            jsoon.RemoveAll();
-            jsona.RemoveAll();
-            Songs.Clear();
-        }
-        catch (Exception ex)
-        {
-            Common.AddToTeachingTipLists(ex.Message, (ex.InnerException ?? new Exception()).Message);
-        }
-        */
+        await Api.EnterIntelligencePlay();
     }
 
     private void OnNavigateBack(NavigationView sender, NavigationViewBackRequestedEventArgs args)

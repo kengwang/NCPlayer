@@ -539,7 +539,9 @@ public sealed partial class ExpandedPlayer : Page, IDisposable
     private Storyboard bpmAniStoryboard = new Storyboard();
     public async void InitializeBPM()
     {
-        bpmAniStoryboard.Stop();
+        // TODO: 完成 BPM API
+        /*
+        bpmAniStoryboard.Stop();    
         if (HyPlayList.NowPlayingItem.ItemType != HyPlayItemType.Netease ||
             string.IsNullOrEmpty(HyPlayList.NowPlayingItem.PlayItem.Id))
             return;
@@ -564,6 +566,7 @@ public sealed partial class ExpandedPlayer : Page, IDisposable
                 }
             }
         }
+        */
     }
 
     public void LoadLyricsBox()

@@ -286,7 +286,8 @@ public class PlayItem
     public string Name;
     public string Size;
     public string SubExt;
-    public string Tag;
+    public string QualityTag;
+    public string InfoTag;
     public int TrackId;
     public HyPlayItemType Type;
     public string Url;

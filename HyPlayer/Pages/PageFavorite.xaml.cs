@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Navigation;
+using HyPlayer.NeteaseApi.ApiContracts;
 
 #endregion
 
@@ -56,6 +57,7 @@ public sealed partial class PageFavorite : Page, IDisposable
                 return;
             }
         }
+
         Dispose();
     }
 
@@ -91,28 +93,31 @@ public sealed partial class PageFavorite : Page, IDisposable
         if (disposedValue) throw new ObjectDisposedException(nameof(PageFavorite));
         try
         {
-            var json = await Common.ncapi?.RequestAsync(CloudMusicApiProviders.DjSublist,
-                new Dictionary<string, object>
-                {
-                    { "offset", page * 25 }
-                });
-            BtnLoadMore.Visibility = json["hasMore"].ToObject<bool>() ? Visibility.Visible : Visibility.Collapsed;
-            foreach (var pljs in json["djRadios"])
+            var json = await Common.NeteaseAPI.RequestAsync(NeteaseApis.DjChannelSubscribedApi, _cancellationToken);
+            if (json.IsError)
+            {
+                Common.AddToTeachingTipLists("加载订阅播客列表错误", json.Error.Message);
+                return;
+            }
+
+            BtnLoadMore.Visibility = json.Value?.Data?.HasMore is true ? Visibility.Visible : Visibility.Collapsed;
+            foreach (var pljs in json.Value?.Data?.Data ?? [])
             {
                 _cancellationToken.ThrowIfCancellationRequested();
                 ItemContainer.ListItems.Add(new SimpleListItem
                 {
-                    Title = pljs["name"].ToString(),
-                    LineOne = pljs["dj"]["nickname"].ToString(),
-                    LineTwo = pljs["desc"].ToString(),
-                    LineThree = "最后一个节目: " + pljs["lastProgramName"],
-                    ResourceId = "rd" + pljs["id"],
-                    CoverLink = pljs["picUrl"].ToString(),
+                    Title = pljs.Name,
+                    LineOne = pljs.UserName,
+                    LineTwo = pljs.Description,
+                    LineThree =
+                        $"{DateConverter.FriendFormat(DateConverter.GetDateTimeFromTimeStamp(pljs.LastProgramCreateTime))}前 | 最后一个节目: " +
+                        pljs.LastVoiceName,
+                    ResourceId = "rd" + pljs.Id,
+                    CoverLink = pljs.CoverUrl,
                     Order = i++,
                     CanPlay = true
                 });
             }
-            json.RemoveAll();
         }
         catch (Exception ex)
         {
@@ -125,30 +130,35 @@ public sealed partial class PageFavorite : Page, IDisposable
         if (disposedValue) throw new ObjectDisposedException(nameof(PageFavorite));
         try
         {
-            var json = await Common.ncapi?.RequestAsync(CloudMusicApiProviders.ArtistSublist,
-                new Dictionary<string, object>
+            var json = await Common.NeteaseAPI.RequestAsync(NeteaseApis.ArtistSublistApi,
+                new ArtistSublistRequest()
                 {
-                    { "offset", page * 25 }
+                    Limit = 25,
+                    Offset = page * 25
                 });
 
-            BtnLoadMore.Visibility = json["hasMore"].ToObject<bool>() ? Visibility.Visible : Visibility.Collapsed;
-            foreach (var singerjson in json["data"])
+            if (json.IsError)
+            {
+                Common.AddToTeachingTipLists("加载关注歌手列表错误", json.Error.Message);
+                return;
+            }
+
+            BtnLoadMore.Visibility = json.Value.HasMore ? Visibility.Visible : Visibility.Collapsed;
+            foreach (var singerjson in json.Value.Artists ?? [])
             {
                 _cancellationToken.ThrowIfCancellationRequested();
                 ItemContainer.ListItems.Add(new SimpleListItem
                 {
-                    Title = singerjson["name"].ToString(),
-                    LineOne = singerjson["trans"].ToString(),
-                    LineTwo = string.Join(" / ",
-                        singerjson["alia"]?.Select(t => t.ToString()) ?? new List<string>()),
-                    LineThree = $"专辑数 {singerjson["albumSize"]} | MV 数 {singerjson["mvSize"]}",
-                    ResourceId = "ar" + singerjson["id"],
-                    CoverLink = singerjson["img1v1Url"].ToString(),
+                    Title = singerjson.Name,
+                    LineOne = singerjson.Translation,
+                    LineTwo = string.Join("/", singerjson.Alias ?? []),
+                    LineThree = $"专辑数 {singerjson.AlbumSize} | MV 数 {singerjson.MvSize}",
+                    ResourceId = "ar" + singerjson.Id,
+                    CoverLink = singerjson.Img1v1Url,
                     Order = i++,
                     CanPlay = true
                 });
             }
-            json.RemoveAll();
         }
         catch (Exception ex)
         {
@@ -161,30 +171,33 @@ public sealed partial class PageFavorite : Page, IDisposable
         if (disposedValue) throw new ObjectDisposedException(nameof(PageFavorite));
         try
         {
-            var json = await Common.ncapi?.RequestAsync(CloudMusicApiProviders.AlbumSublist,
-                new Dictionary<string, object>
+            var json = await Common.NeteaseAPI.RequestAsync(NeteaseApis.AlbumSublistApi,
+                new AlbumSublistRequest()
                 {
-                    { "offset", page * 25 }
+                    Limit = 25,
+                    Offset = page * 25
                 });
-            BtnLoadMore.Visibility = json["hasMore"].ToObject<bool>() ? Visibility.Visible : Visibility.Collapsed;
-            foreach (var albumjson in json["data"])
+            if (json.IsError)
+            {
+                Common.AddToTeachingTipLists("加载关注专辑列表错误", json.Error.Message);
+                return;
+            }
+            BtnLoadMore.Visibility = json.Value?.HasMore is true ? Visibility.Visible : Visibility.Collapsed;
+            foreach (var albumjson in json.Value?.Data ?? [])
             {
                 _cancellationToken.ThrowIfCancellationRequested();
                 ItemContainer.ListItems.Add(new SimpleListItem
                 {
-                    Title = albumjson["name"].ToString(),
-                    LineOne = string.Join(" / ", albumjson["artists"].Select(t => t["name"].ToString())),
-                    LineTwo = albumjson["alias"] != null
-                        ? string.Join(" / ", albumjson["alias"].ToArray().Select(t => t.ToString()))
-                        : "",
-                    LineThree = albumjson.Value<bool>("paid") ? "付费专辑" : "",
-                    ResourceId = "al" + albumjson["id"],
-                    CoverLink = albumjson["picUrl"].ToString(),
+                    Title = albumjson.Name, 
+                    LineOne = string.Join(" / ", albumjson.Artists?.Select(t => t.Name) ?? []),
+                    LineTwo = string.Join(" / ", albumjson.Alias ?? []),
+                    LineThree = $"歌曲数:{albumjson.Size}",
+                    ResourceId = "al" + albumjson.Id,
+                    CoverLink = albumjson.PictureUrl,
                     Order = i++,
                     CanPlay = true
                 });
             }
-            json.RemoveAll();
         }
         catch (Exception ex)
         {
@@ -208,6 +221,7 @@ public sealed partial class PageFavorite : Page, IDisposable
                 ItemContainer.ListItems.Clear();
                 _cancellationTokenSource.Dispose();
             }
+
             disposedValue = true;
         }
     }

@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json.Nodes;
+using HyPlayer.NeteaseApi.ApiContracts;
 using HyPlayer.NeteaseApi.Models;
 using HyPlayer.NeteaseApi.Models.ResponseModels;
 
@@ -55,6 +56,17 @@ public static class Mapper
         };
     }
     
+    public static NCMlog MapToNcMlog(this ArtistVideoResponse.ArtistVideoResponseData.ArtistVideoResponseDataRecord.ArtistVideoResponseResource.ArtistVideoResponseBaseData mlog)
+    {
+        return new NCMlog
+        {
+            cover = mlog.CoverUrl,
+            id = mlog.Id,
+            title = mlog.Title,
+            duration = (int)mlog.Duration,
+        };
+    }
+    
     public static Comment MapToComment(this CommentDto comment)
     {
         return new Comment
@@ -64,7 +76,7 @@ public static class Mapper
             HasLiked = comment.Liked,
             likedCount = comment.LikedCount,
             ReplyCount = comment.ReplyCount,
-            SendTime = new DateTime(comment.Time * 10000 + 621355968000000000),
+            SendTime = DateConverter.GetDateTimeFromTimeStamp(comment.Time),
             CommentUser = comment.User.MapToNcUser(),
         };
     }
@@ -167,23 +179,38 @@ public static class Mapper
             transname = null,
             fmId = dto.Id,
             description = dto.Description,
-            RadioId = dto.Radio.Id,
-            RadioName = dto.Radio.Name
+            RadioId = dto.Radio?.Id,
+            RadioName = dto.Radio?.Name
         };
     }
 
+    
+    public static NCRadio MapToNCRadio(this DjRadioChannelWithDjDto dto)
+    {
+        return new NCRadio
+        {
+            cover = dto.CoverUrl,
+            desc = dto.Description,
+            DJ = dto.DjData.MapToNcUser(),
+            id = dto.Id,
+            lastProgramName = dto.LastProgramName,
+            name = dto.Name,
+            subed = dto.Subscribed,
+        };
+    }
+    
     public static List<NCArtist> MapToNCArtists(this UserInfoDto dto)
     {
-        return new List<NCArtist>
-        {
-            new()
+        return
+        [
+            new NCArtist
             {
                 Type = HyPlayItemType.Radio,
                 id = dto.UserId,
                 name = dto.Nickname,
                 avatar = dto.AvatarUrl
             }
-        };
+        ];
     }
 
     public static NCAlbum MapToNcAlbum(this DjRadioChannelDto dto)

@@ -340,11 +340,10 @@ DoubleAnimation verticalAnimation;
                 ListBoxPlayList.SelectedIndex = HyPlayList.NowPlaying;
 
             realSelectSong = true;
-
-            if (HyPlayList.NowPlayingItem.PlayItem.Tag != "在线")
-                TbSongTag.Text = HyPlayList.NowPlayingItem.PlayItem.Tag;
+            
+            TbSongTag.Text = HyPlayList.NowPlayingItem.PlayItem.QualityTag ?? "";
             Btn_Share.IsEnabled =
-                HyPlayList.NowPlayingItem.ItemType is not HyPlayItemType.Local or HyPlayItemType.LocalProgressive;
+                HyPlayList.NowPlayingItem?.ItemType is not HyPlayItemType.Local or HyPlayItemType.LocalProgressive;
         });
         var isLiked = Common.LikedSongs.Contains(mpi.PlayItem.Id);
         if (mpi.ItemType is not HyPlayItemType.Local or HyPlayItemType.LocalProgressive)

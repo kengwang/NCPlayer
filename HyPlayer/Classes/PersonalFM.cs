@@ -124,7 +124,7 @@ internal static class PersonalFM
                                             IsLocalFile = false,
                                             LengthInMilliseconds = audioItem.Duration,
                                             Name = "私人 DJ 推荐语",
-                                            Tag = "私人 DJ",
+                                            InfoTag = "私人 DJ",
                                             Type = HyPlayItemType.Netease,
                                             Url = audioItem.Url
                                         }

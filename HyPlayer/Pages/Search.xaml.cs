@@ -12,6 +12,9 @@ using Windows.System;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Navigation;
+using HyPlayer.NeteaseApi.ApiContracts;
+using HyPlayer.NeteaseApi.Bases;
+using HyPlayer.NeteaseApi.Models;
 
 #endregion
 
@@ -84,6 +87,7 @@ public sealed partial class Search : Page, IDisposable
                 return;
             }
         }
+
         Dispose();
     }
 
@@ -105,45 +109,36 @@ public sealed partial class Search : Page, IDisposable
         SongResults.Clear();
         try
         {
-            var json = await Common.ncapi?.RequestAsync(CloudMusicApiProviders.Cloudsearch,
-                new Dictionary<string, object>
-                {
-                    { "keywords", searchText },
-                    { "type", ((NavigationViewItem)NavigationViewSelector.SelectedItem).Tag.ToString() },
-                    { "offset", page * 30 }
-                });
-
             switch (((NavigationViewItem)NavigationViewSelector.SelectedItem).Tag.ToString())
             {
                 case "1":
-                    LoadSongResult(json);
+                    await LoadSongResult();
                     break;
                 case "10":
-                    LoadAlbumResult(json);
+                    await LoadAlbumResult();
                     break;
                 case "100":
-                    LoadArtistResult(json);
+                    await LoadArtistResult();
                     break;
                 case "1000":
-                    LoadPlaylistResult(json);
+                    await LoadPlaylistResult();
                     break;
                 case "1002":
-                    LoadUserResult(json);
+                    await LoadUserResult();
                     break;
                 case "1004":
-                    LoadMVResult(json);
+                    await LoadMVResult();
                     break;
                 case "1006":
-                    LoadLyricResult(json);
+                    await LoadLyricResult();
                     break;
                 case "1009":
-                    LoadRadioResult(json);
+                    await LoadRadioResult();
                     break;
                 case "1014":
-                    LoadMlogResult(json);
+                    await LoadMlogResult();
                     break;
             }
-            json.RemoveAll();
         }
         catch (Exception ex)
         {
@@ -152,30 +147,48 @@ public sealed partial class Search : Page, IDisposable
         }
     }
 
-    private void LoadMVResult(JObject json)
+    private async Task LoadSongResult()
     {
         if (disposedValue) throw new ObjectDisposedException(nameof(Search));
+        var json = await Common.NeteaseAPI.RequestAsync
+        <SearchSongResponse,
+            SearchRequest, SearchResponse, ErrorResultBase, SearchActualRequest>(NeteaseApis.SearchApi,
+            new SearchRequest()
+            {
+                Keyword = searchText,
+                Type = NeteaseResourceType.Song,
+                Limit = 30,
+                Offset = page * 30
+            }, _cancellationToken);
         var i = 0;
-        if (json["result"]["mvCount"].ToObject<int>() == 0)
+        if (json.IsError)
+        {
+            Common.AddToTeachingTipLists("搜索歌曲时出错", json.Error.Message);
+            return;
+        }
+
+        if (json.Value?.Result?.Count is null or 0)
         {
             TBNoRes.Visibility = Visibility.Visible;
             return;
         }
 
-        foreach (var item in json["result"]["mvs"])
+        foreach (var songJs in json.Value.Result?.Items ?? [])
         {
+            _cancellationToken.ThrowIfCancellationRequested();
+            SongResults.Add(songJs.MapNcSong());
             SearchResultContainer.ListItems.Add(
                 new SimpleListItem
                 {
-                    Title = item["name"].ToString(),
-                    LineOne = item["artistName"].ToString(),
-                    LineTwo = item["briefDesc"]?.ToString(),
-                    LineThree = item["transNames"]?.ToString(),
-                    ResourceId = "ml" + item["id"],
-                    CoverLink = item["cover"].ToString(),
+                    Title = songJs.Name,
+                    LineTwo = string.Join(" / ", songJs.Artists?.Select(t => t.Name) ?? []),
+                    LineThree = songJs.Album?.Name,
+                    LineOne = string.Join(" ",songJs.Translations ?? []) + " / " + string.Join("", songJs.Alias ?? []),
+                    ResourceId = "ns" + songJs.Id,
+                    CoverLink = songJs.Album?.PictureUrl,
                     Order = i++
                 });
-            if (json["result"]["mvCount"].ToObject<int>() >= (page + 1) * 30)
+            if (json.Value.Result?.Count >= (page + 1) * 30)
                 HasNextPage = true;
             else
                 HasNextPage = false;
@@ -185,285 +198,312 @@ public sealed partial class Search : Page, IDisposable
                 HasPreviousPage = false;
         }
     }
-
-    private void LoadMlogResult(JObject json)
+    
+    private async Task LoadAlbumResult()
     {
         if (disposedValue) throw new ObjectDisposedException(nameof(Search));
+        var json = await Common.NeteaseAPI.RequestAsync
+        <SearchAlbumResponse,
+            SearchRequest, SearchResponse, ErrorResultBase, SearchActualRequest>(NeteaseApis.SearchApi,
+            new SearchRequest()
+            {
+                Keyword = searchText,
+                Type = NeteaseResourceType.Album,
+                Limit = 30,
+                Offset = page * 30
+            }, _cancellationToken);
         var i = 0;
-        if (json["result"]["videoCount"].ToObject<int>() == 0)
+        if (json.IsError)
+        {
+            Common.AddToTeachingTipLists("搜索专辑时出错", json.Error.Message);
+            return;
+        }
+
+        if (json.Value?.Result?.Count is null or 0)
         {
             TBNoRes.Visibility = Visibility.Visible;
             return;
         }
 
-        foreach (var item in json["result"]["videos"])
+        foreach (var albumJs in json.Value.Result?.Items ?? [])
         {
             _cancellationToken.ThrowIfCancellationRequested();
             SearchResultContainer.ListItems.Add(
                 new SimpleListItem
                 {
-                    Title = item["title"]?.ToString(),
-                    LineOne = item["aliaName"]?.ToString(),
-                    LineTwo = item["transName"]?.ToString(),
-                    LineThree = item["creator"]?.First?["userName"]?.ToString(),
-                    ResourceId = "ml" + item["vid"],
-                    CoverLink = item["coverUrl"].ToString(),
-                    Order = i++
-                });
-            if (json["result"]["videoCount"].ToObject<int>() >= (page + 1) * 30)
-                HasNextPage = true;
-            else
-                HasNextPage = false;
-            if (page > 0)
-                HasPreviousPage = true;
-            else
-                HasPreviousPage = false;
-        }
-    }
-
-    private void LoadLyricResult(JObject json)
-    {
-        if (disposedValue) throw new ObjectDisposedException(nameof(Search));
-        var i = 0;
-        if (json["result"]["songCount"].ToObject<int>() == 0)
-        {
-            TBNoRes.Visibility = Visibility.Visible;
-            return;
-        }
-
-        foreach (var songJs in json["result"]["songs"].ToArray())
-        {
-            _cancellationToken.ThrowIfCancellationRequested();
-            SearchResultContainer.ListItems.Add(
-                new SimpleListItem
-                {
-                    Title = songJs["name"].ToString(),
-                    LineOne = string.Join(" / ", songJs["ar"].Select(t => t["name"].ToString())),
-                    LineTwo = songJs["lyrics"].ToList().First(t => t.ToString().Contains("</b>")).ToString(),
-                    LineThree = string.Join("\r\n", songJs["lyrics"].ToList()),
-                    ResourceId = "ns" + songJs["id"],
-                    CoverLink = songJs["al"]["picUrl"].ToString(),
+                    Title = albumJs.Name,
+                    LineOne = string.Join(" / ", albumJs.Artists?.Select(t => t.Name) ?? []),
+                    LineTwo = string.Join(" / ", albumJs.Alias ?? []),
+                    LineThree = $"歌曲数:{albumJs.Size}",
+                    ResourceId = "al" + albumJs.Id,
+                    CoverLink = albumJs.PictureUrl,
                     Order = i++
                 });
         }
-        if (json["result"]["songCount"].ToObject<int>() >= (page + 1) * 30)
+
+        if (json.Value.Result?.Count >= (page + 1) * 30)
             HasNextPage = true;
         else
             HasNextPage = false;
+        
         if (page > 0)
             HasPreviousPage = true;
         else
             HasPreviousPage = false;
     }
-
-    private void LoadUserResult(JObject json)
+    
+    private async Task LoadArtistResult()
     {
         if (disposedValue) throw new ObjectDisposedException(nameof(Search));
+        var json = await Common.NeteaseAPI.RequestAsync
+        <SearchArtistResponse,
+            SearchRequest, SearchResponse, ErrorResultBase, SearchActualRequest>(NeteaseApis.SearchApi,
+            new SearchRequest()
+            {
+                Keyword = searchText,
+                Type = NeteaseResourceType.Artist,
+                Limit = 30,
+                Offset = page * 30
+            }, _cancellationToken);
         var i = 0;
-        if (!json["result"].HasValues)
+        if (json.IsError)
+        {
+            Common.AddToTeachingTipLists("搜索歌手时出错", json.Error.Message);
+            return;
+        }
+
+        if (json.Value?.Result?.Count is null or 0)
         {
             TBNoRes.Visibility = Visibility.Visible;
             return;
         }
 
-        foreach (var userJs in json["result"]["userprofiles"].ToArray())
-        {
-            _cancellationToken.ThrowIfCancellationRequested();
-            SearchResultContainer.ListItems.Add(
-                new SimpleListItem
-                {
-                    Title = userJs["nickname"].ToString(),
-                    LineOne = userJs["signature"].ToString(),
-                    LineTwo = "",
-                    LineThree = "",
-                    ResourceId = "us" + userJs["userId"],
-                    CoverLink = userJs["avatarUrl"].ToString(),
-                    Order = i++
-                });
-        }
-
-        if (json["result"]["userprofileCount"].ToObject<int>() >= (page + 1) * 30)
-            HasNextPage = true;
-        else
-            HasNextPage = false;
-        if (page > 0)
-            HasPreviousPage = true;
-        else
-            HasPreviousPage = false;
-    }
-
-    private void LoadRadioResult(JObject json)
-    {
-        if (disposedValue) throw new ObjectDisposedException(nameof(Search));
-        var i = 0;
-        if (json["result"]["djRadiosCount"].ToObject<int>() == 0)
-        {
-            TBNoRes.Visibility = Visibility.Visible;
-            return;
-        }
-
-        foreach (var pljs in json["result"]["djRadios"].ToArray())
-        {
-            _cancellationToken.ThrowIfCancellationRequested();
-            SearchResultContainer.ListItems.Add(
-                new SimpleListItem
-                {
-                    Title = pljs["name"].ToString(),
-                    LineOne = pljs["dj"]["nickname"].ToString(),
-                    LineTwo = pljs["desc"].ToString(),
-                    LineThree = pljs["rcmdText"].ToString(),
-                    ResourceId = "rd" + pljs["id"],
-                    CoverLink = pljs["picUrl"].ToString(),
-                    Order = i++,
-                    CanPlay = true
-                });
-        }
-
-        if (int.Parse(json["result"]["djRadiosCount"].ToString()) >= (page + 1) * 30)
-            HasNextPage = true;
-        else
-            HasNextPage = false;
-        if (page > 0)
-            HasPreviousPage = true;
-        else
-            HasPreviousPage = false;
-    }
-
-    private void Btn_Click(object sender, RoutedEventArgs e)
-    {
-        if (disposedValue) throw new ObjectDisposedException(nameof(Search));
-        searchText = (sender as Button).Content.ToString();
-        _loadResultTask = LoadResult();
-    }
-
-    private void LoadPlaylistResult(JObject json)
-    {
-        if (disposedValue) throw new ObjectDisposedException(nameof(Search));
-        var i = 0;
-        if (json["result"]["playlistCount"].ToObject<int>() == 0)
-        {
-            TBNoRes.Visibility = Visibility.Visible;
-            return;
-        }
-
-        foreach (var pljs in json["result"]["playlists"].ToArray())
+        foreach (var singerjson in json.Value.Result?.Items ?? [])
         {
             _cancellationToken.ThrowIfCancellationRequested();
             SearchResultContainer.ListItems.Add(new SimpleListItem
             {
-                Title = pljs["name"].ToString(),
-                LineOne = pljs["creator"]["nickname"].ToString(),
-                LineTwo = pljs["description"].ToString(),
-                LineThree = $"{pljs["trackCount"]}首 | 播放{pljs["playCount"]}次 | 收藏 {pljs["bookCount"]}次",
-                ResourceId = "pl" + pljs["id"],
-                CoverLink = pljs["coverImgUrl"].ToString(),
+                Title = singerjson.Name,
+                LineOne = singerjson.Translation,
+                LineTwo = string.Join("/", singerjson.Alias ?? []),
+                LineThree = $"专辑数 {singerjson.AlbumSize} | MV 数 {singerjson.MvSize}",
+                ResourceId = "ar" + singerjson.Id,
+                CoverLink = singerjson.Img1v1Url,
                 Order = i++,
                 CanPlay = true
             });
         }
-        if (int.Parse(json["result"]["playlistCount"].ToString()) >= (page + 1) * 30)
+
+        if (json.Value.Result?.Count >= (page + 1) * 30)
             HasNextPage = true;
         else
             HasNextPage = false;
+        
         if (page > 0)
             HasPreviousPage = true;
         else
             HasPreviousPage = false;
     }
-
-    private void LoadArtistResult(JObject json)
+    
+    private async Task LoadPlaylistResult()
     {
         if (disposedValue) throw new ObjectDisposedException(nameof(Search));
+        var json = await Common.NeteaseAPI.RequestAsync
+        <SearchPlaylistResponse,
+            SearchRequest, SearchResponse, ErrorResultBase, SearchActualRequest>(NeteaseApis.SearchApi,
+            new SearchRequest()
+            {
+                Keyword = searchText,
+                Type = NeteaseResourceType.Playlist,
+                Limit = 30,
+                Offset = page * 30
+            }, _cancellationToken);
         var i = 0;
-        if (json["result"]["artistCount"].ToObject<int>() == 0)
+        if (json.IsError)
+        {
+            Common.AddToTeachingTipLists("搜索歌单时出错", json.Error.Message);
+            return;
+        }
+
+        if (json.Value?.Result?.Count is null or 0)
         {
             TBNoRes.Visibility = Visibility.Visible;
             return;
         }
 
-        foreach (var singerjson in json["result"]["artists"].ToArray())
+        foreach (var playlistJs in json.Value.Result?.Items ?? [])
         {
             _cancellationToken.ThrowIfCancellationRequested();
-            SearchResultContainer.ListItems.Add(new SimpleListItem
-            {
-                Title = singerjson["name"].ToString(),
-                LineOne = singerjson["trans"].ToString(),
-                LineTwo = string.Join(" / ",
-                    (singerjson["alia"]?.ToList() ?? new List<JToken>()).Select(t => t.ToString())),
-                LineThree = $"专辑数 {singerjson["albumSize"]} | MV 数 {singerjson["mvSize"]}",
-                ResourceId = "ar" + singerjson["id"],
-                CoverLink = singerjson["img1v1Url"].ToString(),
-                Order = i++
-            });
+            SearchResultContainer.ListItems.Add(
+                new SimpleListItem
+                {
+                    Title = playlistJs.Name,
+                    LineOne = playlistJs.Creator?.Nickname,
+                    LineTwo = playlistJs.Description,
+                    LineThree = $"歌曲数:{playlistJs.TrackCount}",
+                    ResourceId = "pl" + playlistJs.Id,
+                    CoverLink = playlistJs.CoverUrl,
+                    Order = i++
+                });
         }
-        if (int.Parse(json["result"]["artistCount"].ToString()) >= (page + 1) * 30)
+
+        if (json.Value.Result?.Count >= (page + 1) * 30)
             HasNextPage = true;
         else
             HasNextPage = false;
+        
         if (page > 0)
             HasPreviousPage = true;
         else
             HasPreviousPage = false;
     }
-
-    private void LoadAlbumResult(JObject json)
+    
+    private async Task LoadUserResult()
     {
         if (disposedValue) throw new ObjectDisposedException(nameof(Search));
+        var json = await Common.NeteaseAPI.RequestAsync
+        <SearchUserResponse,
+            SearchRequest, SearchResponse, ErrorResultBase, SearchActualRequest>(NeteaseApis.SearchApi,
+            new SearchRequest()
+            {
+                Keyword = searchText,
+                Type = NeteaseResourceType.User,
+                Limit = 30,
+                Offset = page * 30
+            }, _cancellationToken);
         var i = 0;
-        if (json["result"]["albumCount"].ToObject<int>() == 0)
+        if (json.IsError)
+        {
+            Common.AddToTeachingTipLists("搜索用户时出错", json.Error.Message);
+            return;
+        }
+
+        if (json.Value?.Result?.Count is null or 0)
         {
             TBNoRes.Visibility = Visibility.Visible;
             return;
         }
 
-        foreach (var albumjson in json["result"]["albums"].ToArray())
+        foreach (var userJs in json.Value.Result?.Items ?? [])
         {
             _cancellationToken.ThrowIfCancellationRequested();
-            SearchResultContainer.ListItems.Add(new SimpleListItem
-            {
-                Title = albumjson["name"].ToString(),
-                LineOne = albumjson["artist"]["name"].ToString(),
-                LineTwo = albumjson["alias"] != null
-                    ? string.Join(" / ", albumjson["alias"].ToArray().Select(t => t.ToString()))
-                    : "",
-                LineThree = albumjson.Value<bool>("paid") ? "付费专辑" : "",
-                ResourceId = "al" + albumjson["id"],
-                CoverLink = albumjson["picUrl"].ToString(),
-                Order = i++,
-                CanPlay = true
-            });
+            SearchResultContainer.ListItems.Add(
+                new SimpleListItem
+                {
+                    Title = userJs.Nickname,
+                    LineOne = userJs.Signature,
+                    ResourceId = "us" + userJs.UserId,
+                    CoverLink = userJs.AvatarUrl,
+                    Order = i++
+                });
         }
-        if (int.Parse(json["result"]["albumCount"].ToString()) >= (page + 1) * 30)
+
+        if (json.Value.Result?.Count >= (page + 1) * 30)
             HasNextPage = true;
         else
             HasNextPage = false;
+        
         if (page > 0)
             HasPreviousPage = true;
         else
             HasPreviousPage = false;
     }
-
-    private void LoadSongResult(JObject json)
+    
+    private async Task LoadRadioResult()
     {
         if (disposedValue) throw new ObjectDisposedException(nameof(Search));
-        if (json["result"]["songCount"].ToObject<int>() == 0)
+        var json = await Common.NeteaseAPI.RequestAsync
+        <SearchRadioResponse,
+            SearchRequest, SearchResponse, ErrorResultBase, SearchActualRequest>(NeteaseApis.SearchApi,
+            new SearchRequest()
+            {
+                Keyword = searchText,
+                Type = NeteaseResourceType.RadioChannel,
+                Limit = 30,
+                Offset = page * 30
+            }, _cancellationToken);
+        var i = 0;
+        if (json.IsError)
+        {
+            Common.AddToTeachingTipLists("搜索电台时出错", json.Error.Message);
+            return;
+        }
+
+        if (json.Value?.Result?.Count is null or 0)
         {
             TBNoRes.Visibility = Visibility.Visible;
             return;
         }
 
-        var idx = 0;
-        try
+        foreach (var radioJs in json.Value.Result?.Items ?? [])
         {
-            foreach (var song in json["result"]["songs"].ToArray())
-            {
-                _cancellationToken.ThrowIfCancellationRequested();
-                var ncSong = NCSong.CreateFromJson(song);
-                ncSong.Order = idx++;
-                SongResults.Add(ncSong);
-            }
+            _cancellationToken.ThrowIfCancellationRequested();
+            SearchResultContainer.ListItems.Add(
+                new SimpleListItem
+                {
+                    Title = radioJs.Name,
+                    LineOne = radioJs.DjData?.Nickname,
+                    LineTwo = radioJs.Description,
+                    LineThree = $"节目数:{radioJs.ProgramCount}",
+                    ResourceId = "rd" + radioJs.Id,
+                    CoverLink = radioJs.CoverUrl,
+                    Order = i++
+                });
+        }
 
-            if (int.Parse(json["result"]["songCount"].ToString()) >= (page + 1) * 30)
+        if (json.Value.Result?.Count >= (page + 1) * 30)
+            HasNextPage = true;
+        else
+            HasNextPage = false;
+        
+        if (page > 0)
+            HasPreviousPage = true;
+        else
+            HasPreviousPage = false;
+    }
+    
+                
+    
+    private async Task LoadMVResult()
+    {
+        if (disposedValue) throw new ObjectDisposedException(nameof(Search));
+        var json = await Common.NeteaseAPI.RequestAsync
+        <SearchMVResponse,
+            SearchRequest, SearchResponse, ErrorResultBase, SearchActualRequest>(NeteaseApis.SearchApi,
+            new SearchRequest()
+            {
+                Keyword = searchText,
+                Type = NeteaseResourceType.MV,
+                Limit = 30,
+                Offset = page * 30
+            }, _cancellationToken);
+        var i = 0;
+        if (json.IsError)
+        {
+            Common.AddToTeachingTipLists("搜索 MV 时出错", json.Error.Message);
+            return;
+        }
+
+        if (json.Value?.Result?.Count is null or 0)
+        {
+            TBNoRes.Visibility = Visibility.Visible;
+            return;
+        }
+
+        foreach (var item in json.Value.Result?.Items ?? [])
+        {
+            SearchResultContainer.ListItems.Add(
+                new SimpleListItem
+                {
+                    Title = item.Name,
+                    LineOne = item.ArtistName,
+                    LineTwo = item.Description,
+                    LineThree = string.Join(" / ", item.TransNames),
+                    ResourceId = "ml" + item.Id,
+                    CoverLink = item.Cover.ToString(),
+                    Order = i++
+                });
+            if (json.Value.Result?.Count >= (page + 1) * 30)
                 HasNextPage = true;
             else
                 HasNextPage = false;
@@ -472,13 +512,110 @@ public sealed partial class Search : Page, IDisposable
             else
                 HasPreviousPage = false;
         }
-        catch (Exception ex)
+    }
+
+    private async Task LoadMlogResult()
+    {
+        if (disposedValue) throw new ObjectDisposedException(nameof(Search));
+        var json = await Common.NeteaseAPI.RequestAsync
+        <SearchVideoResponse,
+            SearchRequest, SearchResponse, ErrorResultBase, SearchActualRequest>(NeteaseApis.SearchApi,
+            new SearchRequest()
+            {
+                Keyword = searchText,
+                Type = NeteaseResourceType.Video,
+                Limit = 30,
+                Offset = page * 30
+            }, _cancellationToken);
+        var i = 0;
+        if (json.IsError)
         {
-            if (ex.GetType() != typeof(TaskCanceledException) && ex.GetType() != typeof(OperationCanceledException))
-                Common.AddToTeachingTipLists(ex.Message, (ex.InnerException ?? new Exception()).Message);
+            Common.AddToTeachingTipLists("搜索 Mlog 时出错", json.Error.Message);
+            return;
+        }
+
+        if (json.Value?.Result?.Count is null or 0)
+        {
+            TBNoRes.Visibility = Visibility.Visible;
+            return;
+        }
+
+        foreach (var item in json.Value.Result?.Items ?? [])
+        {
+            _cancellationToken.ThrowIfCancellationRequested();
+            SearchResultContainer.ListItems.Add(
+                new SimpleListItem
+                {
+                    Title = item.Title,
+                    LineOne = string.Join(" / ", item.Artists?.Select(t => t.UserName) ?? []),
+                    LineTwo = null,
+                    LineThree = null,
+                    ResourceId = "ml" + item.Id,
+                    CoverLink = item.CoverUrl,
+                    Order = i++
+                });
+            if (json.Value.Result?.Count >= (page + 1) * 30)
+                HasNextPage = true;
+            else
+                HasNextPage = false;
+            if (page > 0)
+                HasPreviousPage = true;
+            else
+                HasPreviousPage = false;
         }
     }
 
+    private async Task LoadLyricResult()
+    {
+        if (disposedValue) throw new ObjectDisposedException(nameof(Search));
+        var i = 0;
+        var json = await Common.NeteaseAPI.RequestAsync
+        <SearchLyricResponse,
+            SearchRequest, SearchResponse, ErrorResultBase, SearchActualRequest>(NeteaseApis.SearchApi,
+            new SearchRequest()
+            {
+                Keyword = searchText,
+                Type = NeteaseResourceType.Lyric,
+                Limit = 30,
+                Offset = page * 30
+            }, _cancellationToken);
+        if (json.IsError)
+        {
+            Common.AddToTeachingTipLists("搜索歌词时出错", json.Error.Message);
+            return;
+        }
+
+        if (json.Value?.Result?.Count is null or 0)
+        {
+            TBNoRes.Visibility = Visibility.Visible;
+            return;
+        }
+
+        foreach (var songJs in json.Value?.Result?.Items ?? [])
+        {
+            _cancellationToken.ThrowIfCancellationRequested();
+            SearchResultContainer.ListItems.Add(
+                new SimpleListItem
+                {
+                    Title = songJs.Name,
+                    LineOne = string.Join(" / ", songJs.Artists?.Select(t => t.Name) ?? []),
+                    LineTwo = songJs.Lyrics?.First(t => t.Contains("</b>")),
+                    LineThree = string.Join("   ", songJs.Lyrics?.ToList() ?? []),
+                    ResourceId = "ns" + songJs.Id,
+                    CoverLink = songJs.Album?.PictureUrl,
+                    Order = i++
+                });
+        }
+
+        if ( json.Value?.Result?.Count >= (page + 1) * 30)
+            HasNextPage = true;
+        else
+            HasNextPage = false;
+        if (page > 0)
+            HasPreviousPage = true;
+        else
+            HasPreviousPage = false;
+    }
 
     private void PrevPage_OnClick(object sender, RoutedEventArgs e)
     {
@@ -536,15 +673,19 @@ public sealed partial class Search : Page, IDisposable
 
         try
         {
-            var json = await Common.ncapi?.RequestAsync(CloudMusicApiProviders.SearchSuggest,
-                new Dictionary<string, object> { { "keywords", sender.Text }, { "type", "mobile" } });
+            var json = await Common.NeteaseAPI.RequestAsync(NeteaseApis.SearchSuggestionApi,
+                new SearchSuggestionRequest()
+                {
+                    Keyword = sender.Text
+                }, _cancellationToken);
 
-            if (json["result"] != null && json["result"]["allMatch"] != null &&
-                json["result"]["allMatch"].HasValues)
-                sender.ItemsSource = json["result"]["allMatch"].ToArray().ToList()
-                    .Select(t => t["keyword"].ToString())
-                    .ToList();
-            json.RemoveAll();
+            if (json.IsError)
+            {
+                Common.AddToTeachingTipLists("搜索建议时出错", json.Error.Message);
+                return;
+            }
+            
+            sender.ItemsSource = json.Value.Result?.AllMatch?.Select(t=>t.Keyword)?.ToList() ?? [];
         }
         catch (Exception ex)
         {
@@ -558,12 +699,13 @@ public sealed partial class Search : Page, IDisposable
         if (disposedValue) throw new ObjectDisposedException(nameof(Search));
         if ((sender as ComboBox) is not null)
         {
-            SearchKeywordBox.Text = (sender as ComboBox).SelectedItem as string;//将历史放上去
+            SearchKeywordBox.Text = (sender as ComboBox).SelectedItem as string; //将历史放上去
             _loadResultTask = LoadResult();
         }
     }
 
-    private void SearchKeywordBox_OnSuggestionChosen(AutoSuggestBox sender, AutoSuggestBoxSuggestionChosenEventArgs args)
+    private void SearchKeywordBox_OnSuggestionChosen(AutoSuggestBox sender,
+        AutoSuggestBoxSuggestionChosenEventArgs args)
     {
         sender.Text = (string)args.SelectedItem;
     }

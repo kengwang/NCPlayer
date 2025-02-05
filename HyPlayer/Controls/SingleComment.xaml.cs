@@ -74,22 +74,14 @@ public sealed partial class SingleComment : UserControl, INotifyPropertyChanged
 
     private async Task LoadFloorComments(bool IsLoadMoreComments)
     {
-        throw new NotImplementedException();
-        /*
         try
         {
             if (!IsLoadMoreComments) floorComments.Clear();
-            new Dictionary<string, object>
-            {
-                { "parentCommentId", MainComment.cid }, { "id", MainComment.resourceId },
-                { "type", MainComment.resourceType },
-                { "time", IsLoadMoreComments ? 0 : time }
-            };
             var result = await Common.NeteaseAPI.RequestAsync(NeteaseApis.CommentFloorApi,
                 new CommentFloorRequest()
                 {
                     ParentCommentId = MainComment.cid,
-                    ResourceId = MainComment.resourceId,
+                    ResourceId = MainComment.resourceId ,
                     ResourceType = MainComment.resourceType,
                     Time = IsLoadMoreComments ? 0 : long.Parse(time)
                 }
@@ -99,7 +91,7 @@ public sealed partial class SingleComment : UserControl, INotifyPropertyChanged
                 Common.AddToTeachingTipLists("加载楼层评论错误", result.Error?.Message ?? "未知错误");
                 return;
             }
-            foreach (var floorcomment in result.Value.Data?.Comments ?? [])
+            foreach (var floorcomment in result.Value?.Data?.Comments ?? [])
             {
                 var floorComment = floorcomment.MapToComment();
                 floorComment.resourceId = MainComment.resourceId;
@@ -107,14 +99,13 @@ public sealed partial class SingleComment : UserControl, INotifyPropertyChanged
                 floorComment.IsMainComment = false;
                 floorComments.Add(floorComment);
             }
-            time = result.Value.Data?.Time.ToString();
-            LoadMore.Visibility = result.Value.Data?.HasMore is true ? Visibility.Visible : Visibility.Collapsed;
+            time = result.Value?.Data?.Time.ToString();
+            LoadMore.Visibility = result.Value?.Data?.HasMore is true ? Visibility.Visible : Visibility.Collapsed;
         }
         catch (Exception ex)
         {
             Common.AddToTeachingTipLists(ex.Message, (ex.InnerException ?? new Exception()).Message);
         }
-        */
     }
 
     private async void Like_Click(object sender, RoutedEventArgs e)

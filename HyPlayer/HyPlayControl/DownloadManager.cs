@@ -424,7 +424,8 @@ internal sealed class DownloadObject : INotifyPropertyChanged
             DontUsePlayItem = new PlayItem
             {
                 Bitrate = Convert.ToInt32(urlResult.Value.SongUrls[0].BitRate),
-                Tag = "下载",
+                QualityTag = "下载",
+                InfoTag = "下载",
                 Album = ncsong.Album,
                 Artist = ncsong.Artist,
                 SubExt = urlResult.Value.SongUrls[0].Type.ToLowerInvariant(),

@@ -1,7 +1,10 @@
 ﻿#region
 
+using System;
+using System.Threading;
 using HyPlayer.NeteaseApi.ApiContracts;
 using System.Threading.Tasks;
+using HyPlayer.HyPlayControl;
 
 #endregion
 
@@ -21,6 +24,52 @@ internal class Api
         {
             Common.AddToTeachingTipLists(requestResult.Error.Message);
             return false;
+        }
+    }
+
+    public static async Task EnterIntelligencePlay(CancellationToken cancellationToken = default)
+    {
+        HyPlayList.RemoveAllSong();
+        try
+        {
+            var songList = Common.MySongLists[0].plid;
+            var randomSong = Common.LikedSongs[new Random().Next(0, Common.LikedSongs.Count - 1)];
+            var jsoon = await Common.NeteaseAPI.RequestAsync(NeteaseApis.PlaymodeIntelligenceListApi,
+                new PlaymodeIntelligenceListRequest
+                {
+                    PlaylistId = songList,
+                    SongId = randomSong,
+                    StartMusicId = HyPlayList.NowPlayingItem.PlayItem.Id,
+                    Count = Common.LikedSongs.Count
+                }, cancellationToken);
+            
+            if (jsoon.IsError)
+            {
+                Common.AddToTeachingTipLists("加载心动模式列表出错", jsoon.Error.Message);
+                return;
+            }
+
+            foreach (var item in jsoon.Value?.Data ?? [])
+            {
+                var ncSong = item.SongInfo.MapNcSong();
+                var playItem = HyPlayList.NCSongToPlayItem(ncSong);
+                playItem.InfoTag = item.Recommended ? "为你推荐" : "我的喜欢";
+                HyPlayList.AppendNcPlayItem(playItem);
+                HyPlayList.SongMoveTo(0);
+            }
+
+            try
+            {
+                HyPlayList.SongAppendDone();
+            }
+            catch (Exception ex)
+            {
+                Common.AddToTeachingTipLists(ex.Message, (ex.InnerException ?? new Exception()).Message);
+            }
+        }
+        catch (Exception ex)
+        {
+            Common.AddToTeachingTipLists(ex.Message, (ex.InnerException ?? new Exception()).Message);
         }
     }
 }

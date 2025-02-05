@@ -227,9 +227,9 @@ public sealed partial class Settings : Page, IDisposable
         if (disposedValue) throw new ObjectDisposedException(nameof(Settings));
         ApplicationData.Current.LocalSettings.Values["xRealIp"] =
             TextBoxXREALIP.Text == "" ? null : TextBoxXREALIP.Text;
-        if (Common.ncapi != null)
+        if (Common.NeteaseAPI != null)
         {
-            Common.ncapi.RealIP = (string)ApplicationData.Current.LocalSettings.Values["xRealIp"];
+            Common.NeteaseAPI.Option.XRealIP = (string)ApplicationData.Current.LocalSettings.Values["xRealIp"];
         }
     }
 

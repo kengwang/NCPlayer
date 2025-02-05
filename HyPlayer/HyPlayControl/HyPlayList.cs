@@ -420,7 +420,7 @@ public static class HyPlayList
                                 .Size.ToString(),
                             */
                             Name = Info.musicName,
-                            Tag = file.Provider.DisplayName + " NCM"
+                            InfoTag = file.Provider.DisplayName + " NCM"
                         }
                     };
                     hyitem.PlayItem.Artist = Info.artist.Select(t => new NCArtist
@@ -612,9 +612,8 @@ public static class HyPlayList
                     break;
                 }
             case HyPlayItemType.Radio:
-                throw new NotImplementedException();
-                var likeRequest = new LikeRequest() { Like = !isLiked, TrackId = NowPlayingItem.PlayItem.Id };
-                _ = Common.NeteaseAPI.RequestAsync(NeteaseApis.LikeApi, likeRequest);
+                // TODO: 待实现电台红心
+                Common.AddToTeachingTipLists("暂不支持红心电台歌曲", "将在后续版本中支持");
                 OnSongLikeStatusChange?.Invoke(!isLiked);
                 break;
         }
@@ -1066,25 +1065,29 @@ public static class HyPlayList
                         {
                             playUrl = playUrl.Replace("https://", "http://");
                         }
+
+
                         var tag = songResult.Value.SongUrls[0]?.Level
                             switch
-                        {
-                            "standard" => "标准",
-                            "higher" => "较高",
-                            "exhigh" => "极高",
-                            "lossless" => "无损",
-                            "hires" => "Hi-Res",
-                            "jyeffect" => "高清环绕声",
-                            "sky" => "沉浸环绕声",
-                            "jymaster" => "超清母带",
-                            _ => "在线"
-                        };
-                        targetItem.PlayItem.Tag = tag;
+                            {
+                                "standard" => "标准",
+                                "higher" => "较高",
+                                "exhigh" => "极高",
+                                "lossless" => "无损",
+                                "hires" => "Hi-Res",
+                                "jyeffect" => "高清环绕声",
+                                "sky" => "沉浸环绕声",
+                                "jymaster" => "超清母带",
+                                _ => "在线"
+                            };
+                        targetItem.PlayItem.QualityTag = tag;
+                        
+
                         AudioEffectsProperties["AudioGain_GainValue"] = songResult.Value.SongUrls[0]?.Gain ?? 0f;
                         _ = Common.Invoke(() =>
                         {
-                            Common.BarPlayBar.TbSongTag.Text = tag;
-                            if (tag.Length > 2)
+                            Common.BarPlayBar.TbSongTag.Text = targetItem.PlayItem.QualityTag;
+                            if (targetItem.PlayItem.QualityTag.Length > 2)
                             {
                                 var backgroundbrush = new LinearGradientBrush();
                                 backgroundbrush.StartPoint = new Windows.Foundation.Point(0, 0);
@@ -1981,23 +1984,7 @@ public static class HyPlayList
     {
         try
         {
-            var ncp = new PlayItem
-            {
-                Type = ncSong.Type,
-                //Bitrate = json["data"][0]["br"].ToObject<int>(),
-                Tag = "在线",
-                Album = ncSong.Album,
-                Artist = ncSong.Artist,
-                //SubExt = json["data"][0]["type"].ToString().ToLowerInvariant(),
-                Id = ncSong.sid,
-                Name = ncSong.songname,
-                TrackId = ncSong.TrackId,
-                CDName = ncSong.CDName,
-                //Url = json["data"][0]["url"].ToString(),
-                LengthInMilliseconds = ncSong.LengthInMilliseconds
-                //Size = json["data"][0]["size"].ToString(),
-                //md5 = json["data"][0]["md5"].ToString()
-            };
+            var ncp = NCSongToPlayItem(ncSong);
             return LoadNcPlayItem(ncp);
         }
         catch (Exception ex)
@@ -2008,7 +1995,7 @@ public static class HyPlayList
         return null;
     }
 
-    private static void AppendNcPlayItem(PlayItem ncp)
+    public static void AppendNcPlayItem(PlayItem ncp)
     {
         var hpi = LoadNcPlayItem(ncp);
         List.Add(hpi);
@@ -2024,6 +2011,26 @@ public static class HyPlayList
         return hpi;
     }
 
+    public static PlayItem NCSongToPlayItem(NCSong ncSong)
+    {
+        return new PlayItem
+        {
+            Type = ncSong.Type,
+            InfoTag = ncSong.alias,
+            Album = ncSong.Album,
+            Artist = ncSong.Artist,
+            //SubExt = token["type"].ToString(),
+            Id = ncSong.sid,
+            Name = ncSong.songname,
+            TrackId = ncSong.TrackId,
+            CDName = ncSong.CDName,
+            //url = token["url"].ToString(),
+            LengthInMilliseconds = ncSong.LengthInMilliseconds
+            //size = token["size"].ToString(),
+            //md5 = token["md5"].ToString()
+        };
+    }
+    
     public static void AppendNcSongs(IList<NCSong> ncSongs, bool needRemoveList = true, bool resetPlaying = true,
         string currentSongId = "-1")
     {
@@ -2034,22 +2041,7 @@ public static class HyPlayList
         {
             foreach (var ncSong in ncSongs)
             {
-                var ncp = new PlayItem
-                {
-                    Type = ncSong.Type,
-                    Tag = "在线",
-                    Album = ncSong.Album,
-                    Artist = ncSong.Artist,
-                    //SubExt = token["type"].ToString(),
-                    Id = ncSong.sid,
-                    Name = ncSong.songname,
-                    TrackId = ncSong.TrackId,
-                    CDName = ncSong.CDName,
-                    //url = token["url"].ToString(),
-                    LengthInMilliseconds = ncSong.LengthInMilliseconds
-                    //size = token["size"].ToString(),
-                    //md5 = token["md5"].ToString()
-                };
+                var ncp = NCSongToPlayItem(ncSong);
                 AppendNcPlayItem(ncp);
             }
 
@@ -2226,8 +2218,8 @@ public static class HyPlayList
     {
         try
         {
-            var detailResponse = await Common.NeteaseAPI.RequestAsync(NeteaseApis.PlaylistDetailApi,
-                new PlaylistDetailRequest(){Id = playlistId});
+            var detailResponse = await Common.NeteaseAPI.RequestAsync(NeteaseApis.PlaylistTracksGetApi,
+                new PlaylistTracksGetRequest(){Id = playlistId});
 
             var nowIndex = 0;
             if (detailResponse.IsError)
@@ -2235,7 +2227,7 @@ public static class HyPlayList
                 Common.AddToTeachingTipLists("获取歌单失败", detailResponse.Error.Message);
                 return false;
             }
-            var trackIds = detailResponse.Value.Playlists!.Select(t=>t.Id).ToList();
+            var trackIds = detailResponse.Value.Playlist?.TrackIds?.Select(t=>t.Id).ToList() ?? [];
             while (nowIndex * 500 < trackIds.Count)
             {
                 var nowIds = trackIds.GetRange(nowIndex * 500,
@@ -2248,8 +2240,9 @@ public static class HyPlayList
                     {
                         Common.AddToTeachingTipLists("获取歌曲失败", songResponse.Error.Message);
                     }
-                    var privileges = songResponse.Value.Privileges;
-                    var songs = songResponse.Value.Songs;
+                    nowIndex++;
+                    var privileges = songResponse.Value?.Privileges ?? [];
+                    var songs = songResponse.Value?.Songs ?? [];
                     var result = new List<NCSong>();
                     if (privileges is null) return false;
                     for (var i = 0; i < privileges.Length; i++)
@@ -2305,7 +2298,7 @@ public static class HyPlayList
                     IsLocalFile = true,
                     LocalFileTag = tagFile.Tag,
                     Bitrate = tagFile.Properties.AudioBitrate,
-                    Tag = sf.Provider.DisplayName,
+                    InfoTag = sf.Provider.DisplayName,
                     Id = null,
                     Name = tagFile.Tag.Title,
                     Type = HyPlayItemType.Local,
@@ -2352,7 +2345,7 @@ public static class HyPlayList
             Name = mi.musicName,
             TrackId = (int)tagFile.Tag.Track,
             CDName = "01",
-            Tag = sf.Provider.DisplayName
+            InfoTag = sf.Provider.DisplayName
         };
         hpi.Artist = mi.artist
             .Select(t => new NCArtist { name = t[0].ToString(), id = t[1].ToString() })

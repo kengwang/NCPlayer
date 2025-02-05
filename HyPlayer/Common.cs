@@ -1812,20 +1812,16 @@ namespace HyPlayer
         public bool SaveCookies()
         {
             var container = ApplicationData.Current.LocalSettings.CreateContainer("LoginedUser", ApplicationDataCreateDisposition.Always);
-            if (Common.NeteaseAPI.Option.Cookies != null)
+            container.Values.Clear();
+            foreach (var item in Common.NeteaseAPI.Option.Cookies)
             {
-                container.Values.Clear();
-                foreach (var item in Common.NeteaseAPI.Option.Cookies)
-                {
-                    container.Values[item.Key] = item.Value;
-                }
-                return true;
+                container.Values[item.Key] = item.Value;
             }
-            return false;
+            return true;
         }
         public bool LoadCookies()
         {
-            if (ApplicationData.Current.LocalSettings.Containers.TryGetValue("Cookies", out var container))
+            if (ApplicationData.Current.LocalSettings.Containers.TryGetValue("LoginedUser", out var container))
             {
                 if (container.Values.Count == 0)
                 {

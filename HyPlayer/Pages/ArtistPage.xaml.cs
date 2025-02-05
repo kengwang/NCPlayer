@@ -255,10 +255,10 @@ public sealed partial class ArtistPage : Page, IDisposable
     private async Task LoadAlbum()
     {
         if (disposedValue) throw new ObjectDisposedException(nameof(ArtistPage));
-        _cancellationToken.ThrowIfCancellationRequested();
         try
         {
-            var j1 = await Common.NeteaseAPI.RequestAsync(NeteaseApis.ArtistAlbumsApi,new ArtistAlbumsRequest() { ArtistId = artist.id, Limit = 50, Start = page * 50});
+            _cancellationToken.ThrowIfCancellationRequested();
+            var j1 = await Common.NeteaseAPI.RequestAsync(NeteaseApis.ArtistAlbumsApi,new ArtistAlbumsRequest() { ArtistId = artist.id, Limit = 50, Start = page * 50}, _cancellationToken);
             if (j1.IsError)
             {
                 Common.AddToTeachingTipLists("获取歌手专辑失败", j1.Error.Message);
@@ -266,13 +266,13 @@ public sealed partial class ArtistPage : Page, IDisposable
             }
             AlbumContainer.ListItems.Clear();
             var i = 0;
-            foreach (var album in j1.Value.Albums)
+            foreach (var album in j1.Value?.Albums ?? [])
             {
                 _cancellationToken.ThrowIfCancellationRequested();
                 AlbumContainer.ListItems.Add(new SimpleListItem
                 {
                     Title = album.Name,
-                    LineOne = string.Join("/", album.Artists.Select(t=>t.Name).ToString()),
+                    LineOne = string.Join("/", album.Artists?.Select(t=>t.Name).ToString()),
                     LineTwo = album.Alias != null
                         ? string.Join(" / ", album.Alias)
                         : "",

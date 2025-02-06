@@ -127,8 +127,9 @@ public sealed partial class SingleComment : UserControl, INotifyPropertyChanged
         LikeCountTB.Text = MainComment.likedCount.ToString();
     }
 
-    private async void Delete_Click(object sender, RoutedEventArgs e)
+    private void Delete_Click(object sender, RoutedEventArgs e)
     {
+        throw new NotImplementedException();
         // TODO: 删除评论
     }
 

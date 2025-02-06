@@ -237,7 +237,6 @@ public sealed partial class BasePage : Page
 
         DialogLogin.IsPrimaryButtonEnabled = false;
         DialogLogin.PrimaryButtonText = "登录中......";
-        LoginResponse json;
         try
         {
             var queries = new Dictionary<string, object>();

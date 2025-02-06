@@ -537,7 +537,7 @@ public sealed partial class ExpandedPlayer : Page, IDisposable
 
 
     private Storyboard bpmAniStoryboard = new Storyboard();
-    public async void InitializeBPM()
+    public void InitializeBPM()
     {
         // TODO: 完成 BPM API
         /*

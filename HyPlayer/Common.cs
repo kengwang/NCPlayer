@@ -2031,7 +2031,6 @@ namespace HyPlayer
                             IdList = nowIds
                         });
                     nowIndex++;
-                    var i = 0;
                     if (json.IsError)
                     {
                         Common.AddToTeachingTipLists("加载当前播放失败", json.Error.Message);

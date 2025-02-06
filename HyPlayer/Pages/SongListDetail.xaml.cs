@@ -384,7 +384,7 @@ public sealed partial class SongListDetail : Page, IDisposable
         Common.NavigatePage(typeof(Comments), "pl" + playList.plid);
     }
 
-    private async void ButtonHeartBeat_OnClick(object sender, RoutedEventArgs e)
+    private void ButtonHeartBeat_OnClick(object sender, RoutedEventArgs e)
     {
         if (disposedValue) throw new ObjectDisposedException(nameof(SongListDetail));
         _ = Api.EnterIntelligencePlay(_cancellationToken);

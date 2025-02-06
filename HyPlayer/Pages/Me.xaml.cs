@@ -126,7 +126,6 @@ public sealed partial class Me : Page, IDisposable
                 return;
             }
             
-            var myListIdx = 0;
             var subListIdx = 0;
             foreach (var valuePlaylist in json.Value.Playlists ?? [])
             {
@@ -173,7 +172,7 @@ public sealed partial class Me : Page, IDisposable
         }
     }
 
-    private async void Logout_OnClick(object sender, RoutedEventArgs e)
+    private void Logout_OnClick(object sender, RoutedEventArgs e)
     {
         if (disposedValue) throw new ObjectDisposedException(nameof(Me));
         try

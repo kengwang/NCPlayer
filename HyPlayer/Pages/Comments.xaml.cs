@@ -188,7 +188,7 @@ public sealed partial class Comments : Page, IDisposable
         ScrollTop();
     }
 
-    private async void SendComment_Click(object sender, RoutedEventArgs e)
+    private void SendComment_Click(object sender, RoutedEventArgs e)
     {
         // TODO: 评论功能风控
         Common.AddToTeachingTipLists("评论功能暂时关闭", "由于网易云音乐风控策略，评论功能暂时关闭");

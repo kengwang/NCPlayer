@@ -17,7 +17,7 @@ public sealed partial class CreateSonglistDialog : ContentDialog
         InitializeComponent();
     }
 
-    private async void ContentDialog_PrimaryButtonClick(ContentDialog sender,
+    private void ContentDialog_PrimaryButtonClick(ContentDialog sender,
         ContentDialogButtonClickEventArgs args)
     {
         // Todo: 当前创建歌单需要 CheckToken, 不再允许

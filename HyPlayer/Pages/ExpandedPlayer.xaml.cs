@@ -90,6 +90,7 @@ public sealed partial class ExpandedPlayer : Page, IDisposable
     public System.Diagnostics.Stopwatch time = new System.Diagnostics.Stopwatch();
     private PixelShaderEffect? _shaderEffect;
     private float _randomValue = -1;
+    private bool _backgroundIsReady = false;
 
 
     public ExpandedPlayer()
@@ -1451,6 +1452,7 @@ public sealed partial class ExpandedPlayer : Page, IDisposable
                             _shaderEffect.Properties["RandomValue2"] = (float)random.Next(-50, +50);
                             _shaderEffect.Properties["RandomValue3"] = (float)random.Next(-50, +50);
                         }
+                        if(!HyPlayList.IsPlaying) LuminousBackground.Paused = true;
                     }
                 }
                 catch
@@ -1500,7 +1502,7 @@ public sealed partial class ExpandedPlayer : Page, IDisposable
 
     private void LuminousBackground_OnUnloaded(object sender, RoutedEventArgs e)
     {
-        LuminousBackground?.RemoveFromVisualTree();
+        if (Common.Setting.expandedPlayerBackgroundType == 7) LuminousBackground.RemoveFromVisualTree();
         LuminousBackground = null;
     }
 
@@ -1707,6 +1709,7 @@ public sealed partial class ExpandedPlayer : Page, IDisposable
             LuminousBackground.IsFixedTimeStep = true;
             LuminousBackground.TargetElapsedTime = TimeSpan.FromMilliseconds(16.6 * (60d / Common.Setting.IsolationFPS));
         }
+        _backgroundIsReady = true;
     }
 
     private void LuminousBackground_Update(Microsoft.Graphics.Canvas.UI.Xaml.ICanvasAnimatedControl sender, Microsoft.Graphics.Canvas.UI.Xaml.CanvasAnimatedUpdateEventArgs args)
@@ -1725,11 +1728,8 @@ public sealed partial class ExpandedPlayer : Page, IDisposable
             if (_shaderEffect != null)
             {
                 session.DrawImage(_shaderEffect);
+                if (!HyPlayList.IsPlaying || !_backgroundIsReady) sender.Paused = true;
             }
-        }
-        if (!HyPlayList.IsPlaying)
-        {
-            LuminousBackground.Paused = true;
         }
     }
 

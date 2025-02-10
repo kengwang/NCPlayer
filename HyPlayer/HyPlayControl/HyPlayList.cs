@@ -8,10 +8,8 @@ using LyricParser.Abstraction;
 using LyricParser.Implementation;
 using Microsoft.Toolkit.Uwp.Helpers;
 using Microsoft.Toolkit.Uwp.Notifications;
-using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
@@ -32,7 +30,6 @@ using Windows.Storage.Streams;
 using Windows.UI;
 using Windows.UI.Notifications;
 using Windows.UI.Xaml.Media;
-using IF.Lastfm.Core.Api;
 using Buffer = Windows.Storage.Streams.Buffer;
 using File = TagLib.File;
 
@@ -1069,19 +1066,19 @@ public static class HyPlayList
 
                         var tag = songResult.Value.SongUrls[0]?.Level
                             switch
-                            {
-                                "standard" => "标准",
-                                "higher" => "较高",
-                                "exhigh" => "极高",
-                                "lossless" => "无损",
-                                "hires" => "Hi-Res",
-                                "jyeffect" => "高清环绕声",
-                                "sky" => "沉浸环绕声",
-                                "jymaster" => "超清母带",
-                                _ => "在线"
-                            };
+                        {
+                            "standard" => "标准",
+                            "higher" => "较高",
+                            "exhigh" => "极高",
+                            "lossless" => "无损",
+                            "hires" => "Hi-Res",
+                            "jyeffect" => "高清环绕声",
+                            "sky" => "沉浸环绕声",
+                            "jymaster" => "超清母带",
+                            _ => "在线"
+                        };
                         targetItem.PlayItem.QualityTag = tag;
-                        
+
 
                         AudioEffectsProperties["AudioGain_GainValue"] = songResult.Value.SongUrls[0]?.Gain ?? 0f;
                         _ = Common.Invoke(() =>
@@ -1869,7 +1866,7 @@ public static class HyPlayList
                         TrLyrics = null
                     };
                 }
-                
+
                 if (lyricResult.Value?.Lyric is null && lyricResult.Value?.YunLyric is null)
                 {
                     return new PureLyricInfo
@@ -1878,7 +1875,7 @@ public static class HyPlayList
                         TrLyrics = null
                     };
                 }
-                
+
                 string CleanLrc(string text)
                 {
                     return string.Join('\n',
@@ -2030,7 +2027,7 @@ public static class HyPlayList
             //md5 = token["md5"].ToString()
         };
     }
-    
+
     public static void AppendNcSongs(IList<NCSong> ncSongs, bool needRemoveList = true, bool resetPlaying = true,
         string currentSongId = "-1")
     {
@@ -2129,7 +2126,7 @@ public static class HyPlayList
                 Common.AddToTeachingTipLists("获取歌手热门歌曲失败", j1.Error.Message);
                 return false;
             }
-            
+
             var list = j1.Value.Songs?.Select(t => t.MapToNcSong()).ToList();
             AppendNcSongs(list, false);
             return true;
@@ -2191,7 +2188,7 @@ public static class HyPlayList
                         Common.AddToTeachingTipLists("获取电台节目失败", json.Error.Message);
                         return false;
                     }
-                    
+
                     hasMore = json.Value is { More: true };
                     if (json.Value?.Programs is { Length: > 0 })
                         AppendNcSongs(
@@ -2219,7 +2216,7 @@ public static class HyPlayList
         try
         {
             var detailResponse = await Common.NeteaseAPI.RequestAsync(NeteaseApis.PlaylistTracksGetApi,
-                new PlaylistTracksGetRequest(){Id = playlistId});
+                new PlaylistTracksGetRequest() { Id = playlistId });
 
             var nowIndex = 0;
             if (detailResponse.IsError)
@@ -2227,16 +2224,16 @@ public static class HyPlayList
                 Common.AddToTeachingTipLists("获取歌单失败", detailResponse.Error.Message);
                 return false;
             }
-            var trackIds = detailResponse.Value.Playlist?.TrackIds?.Select(t=>t.Id).ToList() ?? [];
+            var trackIds = detailResponse.Value.Playlist?.TrackIds?.Select(t => t.Id).ToList() ?? [];
             while (nowIndex * 500 < trackIds.Count)
             {
                 var nowIds = trackIds.GetRange(nowIndex * 500,
                     Math.Min(500, trackIds.Count - nowIndex * 500));
                 try
                 {
-                   var songResponse = await Common.NeteaseAPI.RequestAsync(NeteaseApis.SongDetailApi,
-                        new SongDetailRequest(){IdList = nowIds});
-                    if (songResponse.IsError) 
+                    var songResponse = await Common.NeteaseAPI.RequestAsync(NeteaseApis.SongDetailApi,
+                         new SongDetailRequest() { IdList = nowIds });
+                    if (songResponse.IsError)
                     {
                         Common.AddToTeachingTipLists("获取歌曲失败", songResponse.Error.Message);
                     }

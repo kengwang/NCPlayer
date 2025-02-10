@@ -1,8 +1,7 @@
 #region
 
-using System.Collections.Generic;
-using Windows.UI.Xaml.Controls;
 using HyPlayer.NeteaseApi.ApiContracts;
+using Windows.UI.Xaml.Controls;
 
 #endregion
 
@@ -22,7 +21,7 @@ public sealed partial class SongListSelect : ContentDialog
 
     private async void ListViewSongList_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
     {
-        await Common.NeteaseAPI?.RequestAsync(NeteaseApis.PlaylistTracksEditApi, 
+        await Common.NeteaseAPI?.RequestAsync(NeteaseApis.PlaylistTracksEditApi,
             new PlaylistTracksEditRequest
             {
                 IsAdd = true,

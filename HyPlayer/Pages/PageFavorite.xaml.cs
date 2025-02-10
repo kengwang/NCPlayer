@@ -1,15 +1,14 @@
 ﻿#region
 
 using HyPlayer.Classes;
+using HyPlayer.NeteaseApi.ApiContracts;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Navigation;
-using HyPlayer.NeteaseApi.ApiContracts;
 
 #endregion
 
@@ -188,7 +187,7 @@ public sealed partial class PageFavorite : Page, IDisposable
                 _cancellationToken.ThrowIfCancellationRequested();
                 ItemContainer.ListItems.Add(new SimpleListItem
                 {
-                    Title = albumjson.Name, 
+                    Title = albumjson.Name,
                     LineOne = string.Join(" / ", albumjson.Artists?.Select(t => t.Name) ?? []),
                     LineTwo = string.Join(" / ", albumjson.Alias ?? []),
                     LineThree = $"歌曲数:{albumjson.Size}",

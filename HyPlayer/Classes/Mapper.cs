@@ -1,11 +1,9 @@
-using System;
+using HyPlayer.NeteaseApi.ApiContracts;
+using HyPlayer.NeteaseApi.Models.ResponseModels;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text.Json.Nodes;
-using HyPlayer.NeteaseApi.ApiContracts;
-using HyPlayer.NeteaseApi.Models;
-using HyPlayer.NeteaseApi.Models.ResponseModels;
 using static HyPlayer.NeteaseApi.ApiContracts.ArtistDetailResponse.ArtistDetailResponseData;
+using static HyPlayer.NeteaseApi.ApiContracts.RecommendResourceResponse;
 
 namespace HyPlayer.Classes;
 
@@ -67,7 +65,7 @@ public static class Mapper
             duration = (int)mlog.Duration,
         };
     }
-    
+
     public static Comment MapToComment(this CommentDto comment)
     {
         return new Comment
@@ -81,7 +79,7 @@ public static class Mapper
             CommentUser = comment.User.MapToNcUser(),
         };
     }
-    
+
     public static NCUser MapToNcUser(this UserInfoDto user)
     {
         return new NCUser
@@ -92,7 +90,7 @@ public static class Mapper
             signature = user.Signature
         };
     }
-    
+
     public static NCSong MapNcSong(this EmittedSongDtoWithPrivilege song)
     {
         return new NCSong
@@ -115,7 +113,7 @@ public static class Mapper
             Type = HyPlayItemType.Netease,
         };
     }
-    
+
     public static NCSong MapToNcSong(this SongWithPrivilegeDto song)
     {
         return new NCSong
@@ -138,7 +136,7 @@ public static class Mapper
             Type = HyPlayItemType.Netease,
         };
     }
-    
+
     public static NCAlbum MapToNcAlbum(this AlbumDto album)
     {
         return new NCAlbum
@@ -198,7 +196,7 @@ public static class Mapper
         };
     }
 
-    
+
     public static NCRadio MapToNCRadio(this DjRadioChannelWithDjDto dto)
     {
         return new NCRadio
@@ -212,7 +210,7 @@ public static class Mapper
             subed = dto.Subscribed,
         };
     }
-    
+
     public static List<NCArtist> MapToNCArtists(this UserInfoDto dto)
     {
         return
@@ -244,6 +242,23 @@ public static class Mapper
         var ncp = new NCPlayList
         {
             cover = dto.CoverUrl,
+            creater = dto.Creator?.MapToNcUser() ?? new(),
+            desc = dto.Description,
+            name = dto.Name,
+            plid = dto.Id,
+            subscribed = dto.Subscribed,
+            playCount = dto.PlayCount,
+            trackCount = dto.TrackCount,
+            bookCount = dto.BookCount,
+            updateTime = DateConverter.GetDateTimeFromTimeStamp(dto.UpdateTime)
+        };
+        return ncp;
+    }
+    public static NCPlayList MapToNCPlayList(this RecommendResourceItem dto)
+    {
+        var ncp = new NCPlayList
+        {
+            cover = dto.PicUrl,
             creater = dto.Creator?.MapToNcUser() ?? new(),
             desc = dto.Description,
             name = dto.Name,

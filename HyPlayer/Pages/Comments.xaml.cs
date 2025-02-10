@@ -1,21 +1,18 @@
 ﻿#region
 
 using HyPlayer.Classes;
+using HyPlayer.NeteaseApi.ApiContracts;
+using HyPlayer.NeteaseApi.Models;
 using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Windows.System.Threading;
 using Windows.UI.Core;
-using Windows.UI.Popups;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Media.Animation;
 using Windows.UI.Xaml.Navigation;
-using HyPlayer.NeteaseApi.ApiContracts;
-using HyPlayer.NeteaseApi.Models;
 using Point = Windows.Foundation.Point;
 
 #endregion
@@ -62,7 +59,7 @@ public sealed partial class Comments : Page, IDisposable
                     resourcetype = NeteaseResourceType.Song;
                     break;
                 case "mv":
-                    resourcetype =NeteaseResourceType.MV;
+                    resourcetype = NeteaseResourceType.MV;
                     break;
                 case "fm":
                     resourcetype = NeteaseResourceType.RadioProgram;
@@ -137,17 +134,17 @@ public sealed partial class Comments : Page, IDisposable
             PageNo = page,
             Cursor = page != 1 && type == 3 ? cursor : null
         }, _cancellationToken);
-        
+
         if (result.IsError)
         {
-            Common.AddToTeachingTipLists("加载评论时出错",result.Error.Message);
+            Common.AddToTeachingTipLists("加载评论时出错", result.Error.Message);
             return;
         }
-        
+
         if (type == 2 && isHotCommentsPage)
             hotComments.Clear();
         else normalComments.Clear();
-        
+
         foreach (var comment in result.Value?.Data?.Comments ?? [])
         {
             _cancellationToken.ThrowIfCancellationRequested();
@@ -158,15 +155,15 @@ public sealed partial class Comments : Page, IDisposable
                 hotComments.Add(cmt);
             else normalComments.Add(cmt);
         }
-        
+
         if (type == 3)
             cursor = result.Value?.Data?.Cursor;
-        
+
         if (result.Value?.Data?.HasMore == true)
             NextPage.IsEnabled = true;
         else
             NextPage.IsEnabled = false;
-        
+
         if (page > 1)
             PrevPage.IsEnabled = true;
         else

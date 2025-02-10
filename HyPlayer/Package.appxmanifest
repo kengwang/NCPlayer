@@ -4,6 +4,7 @@
         xmlns:mp="http://schemas.microsoft.com/appx/2014/phone/manifest"
         xmlns:uap="http://schemas.microsoft.com/appx/manifest/uap/windows10"
         xmlns:uap3="http://schemas.microsoft.com/appx/manifest/uap/windows10/3"
+		xmlns:uap5="http://schemas.microsoft.com/appx/manifest/uap/windows10/5"
         xmlns="http://schemas.microsoft.com/appx/manifest/foundation/windows10"
         IgnorableNamespaces="uap mp uap3">
 
@@ -48,7 +49,7 @@
                         <uap:ShowOn Tile="square310x310Logo"/>
                     </uap:ShowNameOnTiles>
                 </uap:DefaultTile>
-                <uap:SplashScreen Image="Assets\SplashScreen.png"/>
+                <uap:SplashScreen Image="Assets\SplashScreen.png" uap5:Optional="true"/>
                 <uap:LockScreen BadgeLogo="Assets\BadgeLogo.png" Notification="badgeAndTileText"/>
 
                 <uap:InitialRotationPreference>

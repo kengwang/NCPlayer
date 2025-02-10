@@ -1,12 +1,11 @@
 ﻿#region
 
 using HyPlayer.Classes;
+using HyPlayer.NeteaseApi.ApiContracts;
 using HyPlayer.Pages;
 using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using Windows.ApplicationModel.Core;
@@ -15,7 +14,6 @@ using Windows.UI.Popups;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Media.Imaging;
-using HyPlayer.NeteaseApi.ApiContracts;
 
 #endregion
 
@@ -81,7 +79,7 @@ public sealed partial class SingleComment : UserControl, INotifyPropertyChanged
                 new CommentFloorRequest()
                 {
                     ParentCommentId = MainComment.cid,
-                    ResourceId = MainComment.resourceId ,
+                    ResourceId = MainComment.resourceId,
                     ResourceType = MainComment.resourceType,
                     Time = !IsLoadMoreComments ? 0 : long.Parse(time ?? "0")
                 }
@@ -115,7 +113,7 @@ public sealed partial class SingleComment : UserControl, INotifyPropertyChanged
             {
                 CommentId = MainComment.cid,
                 ResourceType = MainComment.resourceType,
-                IsLike= !MainComment.HasLiked
+                IsLike = !MainComment.HasLiked
             });
         if (result.IsError)
         {
@@ -148,7 +146,7 @@ public sealed partial class SingleComment : UserControl, INotifyPropertyChanged
                 ReplyText.Text = string.Empty;
                 await Task.Delay(1000);
                 _ = LoadFloorComments(false);
-                
+
             }
             catch (Exception ex)
             {

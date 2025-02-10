@@ -2,16 +2,15 @@
 
 using HyPlayer.Classes;
 using HyPlayer.HyPlayControl;
+using HyPlayer.NeteaseApi.ApiContracts;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using Windows.Media.Core;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Navigation;
-using HyPlayer.NeteaseApi.ApiContracts;
 
 #endregion
 
@@ -255,7 +254,7 @@ public sealed partial class MVPage : Page, IDisposable
                 }
 
                 TextBoxVideoName.Text = json.Value?.Data?.Resource?.Content?.Title;
-                
+
                 TextBoxSinger.Text = json.Value?.Data?.Resource?.Profile?.Nickname;
                 TextBoxDesc.Text = json.Value?.Data?.Resource?.Content?.Text;
                 TextBoxOtherInfo.Text =

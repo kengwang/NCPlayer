@@ -4,6 +4,8 @@
 using HyPlayer.Classes;
 using HyPlayer.Controls;
 using HyPlayer.HyPlayControl;
+using HyPlayer.NeteaseApi;
+using HyPlayer.NeteaseApi.ApiContracts;
 using HyPlayer.Pages;
 using Kawazu;
 using Microsoft.Gaming.XboxGameBar;
@@ -11,14 +13,12 @@ using Microsoft.Graphics.Canvas.Effects;
 using Microsoft.Toolkit.Uwp.UI;
 using Microsoft.UI.Xaml.Controls;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 using System.Net;
-using System.Net.Http;
 using System.Runtime.CompilerServices;
 using System.Security.Cryptography;
 using System.Text;
@@ -36,12 +36,9 @@ using Windows.UI.Xaml.Controls.Primitives;
 using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media.Animation;
 using Windows.Web.Http.Filters;
-using HyPlayer.NeteaseApi;
-using HyPlayer.NeteaseApi.ApiContracts;
 using Color = Windows.UI.Color;
 using HttpClient = Windows.Web.Http.HttpClient;
 #if !DEBUG
-using Microsoft.AppCenter.Crashes;
 #endif
 
 #endregion
@@ -125,30 +122,10 @@ namespace HyPlayer
                         return CoreApplication.MainView.Dispatcher.RunAsync(Priority,
                             () => { action(); });
                 }
-#if DEBUG
                 catch
                 {
-#else
-                catch (Exception e)
-                {
-                    Crashes.TrackError(e, null,
-                        ErrorAttachmentLog.AttachmentWithText(e.InnerException?.ToString(), "inner"));
-#endif
-
-                    /*
-                    Invoke((async () =>
-                    {
-                        await new ContentDialog
-                        {
-                            Title = "发生错误",
-                            Content = "Error: " + e.Message + "\r\n" + e.StackTrace,
-                            CloseButtonText = "关闭",
-                            DefaultButton = ContentDialogButton.Close
-                        }.ShowAsync();
-                    }));
-                    */
+                    //Ignore
                 }
-
             return null;
         }
 
@@ -652,12 +629,12 @@ namespace HyPlayer
             }
         }
 
-        public bool doScrobble
+        public bool EnableSonglistCreate
         {
-            get => GetSettings(nameof(doScrobble), false);
+            get => GetSettings(nameof(EnableSonglistCreate), false);
             set
             {
-                ApplicationData.Current.LocalSettings.Values[nameof(doScrobble)] = value;
+                ApplicationData.Current.LocalSettings.Values[nameof(EnableSonglistCreate)] = value;
                 OnPropertyChanged();
             }
         }
@@ -1842,7 +1819,7 @@ namespace HyPlayer
                 return false;
             }
         }
-        
+
 #nullable enable
         public event PropertyChangedEventHandler? PropertyChanged;
 #nullable restore
@@ -1996,7 +1973,7 @@ namespace HyPlayer
 
             return [];
         }
-        
+
         public static List<string> GetSearchHistory()
         {
             return JsonConvert.DeserializeObject<List<string>>(ApplicationData.Current.LocalSettings
@@ -2036,7 +2013,7 @@ namespace HyPlayer
                         Common.AddToTeachingTipLists("加载当前播放失败", json.Error.Message);
                         continue;
                     }
-                    
+
                     var ncSongs = json.Value.Songs?.Select(t => t.MapToNcSong()).ToList();
                     retsongs.AddRange(ncSongs ?? []);
                 }

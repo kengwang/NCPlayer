@@ -1,7 +1,5 @@
 ﻿using HyPlayer.Classes;
 using HyPlayer.HyPlayControl;
-using Microsoft.AppCenter.Ingestion.Models;
-using Microsoft.AppCenter.Utils;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -61,7 +59,6 @@ public sealed partial class TestPage : Page
             CurrentSong = HyPlayList.NowPlayingItem,
             CurrentPlaySource = HyPlayList.PlaySourceId,
             CurrentUser = Common.LoginedUser,
-            DeviceType = new DeviceInformationHelper().GetDeviceInformation(),
             DeviceId = new EasClientDeviceInformation().Id.ToString(),
             IsInBackground = Common.IsInBackground,
             IsUsingCache = Common.Setting.enableCache,
@@ -84,7 +81,6 @@ public sealed partial class TestPage : Page
         public HyPlayItem CurrentSong { get; set; }
         public string CurrentPlaySource { get; set; }
         public NCUser CurrentUser { get; set; }
-        public Device DeviceType { get; set; }
         public string DeviceId { get; set; }
         public bool IsInBackground { get; set; }
         public bool IsUsingCache { get; set; }

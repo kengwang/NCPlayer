@@ -1370,8 +1370,8 @@
                             <controls3:SettingsCard Description="可能会提高内存占用" Header="启用安全本地文件访问">
                                 <CheckBox Margin="0,0,-100,0" IsChecked="{x:Bind hyplayer:Common.Setting.safeFileAccess, Mode=TwoWay}" />
                             </controls3:SettingsCard>
-                            <controls3:SettingsCard Description="将会把听歌数据上传网易云音乐同步" Header="进行听歌打卡">
-                                <CheckBox Margin="0,0,-100,0" IsChecked="{x:Bind hyplayer:Common.Setting.doScrobble, Mode=TwoWay}" />
+                            <controls3:SettingsCard Header="启用歌单创建">
+                                <CheckBox Margin="0,0,-100,0" IsChecked="{x:Bind hyplayer:Common.Setting.EnableSonglistCreate, Mode=TwoWay}" />
                             </controls3:SettingsCard>
                             <controls3:SettingsCard Description="使用「热词」时需开启" Header="SMTC 更新进度条">
                                 <CheckBox Margin="0,0,-100,0" IsChecked="{x:Bind hyplayer:Common.Setting.progressInSMTC, Mode=TwoWay}" />

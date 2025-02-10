@@ -4,7 +4,6 @@ using HyPlayer.Classes;
 using HyPlayer.Controls;
 using HyPlayer.HyPlayControl;
 using HyPlayer.NeteaseApi.ApiContracts;
-using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -94,13 +93,13 @@ public sealed partial class AlbumPage : Page, IDisposable
         if (disposedValue) throw new ObjectDisposedException(nameof(AlbumPage));
         _cancellationToken.ThrowIfCancellationRequested();
         var json = await Common.NeteaseAPI.RequestAsync(NeteaseApis.AlbumDetailDynamicApi,
-            new AlbumDetailDynamicRequest() { Id = albumid});
+            new AlbumDetailDynamicRequest() { Id = albumid });
         if (json.IsError)
         {
             Common.AddToTeachingTipLists("获取专辑动态失败", json.Error.Message);
             return;
         }
-            BtnSub.IsChecked = json.Value.IsSub;
+        BtnSub.IsChecked = json.Value.IsSub;
     }
 
     private async Task LoadAlbumInfo()
@@ -127,14 +126,14 @@ public sealed partial class AlbumPage : Page, IDisposable
             TextBoxAlbumName.Text = Album.name;
 
             TextBoxAlbumName.Text = json.Value.Album.Name.ToString();
-            artists = json.Value.Album.Artists.Select(t=>t.MapToNcArtist()).ToList();
+            artists = json.Value.Album.Artists.Select(t => t.MapToNcArtist()).ToList();
             TextBoxAuthor.Content = string.Join(" / ", artists.Select(t => t.name));
             var converter = new DateConverter();
             TextBlockPublishTime.Text = converter.Convert(json.Value.Album.PublishTime, null, null, null).ToString();
-            TextBlockDesc.Text = (string.Join(" / ", json.Value.Album.Alias)) + json.Value.Album.Alias != null ?  "\r\n" : string.Empty + json.Value.Album.Description;
+            TextBlockDesc.Text = (string.Join(" / ", json.Value.Album.Alias)) + json.Value.Album.Alias != null ? "\r\n" : string.Empty + json.Value.Album.Description;
             var idx = 0;
             SongContainer.ListSource = "al" + Album.id;
-            
+
             AlbumSongsViewSource.Source = json.Value.Songs.Select(song =>
             {
                 return new NCAlbumSong
@@ -213,7 +212,7 @@ public sealed partial class AlbumPage : Page, IDisposable
     {
         if (disposedValue) throw new ObjectDisposedException(nameof(AlbumPage));
         _ = Common.NeteaseAPI?.RequestAsync(NeteaseApis.AlbumSubscribeApi,
-            new AlbumSubscribeRequest() { Id = albumid, IsSubscribe = BtnSub.IsChecked ?? false});
+            new AlbumSubscribeRequest() { Id = albumid, IsSubscribe = BtnSub.IsChecked ?? false });
     }
 
     private async void BtnAddAll_Clicked(object sender, RoutedEventArgs e)

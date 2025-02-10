@@ -1,7 +1,7 @@
 ﻿#region
 
+using HyPlayer.NeteaseApi.ApiContracts;
 using System;
-using System.Collections.Generic;
 using Windows.UI.Xaml.Controls;
 
 #endregion
@@ -17,11 +17,35 @@ public sealed partial class CreateSonglistDialog : ContentDialog
         InitializeComponent();
     }
 
-    private void ContentDialog_PrimaryButtonClick(ContentDialog sender,
+    private async void ContentDialog_PrimaryButtonClick(ContentDialog sender,
         ContentDialogButtonClickEventArgs args)
     {
-        // Todo: 当前创建歌单需要 CheckToken, 不再允许
-        Common.AddToTeachingTipLists("创建歌单功能已被禁用", "由于网易云音乐风控策略升级，暂不支持创建歌单");
+        string realIpBackup = Common.NeteaseAPI.Option.XRealIP;
+        // This request would return with a 250 error without RealIP set
+        Common.NeteaseAPI.Option.XRealIP = "118.88.88.88";
+
+        try
+        {
+            var result = await Common.NeteaseAPI.RequestAsync(NeteaseApis.PlaylistCreateApi,
+                new PlaylistCreateRequest()
+                {
+                    Name = SonglistTitle.Text,
+                    Privacy = (bool)PrivateCheckBox.IsChecked ? 10 : 0
+                });
+            if (result.IsError)
+            {
+                Common.AddToTeachingTipLists("创建失败", result.Error.Message);
+            }
+        }
+        catch (Exception e)
+        {
+            Common.AddToTeachingTipLists("创建失败", e.Message);
+            return;
+        }
+
+        Common.AddToTeachingTipLists("创建成功");
+        _ = Common.PageBase.LoadSongList();
+        Common.NeteaseAPI.Option.XRealIP = realIpBackup;// Restore user setting
     }
 
     private void ContentDialog_SecondaryButtonClick(ContentDialog sender, ContentDialogButtonClickEventArgs args)

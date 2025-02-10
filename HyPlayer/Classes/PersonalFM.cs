@@ -1,11 +1,9 @@
 ﻿#region
 
 using HyPlayer.HyPlayControl;
-using Newtonsoft.Json.Linq;
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 using HyPlayer.NeteaseApi.ApiContracts;
+using System;
+using System.Threading.Tasks;
 
 #endregion
 

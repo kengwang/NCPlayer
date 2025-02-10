@@ -2,6 +2,7 @@
 
 using HyPlayer.Classes;
 using HyPlayer.HyPlayControl;
+using HyPlayer.NeteaseApi.ApiContracts;
 using HyPlayer.Pages;
 using System;
 using System.Collections.Generic;
@@ -16,7 +17,6 @@ using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Controls.Primitives;
 using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
-using HyPlayer.NeteaseApi.ApiContracts;
 
 #endregion
 
@@ -370,7 +370,7 @@ public sealed partial class SongsList : UserControl, IDisposable
 
         SongContainer.ContextFlyout.ShowAt(element,
             new FlyoutShowOptions
-                { Position = e?.GetPosition(element) ?? new Point(element?.ActualWidth ?? 0, 80) });
+            { Position = e?.GetPosition(element) ?? new Point(element?.ActualWidth ?? 0, 80) });
     }
 
     public static Brush GetBrush(bool IsAvailable)

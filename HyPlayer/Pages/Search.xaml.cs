@@ -1,9 +1,10 @@
 ﻿#region
 
 using HyPlayer.Classes;
-using Newtonsoft.Json.Linq;
+using HyPlayer.NeteaseApi.ApiContracts;
+using HyPlayer.NeteaseApi.Bases;
+using HyPlayer.NeteaseApi.Models;
 using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading;
@@ -12,9 +13,6 @@ using Windows.System;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Navigation;
-using HyPlayer.NeteaseApi.ApiContracts;
-using HyPlayer.NeteaseApi.Bases;
-using HyPlayer.NeteaseApi.Models;
 
 #endregion
 
@@ -183,7 +181,7 @@ public sealed partial class Search : Page, IDisposable
                     Title = songJs.Name,
                     LineTwo = string.Join(" / ", songJs.Artists?.Select(t => t.Name) ?? []),
                     LineThree = songJs.Album?.Name,
-                    LineOne = string.Join(" ",songJs.Translations ?? []) + " / " + string.Join("", songJs.Alias ?? []),
+                    LineOne = string.Join(" ", songJs.Translations ?? []) + " / " + string.Join("", songJs.Alias ?? []),
                     ResourceId = "ns" + songJs.Id,
                     CoverLink = songJs.Album?.PictureUrl,
                     Order = i++
@@ -198,7 +196,7 @@ public sealed partial class Search : Page, IDisposable
                 HasPreviousPage = false;
         }
     }
-    
+
     private async Task LoadAlbumResult()
     {
         if (disposedValue) throw new ObjectDisposedException(nameof(Search));
@@ -245,13 +243,13 @@ public sealed partial class Search : Page, IDisposable
             HasNextPage = true;
         else
             HasNextPage = false;
-        
+
         if (page > 0)
             HasPreviousPage = true;
         else
             HasPreviousPage = false;
     }
-    
+
     private async Task LoadArtistResult()
     {
         if (disposedValue) throw new ObjectDisposedException(nameof(Search));
@@ -298,13 +296,13 @@ public sealed partial class Search : Page, IDisposable
             HasNextPage = true;
         else
             HasNextPage = false;
-        
+
         if (page > 0)
             HasPreviousPage = true;
         else
             HasPreviousPage = false;
     }
-    
+
     private async Task LoadPlaylistResult()
     {
         if (disposedValue) throw new ObjectDisposedException(nameof(Search));
@@ -351,13 +349,13 @@ public sealed partial class Search : Page, IDisposable
             HasNextPage = true;
         else
             HasNextPage = false;
-        
+
         if (page > 0)
             HasPreviousPage = true;
         else
             HasPreviousPage = false;
     }
-    
+
     private async Task LoadUserResult()
     {
         if (disposedValue) throw new ObjectDisposedException(nameof(Search));
@@ -402,13 +400,13 @@ public sealed partial class Search : Page, IDisposable
             HasNextPage = true;
         else
             HasNextPage = false;
-        
+
         if (page > 0)
             HasPreviousPage = true;
         else
             HasPreviousPage = false;
     }
-    
+
     private async Task LoadRadioResult()
     {
         if (disposedValue) throw new ObjectDisposedException(nameof(Search));
@@ -455,15 +453,15 @@ public sealed partial class Search : Page, IDisposable
             HasNextPage = true;
         else
             HasNextPage = false;
-        
+
         if (page > 0)
             HasPreviousPage = true;
         else
             HasPreviousPage = false;
     }
-    
-                
-    
+
+
+
     private async Task LoadMVResult()
     {
         if (disposedValue) throw new ObjectDisposedException(nameof(Search));
@@ -607,7 +605,7 @@ public sealed partial class Search : Page, IDisposable
                 });
         }
 
-        if ( json.Value?.Result?.Count >= (page + 1) * 30)
+        if (json.Value?.Result?.Count >= (page + 1) * 30)
             HasNextPage = true;
         else
             HasNextPage = false;
@@ -684,8 +682,8 @@ public sealed partial class Search : Page, IDisposable
                 Common.AddToTeachingTipLists("搜索建议时出错", json.Error.Message);
                 return;
             }
-            
-            sender.ItemsSource = json.Value.Result?.AllMatch?.Select(t=>t.Keyword)?.ToList() ?? [];
+
+            sender.ItemsSource = json.Value.Result?.AllMatch?.Select(t => t.Keyword)?.ToList() ?? [];
         }
         catch (Exception ex)
         {

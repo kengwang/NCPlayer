@@ -392,7 +392,7 @@ internal sealed class DownloadObject : INotifyPropertyChanged
                 HasPaused = false;
                 Message = "正在获取下载链接";
             });
-            var urlRequest = new SongUrlRequest() { Id = ncsong.sid , Level = Common.Setting.downloadAudioRate};
+            var urlRequest = new SongUrlRequest() { Id = ncsong.sid, Level = Common.Setting.downloadAudioRate };
             var urlResult = await Common.NeteaseAPI.RequestAsync(NeteaseApis.SongUrlApi, urlRequest);
 
             if (urlResult.IsError)

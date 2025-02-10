@@ -2,6 +2,7 @@
 
 using HyPlayer.Classes;
 using HyPlayer.HyPlayControl;
+using HyPlayer.NeteaseApi.ApiContracts;
 using HyPlayer.Pages;
 using Microsoft.Toolkit.Uwp.Notifications;
 using System;
@@ -26,7 +27,6 @@ using Windows.UI.Xaml.Controls.Primitives;
 using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Media.Animation;
-using HyPlayer.NeteaseApi.ApiContracts;
 
 #endregion
 
@@ -340,7 +340,7 @@ DoubleAnimation verticalAnimation;
                 ListBoxPlayList.SelectedIndex = HyPlayList.NowPlaying;
 
             realSelectSong = true;
-            
+
             TbSongTag.Text = HyPlayList.NowPlayingItem.PlayItem.QualityTag ?? "";
             Btn_Share.IsEnabled =
                 HyPlayList.NowPlayingItem?.ItemType is not HyPlayItemType.Local or HyPlayItemType.LocalProgressive;

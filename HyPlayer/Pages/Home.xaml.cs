@@ -6,7 +6,6 @@ using HyPlayer.HyPlayControl;
 using HyPlayer.NeteaseApi.ApiContracts;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Windows.UI.Xaml;
@@ -110,11 +109,11 @@ public sealed partial class Home : Page, IDisposable
                 {
                     _cancellationToken.ThrowIfCancellationRequested();
                     RankPlayList.Children.Clear();
-                    foreach (var bditem in ret.Value?.List ??[])
+                    foreach (var bditem in ret.Value?.List ?? [])
                         RankPlayList.Children.Add(new PlaylistItem(bditem.MapToNCPlayList()));
                 });
             }
-            
+
             //推荐歌单加载部分 - 优先级稍微靠后下
             try
             {

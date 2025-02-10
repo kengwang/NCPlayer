@@ -4,9 +4,7 @@ using HyPlayer.Classes;
 using HyPlayer.NeteaseApi.ApiContracts;
 using HyPlayer.NeteaseApi.Bases;
 using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Windows.UI.Xaml.Controls;
@@ -100,7 +98,7 @@ public sealed partial class History : Page, IDisposable
         try
         {
             var ret3 = await Common.NeteaseAPI.RequestAsync<UserRecordAllResponse, UserRecordRequest, UserRecordResponse, ErrorResultBase, UserRecordActualRequest>(NeteaseApis.UserRecordApi,
-                new UserRecordRequest() { UserId = Common.LoginedUser.id, RecordType = UserRecordType.All});
+                new UserRecordRequest() { UserId = Common.LoginedUser.id, RecordType = UserRecordType.All });
             if (ret3.IsError)
             {
                 Common.AddToTeachingTipLists("获取播放记录失败", ret3.Error.Message);

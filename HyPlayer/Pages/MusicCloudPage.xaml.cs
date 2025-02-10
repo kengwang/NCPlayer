@@ -2,6 +2,7 @@
 
 using HyPlayer.Classes;
 using HyPlayer.HyPlayControl;
+using HyPlayer.NeteaseApi.ApiContracts;
 using System;
 using System.Collections.ObjectModel;
 using System.Linq;
@@ -11,7 +12,6 @@ using Windows.Storage.Pickers;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Navigation;
-using HyPlayer.NeteaseApi.ApiContracts;
 
 #endregion
 
@@ -50,12 +50,12 @@ public sealed partial class MusicCloudPage : Page, IDisposable
                     Limit = 200,
                     Offset = page * 200
                 });
-            
+
             if (json.IsError && json.Error.ErrorCode == 405)
             {
                 treashold = ++cooldownTime * 10;
                 page--;
-                Common.AddToTeachingTipLists("贪婪加载被风控",$"渐进加载速度过于快, 将在 {cooldownTime * 10} 秒后尝试继续加载, 正在清洗请求");
+                Common.AddToTeachingTipLists("贪婪加载被风控", $"渐进加载速度过于快, 将在 {cooldownTime * 10} 秒后尝试继续加载, 正在清洗请求");
             }
 
             var idx = page * 200;

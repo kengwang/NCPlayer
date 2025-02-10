@@ -3,14 +3,11 @@
 using HyPlayer.Classes;
 using HyPlayer.HyPlayControl;
 using HyPlayer.NeteaseApi.ApiContracts;
-using Newtonsoft.Json.Schema;
 using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using TagLib;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Media.Imaging;
@@ -58,8 +55,8 @@ public sealed partial class ArtistPage : Page, IDisposable
         try
         {
             var res = await Common.NeteaseAPI.RequestAsync(NeteaseApis.ArtistDetailApi,
-                new ArtistDetailRequest() { ArtistId = (string)e.Parameter});
-            if(res.IsError)
+                new ArtistDetailRequest() { ArtistId = (string)e.Parameter });
+            if (res.IsError)
             {
                 if (res.Error.ErrorCode.ToString() == "404")
                 {
@@ -155,12 +152,12 @@ public sealed partial class ArtistPage : Page, IDisposable
         try
         {
             var j1 = await Common.NeteaseAPI.RequestAsync(NeteaseApis.ArtistTopSongApi,
-                new ArtistTopSongRequest() { ArtistId = artist.id});
+                new ArtistTopSongRequest() { ArtistId = artist.id });
 
             hotSongs.Clear();
             var idx = 0;
             var json = await Common.NeteaseAPI.RequestAsync(NeteaseApis.SongDetailApi,
-                new SongDetailRequest() { IdList = j1.Value.Songs.Select(t=>t.Id).ToList()});
+                new SongDetailRequest() { IdList = j1.Value.Songs.Select(t => t.Id).ToList() });
             if (json.IsError)
             {
                 Common.AddToTeachingTipLists("获取歌手热门歌曲失败", json.Error.Message);
@@ -189,7 +186,7 @@ public sealed partial class ArtistPage : Page, IDisposable
         _cancellationToken.ThrowIfCancellationRequested();
         try
         {
-            var j1 = await Common.NeteaseAPI.RequestAsync(NeteaseApis.ArtistSongsApi, new ArtistSongsRequest() { ArtistId = artist.id, Limit=50,Offset = page * 50});
+            var j1 = await Common.NeteaseAPI.RequestAsync(NeteaseApis.ArtistSongsApi, new ArtistSongsRequest() { ArtistId = artist.id, Limit = 50, Offset = page * 50 });
             var idx = 0;
             if (j1.IsError)
             {
@@ -209,7 +206,7 @@ public sealed partial class ArtistPage : Page, IDisposable
                     _cancellationToken.ThrowIfCancellationRequested();
                     var ncSong = item.MapToNcSong();
                     ncSong.IsAvailable =
-                        json.Value.Privileges[idx].St== 0;
+                        json.Value.Privileges[idx].St == 0;
                     ncSong.Order = page * 50 + idx++;
                     allSongs.Add(ncSong);
                 }
@@ -258,7 +255,7 @@ public sealed partial class ArtistPage : Page, IDisposable
         try
         {
             _cancellationToken.ThrowIfCancellationRequested();
-            var j1 = await Common.NeteaseAPI.RequestAsync(NeteaseApis.ArtistAlbumsApi,new ArtistAlbumsRequest() { ArtistId = artist.id, Limit = 50, Start = page * 50}, _cancellationToken);
+            var j1 = await Common.NeteaseAPI.RequestAsync(NeteaseApis.ArtistAlbumsApi, new ArtistAlbumsRequest() { ArtistId = artist.id, Limit = 50, Start = page * 50 }, _cancellationToken);
             if (j1.IsError)
             {
                 Common.AddToTeachingTipLists("获取歌手专辑失败", j1.Error.Message);
@@ -272,7 +269,7 @@ public sealed partial class ArtistPage : Page, IDisposable
                 AlbumContainer.ListItems.Add(new SimpleListItem
                 {
                     Title = album.Name,
-                    LineOne = string.Join("/", album.Artists?.Select(t=>t.Name)),
+                    LineOne = string.Join("/", album.Artists?.Select(t => t.Name)),
                     LineTwo = album.Alias != null
                         ? string.Join(" / ", album.Alias)
                         : "",

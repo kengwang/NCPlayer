@@ -1,5 +1,6 @@
 ﻿#region
 
+using HyPlayer.NeteaseApi.Models;
 using LyricParser.Abstraction;
 using Newtonsoft.Json.Linq;
 using System;
@@ -7,7 +8,6 @@ using System.Collections.Generic;
 using System.Linq;
 using TagLib;
 using Windows.Storage;
-using HyPlayer.NeteaseApi.Models;
 
 #endregion
 

@@ -1,10 +1,10 @@
 ﻿#region
 
+using HyPlayer.HyPlayControl;
+using HyPlayer.NeteaseApi.ApiContracts;
 using System;
 using System.Threading;
-using HyPlayer.NeteaseApi.ApiContracts;
 using System.Threading.Tasks;
-using HyPlayer.HyPlayControl;
 
 #endregion
 
@@ -42,7 +42,7 @@ internal class Api
                     StartMusicId = HyPlayList.NowPlayingItem.PlayItem?.Id ?? randomSong,
                     Count = Common.LikedSongs.Count
                 }, cancellationToken);
-            
+
             if (jsoon.IsError)
             {
                 Common.AddToTeachingTipLists("加载心动模式列表出错", jsoon.Error.Message);

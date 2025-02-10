@@ -4,14 +4,11 @@ using HyPlayer.Classes;
 using HyPlayer.Controls;
 using HyPlayer.HyPlayControl;
 using HyPlayer.NeteaseApi.ApiContracts;
-using Microsoft.AppCenter.Crashes;
 using Microsoft.UI.Xaml.Controls;
-using Newtonsoft.Json.Linq;
 using QRCoder;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Windows.ApplicationModel.Core;
@@ -272,7 +269,7 @@ public sealed partial class BasePage : Page
             else
             {
                 var response = await Common.NeteaseAPI.RequestAsync(NeteaseApis.LoginEmailApi,
-                    new LoginEmailRequest() { Email = account, Password = TextBoxPassword.Password});
+                    new LoginEmailRequest() { Email = account, Password = TextBoxPassword.Password });
                 if (response.IsError)
                 {
                     InfoBarLoginHint.IsOpen = true;
@@ -294,7 +291,6 @@ public sealed partial class BasePage : Page
             InfoBarLoginHint.IsOpen = true;
             InfoBarLoginHint.Severity = InfoBarSeverity.Error;
             InfoBarLoginHint.Message = "登录失败 " + ex;
-            Crashes.TrackError(ex);
         }
     }
 
@@ -315,7 +311,7 @@ public sealed partial class BasePage : Page
         try
         {
             var result = await Common.NeteaseAPI.RequestAsync(NeteaseApis.LoginStatusApi);
-            if (result.IsError) 
+            if (result.IsError)
             {
                 Common.AddToTeachingTipLists("登录失败", result.Error.Message);
                 return false;
@@ -367,17 +363,14 @@ public sealed partial class BasePage : Page
 
         HyPlayList.LoginDoneCall();
         _ = ((App)Application.Current).InitializeJumpList();
-        if (!Common.Setting.forceMemoryGarbage)
-            NavMain.SelectedItem = NavItemLogin;
-        Common.NavigatePage(typeof(Me));
+        NavMain.SelectedItem = NavItemLogin;
         return true;
     }
 
     public async void Scrobble(HyPlayItem item)
     {
         // 播放数据记录
-        if (item.ItemType != HyPlayItemType.Netease && Common.Setting.doScrobble /* || Common.IsInFm ||
-            string.IsNullOrEmpty(HyPlayList.PlaySourceId)*/) return;
+        if (item.ItemType != HyPlayItemType.Netease) return;
         try
         {
             await LastFMManager.ScrobbleAsync(item);
@@ -392,7 +385,7 @@ public sealed partial class BasePage : Page
     {
         try
         {
-            var js = await Common.NeteaseAPI.RequestAsync(NeteaseApis.LikelistApi, new LikelistRequest() { Uid = Common.LoginedUser.id});
+            var js = await Common.NeteaseAPI.RequestAsync(NeteaseApis.LikelistApi, new LikelistRequest() { Uid = Common.LoginedUser.id });
             if (js.IsError)
             {
                 Common.AddToTeachingTipLists("获取喜欢列表失败", js.Error.Message);
@@ -413,7 +406,7 @@ public sealed partial class BasePage : Page
         try
         {
             var json = await Common.NeteaseAPI.RequestAsync(NeteaseApis.UserPlaylistApi,
-                                                        new UserPlaylistRequest() { Uid = Common.LoginedUser.id});
+                                                        new UserPlaylistRequest() { Uid = Common.LoginedUser.id });
             if (json.IsError)
             {
                 Common.AddToTeachingTipLists("获取歌单列表失败", json.Error.Message);
@@ -573,8 +566,10 @@ public sealed partial class BasePage : Page
         {
             case "SonglistCreate":
                 {
-                    await new CreateSonglistDialog().ShowAsync();
-                    _ = LoadSongList();
+                    if (Common.Setting.EnableSonglistCreate)
+                        await new CreateSonglistDialog().ShowAsync();
+                    else
+                        Common.AddToTeachingTipLists("歌单创建功能被禁用", "由于网易云音乐风控升级, 默认禁用歌单创建功能, 如需启用请至\"设置-实验室\"启用歌单创建功能");
                     break;
                 }
             case "PersonalFM":
@@ -638,7 +633,7 @@ public sealed partial class BasePage : Page
             while (!Common.Logined && nowqrkey == key.Value.Unikey)
             {
                 var res = await Common.NeteaseAPI.RequestAsync(NeteaseApis.LoginQrCodeCheckApi,
-                                                           new LoginQrCodeCheckRequest() { Unikey = key.Value.Unikey});
+                                                           new LoginQrCodeCheckRequest() { Unikey = key.Value.Unikey });
                 if (res.Value.Code == 800)
                 {
                     key = await Common.NeteaseAPI.RequestAsync(NeteaseApis.LoginQrCodeUnikeyApi, new LoginQrCodeUnikeyRequest());
@@ -776,7 +771,7 @@ public sealed partial class BasePage : Page
         try
         {
             var result = await Common.NeteaseAPI.RequestAsync(NeteaseApis.PlaylistPrivacyApi,
-                                             new PlaylistPrivacyRequest() { Id = nowplid});
+                                             new PlaylistPrivacyRequest() { Id = nowplid });
             if (result.IsError)
             {
                 Common.AddToTeachingTipLists("公开歌单失败", result.Error.Message);
@@ -797,7 +792,7 @@ public sealed partial class BasePage : Page
         try
         {
             var json = await Common.NeteaseAPI.RequestAsync(NeteaseApis.PlaylistDeleteApi,
-                                             new PlaylistDeleteRequest() { Id = nowplid});
+                                             new PlaylistDeleteRequest() { Id = nowplid });
             if (json.IsError)
             {
                 Common.AddToTeachingTipLists("删除失败", json.Error.Message);
@@ -836,13 +831,13 @@ public sealed partial class BasePage : Page
         try
         {
             var json = await Common.NeteaseAPI.RequestAsync(NeteaseApis.SearchSuggestionApi,
-                                                        new SearchSuggestionRequest() { Keyword = sender.Text});
+                                                        new SearchSuggestionRequest() { Keyword = sender.Text });
             if (json.IsError)
             {
                 Common.AddToTeachingTipLists("获取推荐词失败", json.Error.Message);
                 return;
             }
-                sender.ItemsSource = json.Value.Result.AllMatch.Select(t=>t.Keyword).ToList();
+            sender.ItemsSource = json.Value.Result.AllMatch.Select(t => t.Keyword).ToList();
         }
         catch (Exception ex)
         {

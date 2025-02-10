@@ -1,8 +1,10 @@
 ﻿#region
 
+using HyPlayer.HyPlayControl;
 using HyPlayer.NeteaseApi.ApiContracts;
 using System;
 using System.IO;
+using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
 using System.Security.Cryptography;
 using System.Text;
@@ -10,8 +12,6 @@ using System.Threading.Tasks;
 using Windows.Storage;
 using Windows.Web.Http;
 using Windows.Web.Http.Headers;
-using HyPlayer.HyPlayControl;
-using System.Linq;
 
 #endregion
 
@@ -109,7 +109,7 @@ internal class CloudUpload
             foreach (var b in imgcomputedHash) imgsBuilder.Append(b.ToString("x2").ToLower());
             var imgmd5 = imgsBuilder.ToString();
 
-            string? coverId = null;
+            string coverId = string.Empty;
             var coverAllocRes = await Common.NeteaseAPI.RequestAsync(NeteaseApis.CloudUploadCoverTokenAllocApi,
                 new CloudUploadCoverTokenAllocRequest
                 {
@@ -133,7 +133,7 @@ internal class CloudUpload
                 imglb = imgloadBalancerRes.Value.Upload?.FirstOrDefault() ?? lb;
             }
             targetLink = $"{imglb}/yyimg/{coverAllocRes.Value?.Result?.ObjectKey}?offset=0&complete=true&version=1.0";
-            
+
             using var imgReq = new HttpRequestMessage(HttpMethod.Post,
                 new Uri(targetLink));
             using var imgContent = new HttpBufferContent(coverBytes.AsBuffer());
@@ -143,8 +143,8 @@ internal class CloudUpload
             content.Headers.ContentType = new HttpMediaTypeHeaderValue("image/png");
             request.Content = imgContent;
             await Common.HttpClient.SendRequestAsync(request);
-            
-            
+
+
             var infoReq = new CloudUploadInfoRequest
             {
                 Md5 = md5,
@@ -154,7 +154,7 @@ internal class CloudUpload
                 Album = album,
                 Artist = artist,
                 Bitrate = bitrate,
-                CoverId = coverId!,
+                CoverId = coverId,
                 ResourceId = tokenRes.Value.Data!.ResourceId!,
                 ObjectKey = tokenRes.Value.Data!.ObjectKey!,
             };

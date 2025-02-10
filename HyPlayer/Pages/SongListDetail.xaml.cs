@@ -2,12 +2,11 @@
 
 using HyPlayer.Classes;
 using HyPlayer.HyPlayControl;
-using Newtonsoft.Json.Linq;
+using HyPlayer.NeteaseApi.ApiContracts;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using System.Runtime.InteropServices.WindowsRuntime;
 using System.Threading;
 using System.Threading.Tasks;
 using Windows.ApplicationModel.DataTransfer;
@@ -17,7 +16,6 @@ using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
-using HyPlayer.NeteaseApi.ApiContracts;
 
 #endregion
 
@@ -161,7 +159,7 @@ public sealed partial class SongListDetail : Page, IDisposable
             }
 
             var idx = 0;
-            foreach (var song in json.Value?.Data?.DailySongs??[])
+            foreach (var song in json.Value?.Data?.DailySongs ?? [])
             {
                 _cancellationToken.ThrowIfCancellationRequested();
                 var ncSong = song.MapNcSong();
@@ -178,7 +176,7 @@ public sealed partial class SongListDetail : Page, IDisposable
     }
 
     private List<string> _songListIds = [];
-    
+
     private async Task LoadPlayListItems()
     {
         if (disposedValue) throw new ObjectDisposedException(nameof(SongListDetail));
@@ -220,7 +218,7 @@ public sealed partial class SongListDetail : Page, IDisposable
 
     private async Task LoadPage()
     {
-        
+
         var trackIds = _songListIds.Skip(page * 500).Take(500).ToList();
 
         try
@@ -248,7 +246,8 @@ public sealed partial class SongListDetail : Page, IDisposable
                 ncSong.Order = idx++;
                 Songs.Add(ncSong);
             }
-        }catch (Exception ex)
+        }
+        catch (Exception ex)
         {
             if (ex.GetType() != typeof(TaskCanceledException) && ex.GetType() != typeof(OperationCanceledException))
                 Common.AddToTeachingTipLists(ex.Message, (ex.InnerException ?? new Exception()).Message);

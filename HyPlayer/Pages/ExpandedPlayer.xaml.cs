@@ -9,7 +9,6 @@ using HyPlayer.Classes;
 using HyPlayer.Controls;
 using HyPlayer.HyPlayControl;
 using HyPlayer.LyricRenderer.RollingCalculators;
-using HyPlayer.NeteaseApi.ApiContracts;
 using Impressionist.Abstractions;
 using Impressionist.Implementations;
 using LyricParser.Abstraction;
@@ -1452,7 +1451,7 @@ public sealed partial class ExpandedPlayer : Page, IDisposable
                             _shaderEffect.Properties["RandomValue2"] = (float)random.Next(-50, +50);
                             _shaderEffect.Properties["RandomValue3"] = (float)random.Next(-50, +50);
                         }
-                        if(!HyPlayList.IsPlaying) LuminousBackground.Paused = true;
+                        if (!HyPlayList.IsPlaying) LuminousBackground.Paused = true;
                     }
                 }
                 catch

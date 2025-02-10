@@ -982,11 +982,7 @@ public sealed partial class ExpandedPlayer : Page, IDisposable
         lastSongForBrush = HyPlayList.NowPlayingItem.PlayItem;
         try
         {
-            Buffer buffer = new Buffer(MIMEHelper.PICTURE_FILE_HEADER_CAPACITY);
-            stream.Seek(0);
-            await stream.ReadAsync(buffer, MIMEHelper.PICTURE_FILE_HEADER_CAPACITY, InputStreamOptions.None);
-            var mime = MIMEHelper.GetPictureCodecFromBuffer(buffer);
-            BitmapDecoder decoder = await BitmapDecoder.CreateAsync(mime, stream);
+            BitmapDecoder decoder = await BitmapDecoder.CreateAsync(stream);
             var colors = await ImageDecoder.GetPixelColor(decoder);
             ThemeColorResult themeColor;
             PaletteResult palette;

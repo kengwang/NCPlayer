@@ -10,6 +10,7 @@ using Microsoft.Toolkit.Uwp.Helpers;
 using Microsoft.Toolkit.Uwp.Notifications;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
@@ -1524,12 +1525,7 @@ public static class HyPlayList
                 if (properties.Size == 0)
                 {
                     using var outputStream = await storageFile.OpenAsync(FileAccessMode.ReadWrite);
-                    var buffer = new Buffer(MIMEHelper.PICTURE_FILE_HEADER_CAPACITY);
-                    coverStream.Seek(0);
-                    await coverStream.ReadAsync(buffer, MIMEHelper.PICTURE_FILE_HEADER_CAPACITY,
-                        InputStreamOptions.None);
-                    var mime = MIMEHelper.GetPictureCodecFromBuffer(buffer);
-                    BitmapDecoder decoder = await BitmapDecoder.CreateAsync(mime, coverStream);
+                    BitmapDecoder decoder = await BitmapDecoder.CreateAsync(coverStream);
                     using var softwareBitmap = await decoder.GetSoftwareBitmapAsync();
                     BitmapEncoder encoder =
                         await BitmapEncoder.CreateAsync(BitmapEncoder.JpegEncoderId, outputStream);

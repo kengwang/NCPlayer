@@ -12,11 +12,7 @@ namespace HyPlayer.Classes
     {
         public static async Task<Color> ExtractColorFromStream(InMemoryRandomAccessStream stream)
         {
-            var buffer = new Windows.Storage.Streams.Buffer(MIMEHelper.PICTURE_FILE_HEADER_CAPACITY);
-            stream.Seek(0);
-            await stream.ReadAsync(buffer, MIMEHelper.PICTURE_FILE_HEADER_CAPACITY, InputStreamOptions.None);
-            var mime = MIMEHelper.GetPictureCodecFromBuffer(buffer);
-            var decoder = await BitmapDecoder.CreateAsync(mime, stream);
+            var decoder = await BitmapDecoder.CreateAsync(stream);
             var colors = await ImageDecoder.GetPixelColor(decoder);
             ThemeColorResult color;
 

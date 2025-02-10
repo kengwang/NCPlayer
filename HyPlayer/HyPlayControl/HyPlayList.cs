@@ -1405,10 +1405,7 @@ public static class HyPlayList
                 if ((hashCodeWhenRequested == NowPlayingHashCode) && !Common.Setting.noImage)
                 {
                     CoverStream.Seek(0);
-                    var buffer = new Buffer((uint)CoverStream.Size);
-                    await CoverStream.ReadAsync(buffer, (uint)CoverStream.Size, InputStreamOptions.None);
-                    CoverBuffer = buffer;
-                    OnSongCoverChanged?.Invoke(hashCodeWhenRequested, buffer);
+                    OnSongCoverChanged?.Invoke(hashCodeWhenRequested, CoverBuffer);
                 }
             }
 
@@ -1484,7 +1481,11 @@ public static class HyPlayList
                     throw new Exception("更新SMTC图片时发生异常");
                 }
 
-                await result.Content.WriteToStreamAsync(CoverStream);
+                var buffer = (await result.Content.ReadAsByteArrayAsync()).AsBuffer();
+                CoverBuffer = buffer;
+                CoverStream.Size = 0;
+                CoverStream.Seek(0);
+                await CoverStream.WriteAsync(buffer);
             }
         }
         catch (Exception)

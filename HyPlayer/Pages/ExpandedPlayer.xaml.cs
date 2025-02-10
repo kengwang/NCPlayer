@@ -843,7 +843,7 @@ public sealed partial class ExpandedPlayer : Page, IDisposable
                     await Common.HttpClient!.GetAsync(new Uri(HyPlayList.NowPlayingItem.PlayItem.Album.cover));
                 if (coverResult.IsSuccessStatusCode)
                 {
-                    var cover = await coverResult.Content.ReadAsBufferAsync();
+                    var cover = (await coverResult.Content.ReadAsByteArrayAsync()).AsBuffer();
                     await FileIO.WriteBufferAsync(file, cover);
                 }
                 else
@@ -977,8 +977,6 @@ public sealed partial class ExpandedPlayer : Page, IDisposable
             }
 
         if (HyPlayList.NowPlayingItem.PlayItem == null) return false;
-
-        if (lastSongForBrush == HyPlayList.NowPlayingItem.PlayItem) return Common.BrushManagement.AccentBrush.Color.R == 0;
         lastSongForBrush = HyPlayList.NowPlayingItem.PlayItem;
         try
         {

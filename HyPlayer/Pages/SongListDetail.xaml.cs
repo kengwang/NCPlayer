@@ -6,6 +6,7 @@ using HyPlayer.NeteaseApi.ApiContracts;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -71,10 +72,10 @@ public sealed partial class SongListDetail : Page, IDisposable
         using var result = await Common.HttpClient.GetAsync(new Uri(playList.cover + "?param=" + StaticSource.PICSIZE_SONGLIST_DETAIL_COVER));
         if (result.IsSuccessStatusCode)
         {
-            using var stream = new InMemoryRandomAccessStream();
-            await result.Content.WriteToStreamAsync(stream);
+            using var stream = await result.Content.ReadAsStreamAsync();
+            using var inputStream = stream.AsRandomAccessStream();
             _cancellationToken.ThrowIfCancellationRequested();
-            Color imageMainColor = await ColorExtractor.ExtractColorFromStream(stream);
+            Color imageMainColor = await ColorExtractor.ExtractColorFromStream(inputStream);
             if (AlbumColor != null)
             {
                 _ = Common.Invoke(() => AlbumColor.Color = imageMainColor);

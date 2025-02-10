@@ -19,6 +19,7 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 using System.Net;
+using System.Net.Http;
 using System.Runtime.CompilerServices;
 using System.Security.Cryptography;
 using System.Text;
@@ -35,9 +36,8 @@ using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Controls.Primitives;
 using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media.Animation;
-using Windows.Web.Http.Filters;
 using Color = Windows.UI.Color;
-using HttpClient = Windows.Web.Http.HttpClient;
+using HttpClient = System.Net.Http.HttpClient;
 #if !DEBUG
 #endif
 
@@ -61,9 +61,9 @@ namespace HyPlayer
         public static Frame? BaseFrame;
         public static BasePage? PageBase;
         public static KawazuConverter? KawazuConv;
-        public static HttpBaseProtocolFilter? HttpBaseProtocolFilter;
+        public static HttpClientHandler? HttpClientHandler;
         public static HttpClient? HttpClient;
-        public static NeteaseCloudMusicApiHandler NeteaseAPI = new();
+        public static NeteaseCloudMusicApiHandler? NeteaseAPI;
         public static XboxGameBarWidget? XboxGameBarWidget;
         public static PixelShaderEffect? PixelShaderShareEffect;
 #nullable restore
@@ -79,11 +79,10 @@ namespace HyPlayer
 
         public static void InitializeHttpClientAndAPI()
         {
-            HttpBaseProtocolFilter = new HttpBaseProtocolFilter
-            {
-                UseProxy = Setting.EnableProxy
-            };
-            HttpClient = new HttpClient(HttpBaseProtocolFilter);
+            HttpClientHandler = NeteaseCloudMusicApiHandler.HttpClientHandler;
+            HttpClientHandler.UseProxy = Setting.EnableProxy;
+            HttpClient = new HttpClient(HttpClientHandler);
+            NeteaseAPI = new NeteaseCloudMusicApiHandler(HttpClient);
         }
         public static bool isExpanded
         {

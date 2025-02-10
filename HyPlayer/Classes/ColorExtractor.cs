@@ -10,7 +10,7 @@ namespace HyPlayer.Classes
 {
     public static class ColorExtractor
     {
-        public static async Task<Color> ExtractColorFromStream(InMemoryRandomAccessStream stream)
+        public static async Task<Color> ExtractColorFromStream(IRandomAccessStream stream)
         {
             var decoder = await BitmapDecoder.CreateAsync(stream);
             var colors = await ImageDecoder.GetPixelColor(decoder);

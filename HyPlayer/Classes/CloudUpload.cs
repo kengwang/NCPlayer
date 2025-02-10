@@ -5,13 +5,13 @@ using HyPlayer.NeteaseApi.ApiContracts;
 using System;
 using System.IO;
 using System.Linq;
+using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Runtime.InteropServices.WindowsRuntime;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 using Windows.Storage;
-using Windows.Web.Http;
-using Windows.Web.Http.Headers;
 
 #endregion
 
@@ -28,7 +28,6 @@ internal class CloudUpload
     {
         Common.AddToTeachingTipLists("上传本地音乐至音乐云盘中", "正在上传: " + file.DisplayName);
         //首先获取基本信息
-        var size = (await file.GetBasicPropertiesAsync()).Size;
         var abstraction = new UwpStorageFileAbstraction(file);
         var tagFile = TagLib.File.Create(abstraction);
         var tag = tagFile.Tag;
@@ -92,13 +91,13 @@ internal class CloudUpload
             using var request = new HttpRequestMessage(HttpMethod.Post,
                 new Uri(targetLink));
             using var fileStream = await file.OpenAsync(FileAccessMode.Read);
-            using var content = new HttpStreamContent(fileStream);
-            content.Headers.ContentLength = size;
+            using var stream = fileStream.AsStream();
+            using var content = new StreamContent(stream);
             content.Headers.Add("Content-MD5", md5);
             request.Headers.Add("x-nos-token", tokenRes.Value.Data.Token);
-            content.Headers.ContentType = new HttpMediaTypeHeaderValue(file.ContentType);
+            content.Headers.ContentType = new MediaTypeHeaderValue(file.ContentType);
             request.Content = content;
-            await Common.HttpClient.SendRequestAsync(request);
+            await Common.HttpClient.SendAsync(request);
             var title = string.IsNullOrEmpty(name)
                 ? Path.GetFileNameWithoutExtension(file.Path)
                 : name;
@@ -136,13 +135,12 @@ internal class CloudUpload
 
             using var imgReq = new HttpRequestMessage(HttpMethod.Post,
                 new Uri(targetLink));
-            using var imgContent = new HttpBufferContent(coverBytes.AsBuffer());
-            content.Headers.ContentLength = size;
+            using var imgContent = new ByteArrayContent(coverBytes);
             content.Headers.Add("Content-MD5", md5);
             request.Headers.Add("x-nos-token", coverAllocRes.Value?.Result?.Token);
-            content.Headers.ContentType = new HttpMediaTypeHeaderValue("image/png");
+            content.Headers.ContentType = new MediaTypeHeaderValue("image/png");
             request.Content = imgContent;
-            await Common.HttpClient.SendRequestAsync(request);
+            await Common.HttpClient.SendAsync(request);
 
 
             var infoReq = new CloudUploadInfoRequest

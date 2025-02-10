@@ -198,8 +198,8 @@ internal sealed class DownloadObject : INotifyPropertyChanged
                 using var responseMessage = await Common.HttpClient.GetAsync(new Uri(ncsong.Album.cover + "?param=" +
                                                                         StaticSource.PICSIZE_DOWNLOAD_ALBUMCOVER));
                 using IRandomAccessStream outputStream = new InMemoryRandomAccessStream();
-                using IRandomAccessStream inputStream = new InMemoryRandomAccessStream();
-                await responseMessage.Content.WriteToStreamAsync(inputStream);
+                using var stream = await responseMessage.Content.ReadAsStreamAsync();
+                using var inputStream = stream.AsRandomAccessStream();
                 SoftwareBitmap softwareBitmap;
                 BitmapDecoder decoder = await BitmapDecoder.CreateAsync(inputStream);
                 softwareBitmap = await decoder.GetSoftwareBitmapAsync();

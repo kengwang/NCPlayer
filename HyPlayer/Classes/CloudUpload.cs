@@ -151,11 +151,11 @@ internal class CloudUpload
                 using var imgReq = new HttpRequestMessage(HttpMethod.Post,
                     new Uri(targetLink));
                 using var imgContent = new ByteArrayContent(coverBytes);
-                content.Headers.Add("Content-MD5", md5);
-                request.Headers.Add("x-nos-token", coverAllocRes.Value?.Result?.Token);
-                content.Headers.ContentType = new MediaTypeHeaderValue("image/png");
-                request.Content = imgContent;
-                await Common.HttpClient.SendAsync(request);
+                imgContent.Headers.Add("Content-MD5", md5);
+                imgReq.Headers.Add("x-nos-token", coverAllocRes.Value?.Result?.Token);
+                imgContent.Headers.ContentType = new MediaTypeHeaderValue("image/png");
+                imgReq.Content = imgContent;
+                await Common.HttpClient.SendAsync(imgReq);
             }
 
 
@@ -170,7 +170,7 @@ internal class CloudUpload
                 Bitrate = (int)bitrate,
                 CoverId = coverId!,
                 ResourceId = tokenRes.Value.Data!.ResourceId!,
-                ObjectKey = tokenRes.Value.Data!.ObjectKey!,
+                ObjectKey = $"jd-musicrep-privatecloud-audio-public/{tokenRes.Value.Data!.ObjectKey}",
             };
             var infoRes = await Common.NeteaseAPI.RequestAsync(NeteaseApis.CloudUploadInfoApi, infoReq);
             if (infoRes.IsError)

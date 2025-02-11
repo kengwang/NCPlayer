@@ -191,7 +191,7 @@ public sealed partial class BasePage : Page
     {
         try
         {
-            if (Common.Setting.LoadCookies())
+            if (Common.Setting.LoadCookies() || Common.NeteaseAPI?.Option.AdditionalParameters.Cookies.Count is > 0)
             {
                 try
                 {

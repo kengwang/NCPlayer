@@ -83,6 +83,7 @@ namespace HyPlayer
             HttpClientHandler.UseProxy = Setting.EnableProxy;
             HttpClient = new HttpClient(HttpClientHandler);
             NeteaseAPI = new NeteaseCloudMusicApiHandler(HttpClient);
+            NeteaseAPI.Option.AdditionalParameters = Setting.ApiAdditionalParameters;
         }
         public static bool isExpanded
         {
@@ -371,12 +372,13 @@ namespace HyPlayer
                 OnPropertyChanged();
             }
         }
+        
 
-
-
-
-
-
+        public AdditionalParameters ApiAdditionalParameters
+        {
+            get => JsonConvert.DeserializeObject<AdditionalParameters>(GetSettings(nameof(ApiAdditionalParameters), "{}")) ?? new AdditionalParameters();
+            set => ApplicationData.Current.LocalSettings.Values[nameof(ApiAdditionalParameters)] = JsonConvert.SerializeObject(value);
+        }
 
         public string lyricFontFamily
         {

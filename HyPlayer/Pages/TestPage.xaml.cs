@@ -9,6 +9,9 @@ using Windows.Storage;
 using Windows.System;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
+using Windows.UI.Xaml.Navigation;
+using HyPlayer.NeteaseApi;
+
 
 // https://go.microsoft.com/fwlink/?LinkId=234238 上介绍了“空白页”项模板
 
@@ -20,7 +23,7 @@ namespace HyPlayer.Pages;
 public sealed partial class TestPage : Page
 {
     public static readonly DependencyProperty ResourceIdProperty =
-        DependencyProperty.Register("ResourceId", typeof(string), typeof(TestPage), new PropertyMetadata(""));
+        DependencyProperty.Register(nameof(ResourceId), typeof(string), typeof(TestPage), new PropertyMetadata(""));
 
     private int _teachingTipIndex;
 
@@ -30,6 +33,10 @@ public sealed partial class TestPage : Page
         InitializeComponent();
     }
 
+    protected override void OnNavigatedTo(NavigationEventArgs e)
+    {
+        TbAdditionalApiParameters.Text = JsonConvert.SerializeObject(Common.Setting.ApiAdditionalParameters, Formatting.Indented);
+    }
 
     public string ResourceId
     {
@@ -91,5 +98,30 @@ public sealed partial class TestPage : Page
     private void ForceGC_Click(object sender, RoutedEventArgs e)
     {
         GC.Collect();
+    }
+
+    private void SaveApiAdditionalParameters_OnClick(object sender, RoutedEventArgs e)
+    {
+        try
+        {
+            var result = JsonConvert.DeserializeObject<AdditionalParameters>(TbAdditionalApiParameters.Text);
+            if (result == null)
+            {
+                throw new Exception("Invalid JSON");
+            }
+            Common.Setting.ApiAdditionalParameters = result;
+            Common.NeteaseAPI!.Option.AdditionalParameters = result;
+            Common.AddToTeachingTipLists("成功设置API附加参数", "请重启应用以使更改生效");
+        }
+        catch (Exception ex)
+        {
+            ContentDialog dialog = new ContentDialog
+            {
+                Title = "Error",
+                Content = ex.Message,
+                CloseButtonText = "OK"
+            };
+            dialog.ShowAsync();
+        }
     }
 }

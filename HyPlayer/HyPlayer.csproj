@@ -634,7 +634,7 @@
       <Version>4.3.2</Version>
     </PackageReference>
     <PackageReference Include="System.Text.Json">
-      <Version>9.0.1</Version>
+      <Version>9.0.2</Version>
     </PackageReference>
     <PackageReference Include="TagLibSharp">
       <Version>2.3.0</Version>

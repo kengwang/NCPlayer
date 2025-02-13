@@ -610,7 +610,7 @@
       <Version>5.0.6</Version>
     </PackageReference>
     <PackageReference Include="Microsoft.AppCenter.Crashes">
-      <Version>5.0.6</Version>
+      <Version>5.0.7</Version>
     </PackageReference>
     <PackageReference Include="Microsoft.Gaming.XboxGameBar">
       <Version>7.2.241028002</Version>

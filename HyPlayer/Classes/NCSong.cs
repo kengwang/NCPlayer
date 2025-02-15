@@ -1,5 +1,6 @@
 ﻿#region
 
+using HyPlayer.NeteaseApi.Models;
 using LyricParser.Abstraction;
 using Newtonsoft.Json.Linq;
 using System;
@@ -218,7 +219,7 @@ public class NCSong
             TrackId = song["no"]?.ToObject<int>() ?? -1,
             songname = song["name"].ToString(),
             CDName = song["cd"]?.ToString() ?? "01",
-            Artist = new List<NCArtist>(),
+            Artist = [],
             LengthInMilliseconds = double.Parse(song[dtpath].ToString())
         };
         if (song[arpath].HasValues)
@@ -285,7 +286,8 @@ public class PlayItem
     public string Name;
     public string Size;
     public string SubExt;
-    public string Tag;
+    public string QualityTag;
+    public string InfoTag;
     public int TrackId;
     public HyPlayItemType Type;
     public string Url;
@@ -483,12 +485,12 @@ public class Comment
     public int likedCount;
     public int ReplyCount;
     public string resourceId;
-    public int resourceType;
+    public NeteaseResourceType resourceType;
     public DateTime SendTime;
     public NCUser CommentUser;
     public bool IsByMyself => CommentUser.id == Common.LoginedUser?.id;
 
-    public static Comment CreateFromJson(JToken comment, string resourceId, int resourceType)
+    public static Comment CreateFromJson(JToken comment, string resourceId, NeteaseResourceType resourceType)
     {
         var cmt = new Comment();
         cmt.resourceId = resourceId;

@@ -4,22 +4,22 @@
 using HyPlayer.Classes;
 using HyPlayer.Controls;
 using HyPlayer.HyPlayControl;
+using HyPlayer.NeteaseApi;
+using HyPlayer.NeteaseApi.ApiContracts;
 using HyPlayer.Pages;
-using Impressionist.Implementations;
 using Kawazu;
 using Microsoft.Gaming.XboxGameBar;
 using Microsoft.Graphics.Canvas.Effects;
 using Microsoft.Toolkit.Uwp.UI;
 using Microsoft.UI.Xaml.Controls;
-using NeteaseCloudMusicApi;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 using System.Net;
+using System.Net.Http;
 using System.Runtime.CompilerServices;
 using System.Security.Cryptography;
 using System.Text;
@@ -36,11 +36,9 @@ using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Controls.Primitives;
 using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media.Animation;
-using Windows.Web.Http;
-using Windows.Web.Http.Filters;
 using Color = Windows.UI.Color;
+using HttpClient = System.Net.Http.HttpClient;
 #if !DEBUG
-using Microsoft.AppCenter.Crashes;
 #endif
 
 #endregion
@@ -63,14 +61,13 @@ namespace HyPlayer
         public static Frame? BaseFrame;
         public static BasePage? PageBase;
         public static KawazuConverter? KawazuConv;
-        public static HttpBaseProtocolFilter? HttpBaseProtocolFilter;
+        public static HttpClientHandler? HttpClientHandler;
         public static HttpClient? HttpClient;
-        public static CloudMusicApi? ncapi;
+        public static NeteaseCloudMusicApiHandler? NeteaseAPI;
         public static XboxGameBarWidget? XboxGameBarWidget;
         public static PixelShaderEffect? PixelShaderShareEffect;
 #nullable restore
         public static BrushManagement BrushManagement = new();
-        public static KMeansPaletteGenerator PaletteGenerator = new();
         public static Setting Setting = new();
         public static bool ShowLyricSound = true;
         public static bool ShowLyricTrans = true;
@@ -82,12 +79,11 @@ namespace HyPlayer
 
         public static void InitializeHttpClientAndAPI()
         {
-            ncapi = new CloudMusicApi(Setting.EnableProxy);
-            HttpBaseProtocolFilter = new HttpBaseProtocolFilter
-            {
-                UseProxy = Setting.EnableProxy
-            };
-            HttpClient = new HttpClient(HttpBaseProtocolFilter);
+            HttpClientHandler = NeteaseCloudMusicApiHandler.HttpClientHandler;
+            HttpClientHandler.UseProxy = Setting.EnableProxy;
+            HttpClient = new HttpClient(HttpClientHandler);
+            NeteaseAPI = new NeteaseCloudMusicApiHandler(HttpClient);
+            NeteaseAPI.Option.AdditionalParameters = Setting.ApiAdditionalParameters;
         }
         public static bool isExpanded
         {
@@ -126,30 +122,10 @@ namespace HyPlayer
                         return CoreApplication.MainView.Dispatcher.RunAsync(Priority,
                             () => { action(); });
                 }
-#if DEBUG
                 catch
                 {
-#else
-                catch (Exception e)
-                {
-                    Crashes.TrackError(e, null,
-                        ErrorAttachmentLog.AttachmentWithText(e.InnerException?.ToString(), "inner"));
-#endif
-
-                    /*
-                    Invoke((async () =>
-                    {
-                        await new ContentDialog
-                        {
-                            Title = "发生错误",
-                            Content = "Error: " + e.Message + "\r\n" + e.StackTrace,
-                            CloseButtonText = "关闭",
-                            DefaultButton = ContentDialogButton.Close
-                        }.ShowAsync();
-                    }));
-                    */
+                    //Ignore
                 }
-
             return null;
         }
 
@@ -358,6 +334,25 @@ namespace HyPlayer
 
     internal class Setting : INotifyPropertyChanged
     {
+        public int ColorGeneratorType
+        {
+            get => GetSettings(nameof(ColorGeneratorType), 0);
+            set
+            {
+                ApplicationData.Current.LocalSettings.Values[nameof(ColorGeneratorType)] = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public bool EnablePreLoad
+        {
+            get => GetSettings(nameof(EnablePreLoad), false);
+            set
+            {
+                ApplicationData.Current.LocalSettings.Values[nameof(EnablePreLoad)] = value;
+                OnPropertyChanged();
+            }
+        }
 
         public int lyricPaddingTopRatio
         {
@@ -377,12 +372,13 @@ namespace HyPlayer
                 OnPropertyChanged();
             }
         }
+        
 
-
-
-
-
-
+        public AdditionalParameters ApiAdditionalParameters
+        {
+            get => JsonConvert.DeserializeObject<AdditionalParameters>(GetSettings(nameof(ApiAdditionalParameters), "{}")) ?? new AdditionalParameters();
+            set => ApplicationData.Current.LocalSettings.Values[nameof(ApiAdditionalParameters)] = JsonConvert.SerializeObject(value);
+        }
 
         public string lyricFontFamily
         {
@@ -634,12 +630,12 @@ namespace HyPlayer
             }
         }
 
-        public bool doScrobble
+        public bool EnableSonglistCreate
         {
-            get => GetSettings(nameof(doScrobble), false);
+            get => GetSettings(nameof(EnableSonglistCreate), false);
             set
             {
-                ApplicationData.Current.LocalSettings.Values[nameof(doScrobble)] = value;
+                ApplicationData.Current.LocalSettings.Values[nameof(EnableSonglistCreate)] = value;
                 OnPropertyChanged();
             }
         }
@@ -1666,10 +1662,6 @@ namespace HyPlayer
             set
             {
                 ApplicationData.Current.LocalSettings.Values[nameof(UseHttp)] = value;
-                if (Common.ncapi != null)
-                {
-                    Common.ncapi.UseHttp = value;
-                }
                 OnPropertyChanged();
             }
         }
@@ -1797,34 +1789,17 @@ namespace HyPlayer
         public bool LastFMLogined => LastFMManager.LastfmLogined;
         public bool SaveCookies()
         {
-            var container = ApplicationData.Current.LocalSettings.CreateContainer("Cookies", ApplicationDataCreateDisposition.Always);
-            if (Common.ncapi?.Cookies.Count != 0)
+            var container = ApplicationData.Current.LocalSettings.CreateContainer("LoginedUser", ApplicationDataCreateDisposition.Always);
+            container.Values.Clear();
+            foreach (var item in Common.NeteaseAPI.Option.Cookies)
             {
-                container.Values.Clear();
-                container.Values["CookieCount"] = Common.ncapi?.Cookies.Count;
-                var cookieStringBuilder = new StringBuilder();
-                for (int i = 0; i < Common.ncapi?.Cookies.Count; i++)
-                {
-                    Cookie cookie = Common.ncapi?.Cookies[i];
-                    cookieStringBuilder.Append($"{cookie.Name}={cookie.Value}");
-                    if (!string.IsNullOrEmpty(cookie.Domain))
-                        cookieStringBuilder.Append($"; Domain={cookie.Domain}");
-                    if (cookie.Expires != DateTime.MinValue)
-                        cookieStringBuilder.Append($"; Expires={cookie.Expires.ToString("R")}");
-                    if (!string.IsNullOrEmpty(cookie.Path))
-                        cookieStringBuilder.Append($"; Path={cookie.Path}");
-                    cookieStringBuilder.Append($"; Secure={cookie.Secure}");
-                    cookieStringBuilder.Append($"; HttpOnly={cookie.HttpOnly}");
-                    container.Values[$"Cookie-{i}"] = cookieStringBuilder.ToString();
-                    cookieStringBuilder.Clear();
-                }
-                return true;
+                container.Values[item.Key] = item.Value;
             }
-            return false;
+            return true;
         }
         public bool LoadCookies()
         {
-            if (ApplicationData.Current.LocalSettings.Containers.TryGetValue("Cookies", out var container))
+            if (ApplicationData.Current.LocalSettings.Containers.TryGetValue("LoginedUser", out var container))
             {
                 if (container.Values.Count == 0)
                 {
@@ -1832,12 +1807,11 @@ namespace HyPlayer
                 }
                 else
                 {
-                    var count = (int)container.Values["CookieCount"];
-                    for (int i = 0; i < count; i++)
+                    foreach (var item in container.Values)
                     {
-                        var cookie = (string)container.Values[$"Cookie-{i}"];
-                        PhraseCookie(cookie);
+                        Common.NeteaseAPI.Option.Cookies.Add(item.Key, (string)item.Value);
                     }
+
                     return true;
                 }
             }
@@ -1846,57 +1820,7 @@ namespace HyPlayer
                 return false;
             }
         }
-        private bool PhraseCookie(string cookieHeader)
-        {
-            try
-            {
-                if (string.IsNullOrEmpty(cookieHeader)) return false; ;
-                var cookie = new Cookie();
-                var CookieDic = new Dictionary<string, string>();
-                var arr1 = cookieHeader.Split(';').ToList();
-                var arr2 = arr1[0].Trim().Split('=');
-                cookie.Name = arr2[0];
-                cookie.Value = arr2[1];
-                arr1.RemoveAt(0);
-                if (string.IsNullOrEmpty(cookie.Value))
-                    return false;
-                foreach (var cookiediac in arr1)
-                    try
-                    {
-                        var cookiesetarr = cookiediac.Trim().Split('=');
-                        switch (cookiesetarr[0].Trim().ToLower())
-                        {
-                            case "expires":
-                                cookie.Expires = DateTime.Parse(cookiesetarr[1].Trim());
-                                break;
-                            case "max-age":
-                                cookie.Expires = DateTime.Now.AddSeconds(int.Parse(cookiesetarr[1]));
-                                break;
-                            case "domain":
-                                cookie.Domain = cookiesetarr[1].Trim();
-                                break;
-                            case "path":
-                                cookie.Path = cookiesetarr[1].Trim().Replace("%x2F", "/");
-                                break;
-                            case "secure":
-                                cookie.Secure = cookiesetarr[1].Trim().ToLower() == "true";
-                                break;
-                            case "httponly":
-                                cookie.HttpOnly = cookiesetarr[1].Trim().ToLower() == "true";
-                                break;
-                        }
-                    }
-                    catch
-                    {
-                    }
-                Common.ncapi?.Cookies.Add(cookie);
-                return true;
-            }
-            catch (Exception)
-            {
-                return false;
-            }
-        }
+
 #nullable enable
         public event PropertyChangedEventHandler? PropertyChanged;
 #nullable restore
@@ -2029,58 +1953,26 @@ namespace HyPlayer
 
         public static async Task<List<NCSong>> GetNCSongHistory()
         {
-            var retsongs = new List<NCSong>();
             try
             {
-                var json = await Common.ncapi?.RequestAsync(CloudMusicApiProviders.SongDetail,
-                    new Dictionary<string, object>
+                var songIds = JsonConvert.DeserializeObject<List<string>>(ApplicationData.Current.LocalSettings
+                    .Values["songHistory"].ToString());
+                var result = await Common.NeteaseAPI.RequestAsync(NeteaseApis.SongDetailApi,
+                    new SongDetailRequest()
                     {
-                        ["ids"] = string.Join(",",
-                            JsonConvert.DeserializeObject<List<string>>(ApplicationData.Current.LocalSettings
-                                .Values["songHistory"].ToString()))
+                        IdList = songIds
                     });
-                var history = json["songs"].ToArray().Select(NCSong.CreateFromJson).ToList();
-                json.RemoveAll();
-                return history;
+                if (result.IsSuccess)
+                {
+                    return result.Value.Songs?.Select(t => t.MapToNcSong()).ToList();
+                }
             }
             catch (Exception e)
             {
                 Common.AddToTeachingTipLists(e.Message, (e.InnerException ?? new Exception()).Message);
             }
 
-            return new List<NCSong>();
-        }
-
-        public static async Task<List<NCPlayList>> GetSonglistHistory()
-        {
-            var i = 0;
-            var queries = new Dictionary<string, object>();
-            foreach (var plid in JsonConvert.DeserializeObject<List<string>>(ApplicationData.Current.LocalSettings
-                         .Values["songlistHistory"].ToString()))
-                queries["/api/v6/playlist/detail" + new string('/', i++)] = JsonConvert.SerializeObject(
-                    new Dictionary<string, object>
-                    {
-                        ["id"] = plid,
-                        ["n"] = 100000,
-                        ["s"] = 8
-                    });
-            if (queries.Count == 0) return new List<NCPlayList>();
-            var ret = new List<NCPlayList>();
-            try
-            {
-                var json = await Common.ncapi?.RequestAsync(CloudMusicApiProviders.Batch, queries);
-
-                for (var k = 0; k < json.Count - 1; k++)
-                    ret.Add(NCPlayList.CreateFromJson(
-                        json["/api/v6/playlist/detail" + new string('/', k)]["playlist"]));
-                json.RemoveAll();
-            }
-            catch (Exception e)
-            {
-                Common.AddToTeachingTipLists(e.Message, (e.InnerException ?? new Exception()).Message);
-            }
-
-            return ret;
+            return [];
         }
 
         public static List<string> GetSearchHistory()
@@ -2111,21 +2003,20 @@ namespace HyPlayer
                     Math.Min(500, trackIds.Count - nowIndex * 500));
                 try
                 {
-                    var json = await Common.ncapi?.RequestAsync(CloudMusicApiProviders.SongDetail,
-                        new Dictionary<string, object> { ["ids"] = string.Join(",", nowIds) });
+                    var json = await Common.NeteaseAPI?.RequestAsync(NeteaseApis.SongDetailApi,
+                        new SongDetailRequest()
+                        {
+                            IdList = nowIds
+                        });
                     nowIndex++;
-                    var i = 0;
-                    var ncSongs = (json["songs"] ?? new JArray()).Select(t =>
+                    if (json.IsError)
                     {
-                        if (json["privileges"] == null) return null;
-                        if (json["privileges"].ToList()[i++]["st"]?.ToString() == "0")
-                            return NCSong.CreateFromJson(t);
+                        Common.AddToTeachingTipLists("加载当前播放失败", json.Error.Message);
+                        continue;
+                    }
 
-                        return null;
-                    }).ToList();
-                    ncSongs.RemoveAll(t => t == null);
-                    retsongs.AddRange(ncSongs);
-                    json.RemoveAll();
+                    var ncSongs = json.Value.Songs?.Select(t => t.MapToNcSong()).ToList();
+                    retsongs.AddRange(ncSongs ?? []);
                 }
                 catch (Exception ex)
                 {

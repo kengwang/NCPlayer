@@ -4,9 +4,6 @@ using HyPlayer.Classes;
 using HyPlayer.HyPlayControl;
 using HyPlayer.Pages;
 using Kawazu;
-using Microsoft.AppCenter;
-using Microsoft.AppCenter.Analytics;
-using Microsoft.AppCenter.Crashes;
 using Microsoft.Gaming.XboxGameBar;
 using System;
 using System.Linq;
@@ -58,11 +55,7 @@ sealed partial class App : Application
         EnteredBackground += App_EnteredBackground;
         LeavingBackground += App_LeavingBackground;
         AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
-        AppCenter.Start("8e88eab0-1627-4ff9-9ee7-7fd46d0629cf",
-            typeof(Analytics), typeof(Crashes));
-        AppCenter.SetEnabledAsync(true);
         var deviceInfo = new EasClientDeviceInformation();
-        AppCenter.SetUserId(deviceInfo.Id.ToString());
         MemoryManager.AppMemoryUsageIncreased += MemoryManagerOnAppMemoryUsageIncreased;
         MemoryManager.AppMemoryUsageLimitChanging += MemoryManagerOnAppMemoryUsageLimitChanging;
         if (Common.Setting.themeRequest != 0)

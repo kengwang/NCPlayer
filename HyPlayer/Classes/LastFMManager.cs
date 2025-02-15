@@ -79,11 +79,11 @@ namespace HyPlayer.Classes
             var signature = LastFMUtils.GetLastFMAPISignature(token);
             try
             {
-                using var responseData = await Common.HttpClient.TryGetStringAsync(
+                var responseData = await Common.HttpClient.GetStringAsync(
                     new Uri($"https://ws.audioscrobbler.com/2.0/?method=auth.getSession&format=json&token={token}&api_key={LastFMAPIKey}&api_sig={signature}"));
-                if (responseData != null && responseData.Succeeded)
+                if (responseData != null)
                 {
-                    JObject sessionJsonObject = JObject.Parse(responseData.Value);
+                    JObject sessionJsonObject = JObject.Parse(responseData);
                     var session = new LastUserSession()
                     {
                         Username = sessionJsonObject["session"]["name"].ToString(),
@@ -94,9 +94,9 @@ namespace HyPlayer.Classes
                     OnLoginDone.Invoke();
                     sessionJsonObject.RemoveAll();
                 }
-                else if (responseData.Value != null)
+                else if (responseData != null)
                 {
-                    JObject errorMessageJsonObject = JObject.Parse(responseData.Value);
+                    JObject errorMessageJsonObject = JObject.Parse(responseData);
                     OnLoginError.Invoke(new Exception(errorMessageJsonObject["message"].ToString()));
                     errorMessageJsonObject.RemoveAll();
                 }
@@ -156,4 +156,5 @@ namespace HyPlayer.Classes
             return stringBuilder.ToString();
         }
     }
+
 }

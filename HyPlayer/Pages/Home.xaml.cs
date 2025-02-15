@@ -3,10 +3,9 @@
 using HyPlayer.Classes;
 using HyPlayer.Controls;
 using HyPlayer.HyPlayControl;
-using NeteaseCloudMusicApi;
+using HyPlayer.NeteaseApi.ApiContracts;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Windows.UI.Xaml;
@@ -93,63 +92,46 @@ public sealed partial class Home : Page, IDisposable
             TbHelloUserName.Text = Common.LoginedUser?.name ?? string.Empty;
             UserImageRect.ImageSource = Common.Setting.noImage
     ? null
-    : new BitmapImage(new Uri(Common.LoginedUser.avatar, UriKind.RelativeOrAbsolute));
+    : new BitmapImage(new Uri(Common.LoginedUser?.avatar, UriKind.RelativeOrAbsolute));
 
         });
         //我们直接Batch吧
         try
         {
-            var ret = await Common.ncapi?.RequestAsync(
-                CloudMusicApiProviders.Batch,
-                new Dictionary<string, object>
-                {
-                    { "/api/toplist", "{}" }
-                    //{ "/weapi/v1/discovery/recommend/resource","{}" }   //这个走不了Batch
-                }
-            );
-
-            //每日推荐加载部分 - 日推不加载
-            /*
-            var rcmdSongsJson = ret["/api/v3/discovery/recommend/songs"]["data"]["dailySongs"].ToArray();
-            Common.ListedSongs.Clear();
-            DailySongContainer.Children.Clear();
-            var NowSongPanel = new StackPanel();
-            for (var c = 0; c < rcmdSongsJson.Length; c++)
+            var ret = await Common.NeteaseAPI.RequestAsync(NeteaseApis.ToplistApi, _cancellationToken);
+            if (ret.IsError)
             {
-                if (c % 3 == 0)
-                {
-                    NowSongPanel = new StackPanel
-                    { Orientation = Orientation.Vertical, Height = DailySongContainer.Height, Width = 600 };
-                    DailySongContainer.Children.Add(NowSongPanel);
-                }
-
-                var nownc = NCSong.CreateFromJson(rcmdSongsJson[c]);
-                Common.ListedSongs.Add(nownc);
-                NowSongPanel.Children.Add(new SingleNCSong(nownc, c, true, true,
-                    rcmdSongsJson[c]["reason"].ToString()));
+                Common.AddToTeachingTipLists("加载榜单出错", ret.Error.Message);
             }
-            */
-
-            //榜单
-            _ = Common.Invoke(() =>
+            else
             {
-                _cancellationToken.ThrowIfCancellationRequested();
-                RankPlayList.Children.Clear();
-                foreach (var bditem in ret["/api/toplist"]["list"])
-                    RankPlayList.Children.Add(new PlaylistItem(NCPlayList.CreateFromJson(bditem)));
-            });
+                _ = Common.Invoke(() =>
+                {
+                    _cancellationToken.ThrowIfCancellationRequested();
+                    RankPlayList.Children.Clear();
+                    foreach (var bditem in ret.Value?.List ?? [])
+                        RankPlayList.Children.Add(new PlaylistItem(bditem.MapToNCPlayList()));
+                });
+            }
 
             //推荐歌单加载部分 - 优先级稍微靠后下
             try
             {
-                var ret1 = await Common.ncapi?.RequestAsync(CloudMusicApiProviders.RecommendResource);
-                _ = Common.Invoke(() =>
+                var ret1 = await Common.NeteaseAPI.RequestAsync(NeteaseApis.RecommendResourceApi, _cancellationToken);
+                if (ret1.IsError)
                 {
-                    _cancellationToken.ThrowIfCancellationRequested();
-                    RecommendSongListContainer.Children.Clear();
-                    foreach (var item in ret1["recommend"])
-                        RecommendSongListContainer.Children.Add(new PlaylistItem(NCPlayList.CreateFromJson(item)));
-                });
+                    Common.AddToTeachingTipLists("加载推荐歌单出错", ret1.Error.Message);
+                }
+                else
+                {
+                    _ = Common.Invoke(() =>
+                    {
+                        _cancellationToken.ThrowIfCancellationRequested();
+                        RecommendSongListContainer.Children.Clear();
+                        foreach (var item in ret1.Value?.Recommends ?? [])
+                            RecommendSongListContainer.Children.Add(new PlaylistItem(item.MapToNCPlayList()));
+                    });
+                }
             }
             catch (Exception ex)
             {
@@ -170,15 +152,18 @@ public sealed partial class Home : Page, IDisposable
         _cancellationToken.ThrowIfCancellationRequested();
         try
         {
-            var json = await Common.ncapi?.RequestAsync(CloudMusicApiProviders.Toplist);
-
-            foreach (var PlaylistItemJson in json["list"].ToArray())
+            var json = await Common.NeteaseAPI.RequestAsync(NeteaseApis.ToplistApi, _cancellationToken);
+            if (json.IsError)
+            {
+                Common.AddToTeachingTipLists("加载榜单出错", json.Error.Message);
+                return;
+            }
+            foreach (var PlaylistItemJson in json.Value.List ?? [])
             {
                 _cancellationToken.ThrowIfCancellationRequested();
-                var ncp = NCPlayList.CreateFromJson(PlaylistItemJson);
+                var ncp = PlaylistItemJson.MapToNCPlayList();
                 RankList.Children.Add(new PlaylistItem(ncp));
             }
-            json.RemoveAll();
         }
         catch (Exception ex)
         {
@@ -224,46 +209,10 @@ public sealed partial class Home : Page, IDisposable
         Common.NavigatePage(typeof(SongListDetail), Common.MySongLists[0].plid);
     }
 
-    private async void HeartBeatTapped(object sender, TappedRoutedEventArgs e)
+    private void HeartBeatTapped(object sender, TappedRoutedEventArgs e)
     {
         if (disposedValue) throw new ObjectDisposedException(nameof(Home));
-        HyPlayList.RemoveAllSong();
-        try
-        {
-            var jsoon = await Common.ncapi?.RequestAsync(CloudMusicApiProviders.PlaylistDetail,
-                new Dictionary<string, object> { { "id", Common.MySongLists[0].plid } });
-            var jsona = await Common.ncapi?.RequestAsync(
-                CloudMusicApiProviders.PlaymodeIntelligenceList,
-                new Dictionary<string, object>
-                {
-                    { "pid", Common.MySongLists[0].plid },
-                    { "id", jsoon["playlist"]["trackIds"][0]["id"].ToString() }
-                });
-
-            var Songs = new List<NCSong>();
-            foreach (var token in jsona["data"])
-            {
-                var ncSong = NCSong.CreateFromJson(token["songInfo"]);
-                Songs.Add(ncSong);
-            }
-
-            try
-            {
-                HyPlayList.AppendNcSongs(Songs);
-                HyPlayList.SongMoveTo(0);
-            }
-            catch (Exception ex)
-            {
-                Common.AddToTeachingTipLists(ex.Message, (ex.InnerException ?? new Exception()).Message);
-            }
-            Songs.Clear();
-            jsoon.RemoveAll();
-            jsona.RemoveAll();
-        }
-        catch (Exception ex)
-        {
-            Common.AddToTeachingTipLists(ex.Message, (ex.InnerException ?? new Exception()).Message);
-        }
+        _ = Api.EnterIntelligencePlay(_cancellationToken);
     }
 
     private void UserTapped(object sender, TappedRoutedEventArgs e)

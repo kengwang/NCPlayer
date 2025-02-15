@@ -2,9 +2,9 @@
 
 using HyPlayer.Classes;
 using HyPlayer.HyPlayControl;
+using HyPlayer.NeteaseApi.ApiContracts;
 using HyPlayer.Pages;
 using Microsoft.Toolkit.Uwp.Notifications;
-using NeteaseCloudMusicApi;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -341,10 +341,9 @@ DoubleAnimation verticalAnimation;
 
             realSelectSong = true;
 
-            if (HyPlayList.NowPlayingItem.PlayItem.Tag != "在线")
-                TbSongTag.Text = HyPlayList.NowPlayingItem.PlayItem.Tag;
+            TbSongTag.Text = HyPlayList.NowPlayingItem.PlayItem.QualityTag ?? "";
             Btn_Share.IsEnabled =
-                HyPlayList.NowPlayingItem.ItemType is not HyPlayItemType.Local or HyPlayItemType.LocalProgressive;
+                HyPlayList.NowPlayingItem?.ItemType is not HyPlayItemType.Local or HyPlayItemType.LocalProgressive;
         });
         var isLiked = Common.LikedSongs.Contains(mpi.PlayItem.Id);
         if (mpi.ItemType is not HyPlayItemType.Local or HyPlayItemType.LocalProgressive)
@@ -589,8 +588,7 @@ DoubleAnimation verticalAnimation;
         Common.PageMain.ExpandedPlayer.Visibility = Visibility.Collapsed;
         Window.Current.SetTitleBar(Common.PageBase.AppTitleBar);
         Common.isExpanded = false;
-        using var coverStream = HyPlayList.CoverStream.CloneStream();
-        await RefreshPlayBarCover(HyPlayList.NowPlayingHashCode, coverStream);
+        await RefreshPlayBarCover(HyPlayList.NowPlayingHashCode, HyPlayList.CoverBuffer);
     }
 
     private void ButtonCleanAll_OnClick(object sender, RoutedEventArgs e)
@@ -651,8 +649,11 @@ DoubleAnimation verticalAnimation;
         }
         else
         {
-            _ = Common.ncapi?.RequestAsync(CloudMusicApiProviders.FmTrash,
-                new Dictionary<string, object> { { "id", HyPlayList.NowPlayingItem.PlayItem.Id } });
+            _ = Common.NeteaseAPI.RequestAsync(NeteaseApis.PersonalFmTrashApi,
+                new FmTrashRequest
+                {
+                    Id = HyPlayList.NowPlayingItem.PlayItem.Id
+                });
             PersonalFM.LoadNextFM();
         }
     }
@@ -868,8 +869,7 @@ DoubleAnimation verticalAnimation;
     private async Task OnEnteringForeground()
     {
         LoadPlayingFile(HyPlayList.NowPlayingItem);
-        using var coverStream = HyPlayList.CoverStream.CloneStream();
-        await RefreshPlayBarCover(HyPlayList.NowPlayingHashCode, coverStream);
+        await RefreshPlayBarCover(HyPlayList.NowPlayingHashCode, HyPlayList.CoverBuffer);
     }
     private async void UserControl_Loaded(object sender, RoutedEventArgs e)
     {
@@ -958,11 +958,14 @@ DoubleAnimation verticalAnimation;
         TbSongNameScrollStoryBoard.Begin();
         */
     }
-    public async Task RefreshPlayBarCover(int hashCode, IRandomAccessStream coverStream)
+    public async Task RefreshPlayBarCover(int hashCode, IBuffer coverStream)
     {
+        if (HyPlayList.CoverStream.Size == 0) return;
         await Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, async () =>
         {
-            using var stream = coverStream.CloneStream();
+            using var stream = new InMemoryRandomAccessStream();
+            await stream.WriteAsync(coverStream);
+            stream.Seek(0);
             if (GridSongInfo.Visibility == Visibility.Visible && Opacity != 0)
             {
                 try

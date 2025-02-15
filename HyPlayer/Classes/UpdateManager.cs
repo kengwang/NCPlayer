@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using Windows.ApplicationModel;
 using Windows.Services.Store;
 using Windows.UI.Xaml.Controls;
-using Windows.Web.Http;
+using System.Net.Http;
 
 namespace HyPlayer.Classes;
 
@@ -61,16 +61,16 @@ public static class UpdateManager
 
     public static async Task<RemoteVersionResult> GetVersionFromAppCenter(bool isCanary)
     {
-        using var versionsResponse = await Common.HttpClient.TryGetAsync(
+        using var versionsResponse = await Common.HttpClient.GetAsync(
             new Uri($"https://hyplayer.kengwang.com.cn/Channel/{(isCanary ? 2 : 3)}/latest"));
-        if (!versionsResponse.Succeeded)
+        if (!versionsResponse.IsSuccessStatusCode)
         {
-            Common.AddToTeachingTipLists("获取更新失败", $"HTTP状态码:{versionsResponse.ResponseMessage.StatusCode}");
+            Common.AddToTeachingTipLists("获取更新失败", $"HTTP状态码:{versionsResponse.StatusCode}");
             throw new Exception("获取更新失败");
         }
 
         var versionResp =
-            JsonConvert.DeserializeObject<LatestApplicationUpdate>(await versionsResponse.ResponseMessage.Content.ReadAsStringAsync());
+            JsonConvert.DeserializeObject<LatestApplicationUpdate>(await versionsResponse.Content.ReadAsStringAsync());
         return new RemoteVersionResult
         {
             UpdateSource = isCanary ? UpdateSource.AppCenterCanary : UpdateSource.AppCenter,
@@ -84,14 +84,14 @@ public static class UpdateManager
     {
         using HttpRequestMessage message = new HttpRequestMessage(HttpMethod.Get, new Uri("https://api.github.com/repos/HyPlayer/HyPlayer/releases/latest"));
         message.Headers.Add("user-agent", "HyPlayer-UpdateChecker");
-        using var versionsResponse = await Common.HttpClient.TrySendRequestAsync(message);
-        if (!versionsResponse.Succeeded)
+        using var versionsResponse = await Common.HttpClient.SendAsync(message);
+        if (!versionsResponse.IsSuccessStatusCode)
         {
-            Common.AddToTeachingTipLists("获取更新失败", await versionsResponse.ResponseMessage.Content.ReadAsStringAsync());
+            Common.AddToTeachingTipLists("获取更新失败", await versionsResponse.Content.ReadAsStringAsync());
             throw new Exception("获取更新失败");
         }
         var versionData =
-            JObject.Parse(await versionsResponse.ResponseMessage.Content.ReadAsStringAsync());
+            JObject.Parse(await versionsResponse.Content.ReadAsStringAsync());
         var versionResp = new LatestApplicationUpdate()
         {
             Version = versionData["tag_name"].ToString(),
@@ -158,8 +158,8 @@ public static class UpdateManager
 
     public static async Task GetUserCanaryChannelAvailability(string userEmail)
     {
-        var userResp = await Common.HttpClient.TryGetAsync(new Uri($"https://hyplayer.kengwang.com.cn/user/email/{userEmail}"));
-        if (userResp.Succeeded)
+        var userResp = await Common.HttpClient.GetAsync(new Uri($"https://hyplayer.kengwang.com.cn/user/email/{userEmail}"));
+        if (userResp.IsSuccessStatusCode)
         {
             Common.AddToTeachingTipLists("Canary版本已解锁", "感谢您参加HyPlayer测试\nCanary版本现已解锁\n请到“关于”页面检测更新");
             Common.Setting.canaryChannelAvailability = true;

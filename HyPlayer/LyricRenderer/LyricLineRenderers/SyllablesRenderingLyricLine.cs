@@ -85,7 +85,7 @@ namespace HyPlayer.LyricRenderer.LyricLineRenderers
                     B = 0
                 };
                 session.FillRoundedRectangle((float)textLayout.LayoutBounds.Left, offset.Y,
-                    RenderingWidth, RenderingHeight, 6, 6, color);
+                    RenderingWidth + 15, RenderingHeight + 8, 6, 6, color);
             }
 
             float actualX = offset.X;

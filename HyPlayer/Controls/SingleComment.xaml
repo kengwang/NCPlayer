@@ -86,16 +86,6 @@
                             <TextBlock x:Name="LikeCountTB" Text="{x:Bind MainComment.likedCount}" />
                         </StackPanel>
                     </ToggleButton>
-                    <Button
-                        x:Name="Delete"
-                        Height="35"
-                        Background="Transparent"
-                        BorderBrush="Transparent"
-                        Click="Delete_Click"
-                        ToolTipService.ToolTip="删除"
-                        Visibility="{x:Bind MainComment.IsByMyself, Mode=OneWay}">
-                        <FontIcon FontSize="15" Glyph="&#xE107;" />
-                    </Button>
                     <ToggleButton
                         x:Name="ReplyBtn"
                         Height="35"
@@ -112,7 +102,7 @@
                 </StackPanel>
             </muxc:Expander.Header>
             <StackPanel Orientation="Vertical">
-                <Grid Margin="0,12,0,12">
+                <Grid Visibility="Collapsed" Margin="0,12,0,12">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition />
                         <ColumnDefinition Width="80" />

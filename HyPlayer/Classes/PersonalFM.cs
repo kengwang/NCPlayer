@@ -1,10 +1,8 @@
 ﻿#region
 
 using HyPlayer.HyPlayControl;
-using NeteaseCloudMusicApi;
-using Newtonsoft.Json.Linq;
+using HyPlayer.NeteaseApi.ApiContracts;
 using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 
 #endregion
@@ -13,6 +11,8 @@ namespace HyPlayer.Classes;
 
 internal static class PersonalFM
 {
+    private static bool _isNew = true;
+
     public static void InitPersonalFM()
     {
         HyPlayList.NowPlayType = PlayMode.DefaultRoll;
@@ -50,26 +50,40 @@ internal static class PersonalFM
                     {
                         {
                             // 预加载下一首
-                            var json = await Common.ncapi?.RequestAsync(CloudMusicApiProviders.PersonalFm);
-                            foreach (var jToken in json["data"]?.Children() ?? new JEnumerable<JToken>())
+                            var result = await Common.NeteaseAPI.RequestAsync(NeteaseApis.PersonalFmApi);
+                            if (result.IsError || result.Value?.Items?.Length is not > 0)
                             {
-                                HyPlayList.List.Add(HyPlayList.LoadNcSong(NCSong.CreateFromJson(jToken)));
+                                Common.AddToTeachingTipLists("加载私人 FM错误", result.Error?.Message ?? "未知错误");
+                                return;
                             }
-                            json.RemoveAll();
+
+                            foreach (var personalFmDataItem in result.Value.Items)
+                            {
+                                HyPlayList.AppendNcSong(personalFmDataItem.MapToNcSong());
+                            }
                         }
                     }
                     else
                     {
                         // AIDJ
                         // 预加载后续内容
-                        var json = await Common.ncapi?.RequestAsync(CloudMusicApiProviders.AiDjContent);
-                        foreach (var aidjResource in json["data"]?["aiDjResources"]?.Children() ??
-                                                     new JEnumerable<JToken>())
-                        {
-                            if (aidjResource["type"]?.ToString() == "audio")
+                        var result = await Common.NeteaseAPI.RequestAsync(NeteaseApis.AiDjContentRcmdInfoApi,
+                            new AiDjContentRcmdInfoRequest
                             {
-                                foreach (var audioItem in aidjResource["value"]?["audioList"]?.Children() ??
-                                                          new JEnumerable<JToken>())
+                                IsNewToAidj = _isNew
+                            });
+                        _isNew = false;
+                        if (result.IsError || result.Value?.Data?.AiDjResources?.Length is not > 0)
+                        {
+                            Common.AddToTeachingTipLists("加载私人 FM错误", result.Error?.Message ?? "未知错误");
+                            return;
+                        }
+
+                        foreach (var aiDjContentRcmdInfoResource in result.Value.Data.AiDjResources)
+                        {
+                            if (aiDjContentRcmdInfoResource is AiDjContentRcmdInfoResponse.AiDjContentRcmdInfoData.AiDjContentRcmdAudioResource audioValue)
+                            {
+                                foreach (var audioItem in audioValue.Value?.Audio ?? [])
                                 {
                                     var playItem = new HyPlayItem()
                                     {
@@ -81,53 +95,49 @@ internal static class PersonalFM
                                                 AlbumType = HyPlayItemType.Netease,
                                                 alias = "私人 DJ",
                                                 cover =
-                                                                                      "https://p1.music.126.net/kMuXXbwHbduHpLYDmHXrlA==/109951168152833223.jpg",
+                                                    "https://p1.music.126.net/kMuXXbwHbduHpLYDmHXrlA==/109951168152833223.jpg",
                                                 description = "私人 DJ",
                                                 id = "126368130",
                                                 name = "私人 DJ 推荐语"
                                             },
-                                            Artist = new List<NCArtist>()
-                                                                               {
-                                                                                   new NCArtist
-                                                                                   {
-                                                                                       alias = "私人 DJ",
-                                                                                       avatar =
-                                                                                           "https://p1.music.126.net/kMuXXbwHbduHpLYDmHXrlA==/109951168152833223.jpg",
-                                                                                       id = "1",
-                                                                                       name = "私人 DJ",
-                                                                                       transname = null,
-                                                                                       Type = HyPlayItemType.Netease
-                                                                                   }
-                                                                               },
+                                            Artist =
+                                            [
+                                                new NCArtist()
+                                                {
+                                                    alias = "私人 DJ",
+                                                    avatar =
+                                                        "https://p1.music.126.net/kMuXXbwHbduHpLYDmHXrlA==/109951168152833223.jpg",
+                                                    id = "1",
+                                                    name = "私人 DJ",
+                                                    transname = null,
+                                                    Type = HyPlayItemType.Netease
+                                                }
+                                            ],
                                             Bitrate = 0,
                                             CDName = null,
                                             Id = "-1",
                                             IsLocalFile = false,
-                                            LengthInMilliseconds =
-                                                                          audioItem["validTime"]
-                                                                              ?.ToObject<long>() ??
-                                                                          114514,
+                                            LengthInMilliseconds = audioItem.Duration,
                                             Name = "私人 DJ 推荐语",
-                                            Tag = "私人 DJ",
+                                            InfoTag = "私人 DJ",
                                             Type = HyPlayItemType.Netease,
-                                            Url = audioItem["audioUrl"]?.ToString()
+                                            Url = audioItem.Url
                                         }
                                     };
                                     HyPlayList.List.Add(playItem);
                                 }
                             }
-
-                            if (aidjResource["type"]?.ToString() == "song")
+                            else if (aiDjContentRcmdInfoResource is AiDjContentRcmdInfoResponse.AiDjContentRcmdInfoData.AiDjContentRcmdAudioSong songValue)
                             {
-                                var ncSong = NCSong.CreateFromJson(aidjResource["value"]?["songData"]);
+                                var ncSong = songValue.Value?.SongName?.MapToNcSong();
                                 if (ncSong is not null)
                                 {
                                     HyPlayList.AppendNcSong(ncSong);
                                 }
                             }
                         }
-                        json.RemoveAll();
                     }
+
                     HyPlayList.SongAppendDone();
                     HyPlayList.SongMoveTo(appendedIndex);
                 }

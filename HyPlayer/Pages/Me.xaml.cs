@@ -2,11 +2,9 @@
 
 using HyPlayer.Classes;
 using HyPlayer.HyPlayControl;
-using NeteaseCloudMusicApi;
+using HyPlayer.NeteaseApi.ApiContracts;
 using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Windows.Storage;
@@ -85,9 +83,17 @@ public sealed partial class Me : Page, IDisposable
         _cancellationToken.ThrowIfCancellationRequested();
         try
         {
-            var json = await Common.ncapi?.RequestAsync(CloudMusicApiProviders.UserDetail,
-                    new Dictionary<string, object> { ["uid"] = uid });
-            NCUser currentUser = NCUser.CreateFromJson(json["profile"]);
+            var json = await Common.NeteaseAPI?.RequestAsync(NeteaseApis.UserDetailApi,
+                    new UserDetailRequest()
+                    {
+                        UserId = uid
+                    });
+            if (json.IsError)
+            {
+                Common.AddToTeachingTipLists("用户信息获取失败", json.Error.Message);
+                return;
+            }
+            NCUser currentUser = json.Value.Profile.MapToNcUser();
             userDisplay = new(currentUser);
         }
         catch (Exception ex)
@@ -103,50 +109,59 @@ public sealed partial class Me : Page, IDisposable
     public async Task LoadPlayList()
     {
         if (disposedValue) throw new ObjectDisposedException(nameof(Me));
-        _cancellationToken.ThrowIfCancellationRequested();
         try
         {
-            var json = await Common.ncapi?.RequestAsync(CloudMusicApiProviders.UserPlaylist,
-                new Dictionary<string, object> { ["uid"] = uid, ["limit"] = 999 });
+            _cancellationToken.ThrowIfCancellationRequested();
+            var json = await Common.NeteaseAPI?.RequestAsync(NeteaseApis.UserPlaylistApi,
+                new UserPlaylistRequest()
+                {
+                    Uid = uid,
+                    Limit = 1000 // 为什么这么大, 官方客户端也是这么大
+                }, _cancellationToken);
+            if (json.IsError)
+            {
+                Common.AddToTeachingTipLists("用户歌单获取失败", json.Error.Message);
+                return;
+            }
 
-
-            var myListIdx = 0;
             var subListIdx = 0;
-            foreach (var PlaylistItemJson in json["playlist"].ToArray())
+            foreach (var valuePlaylist in json.Value.Playlists ?? [])
             {
                 _cancellationToken.ThrowIfCancellationRequested();
-                var ncp = NCPlayList.CreateFromJson(PlaylistItemJson);
-                if (ncp.creater.id != uid)
-                    //GridContainerSub.Children.Add(new PlaylistItem(ncp));
+                var playList = valuePlaylist.MapToNCPlayList();
+                if (playList.creater.id != uid)
+                {
                     likedPlayList.Add(
                         new SimpleListItem
                         {
-                            CoverLink = ncp.cover.ToString(),
-                            LineOne = ncp.creater.name,
-                            LineThree = null,
-                            LineTwo = null,
-                            Order = myListIdx++,
-                            ResourceId = "pl" + ncp.plid,
-                            Title = ncp.name,
+                            CoverLink = playList.cover,
+                            LineOne = playList.creater.name,
+                            LineThree = $"播放量: {playList.playCount} | 歌曲数: {playList.trackCount}",
+                            LineTwo = playList.desc,
+                            Order = subListIdx++,
+                            ResourceId = "pl" + playList.plid,
+                            Title = playList.name,
                             CanPlay = true
                         }
                     );
+                }
                 else
+                {
                     myPlayList.Add(
                         new SimpleListItem
                         {
-                            CoverLink = ncp.cover.ToString(),
-                            LineOne = ncp.creater.name,
-                            LineThree = null,
-                            LineTwo = null,
+                            CoverLink = playList.cover,
+                            LineOne = playList.creater.name,
+                            LineThree = $"播放量: {playList.playCount} | 歌曲数: {playList.trackCount}",
+                            LineTwo = playList.desc,
                             Order = subListIdx++,
-                            ResourceId = "pl" + ncp.plid,
-                            Title = ncp.name,
+                            ResourceId = "pl" + playList.plid,
+                            Title = playList.name,
                             CanPlay = true
                         }
                     );
+                }
             }
-            json.RemoveAll();
         }
         catch (Exception ex)
         {
@@ -155,19 +170,18 @@ public sealed partial class Me : Page, IDisposable
         }
     }
 
-    private async void Logout_OnClick(object sender, RoutedEventArgs e)
+    private void Logout_OnClick(object sender, RoutedEventArgs e)
     {
         if (disposedValue) throw new ObjectDisposedException(nameof(Me));
         try
         {
-            await Common.ncapi?.RequestAsync(CloudMusicApiProviders.Logout);
             Common.Logined = false;
             Common.LoginedUser = new NCUser();
             if (ApplicationData.Current.LocalSettings.Containers.TryGetValue("Cookies", out var container))
             {
                 container.Values.Clear();
             }
-            Common.ncapi?.ClearCookies();
+            Common.NeteaseAPI.Option.Cookies.Clear();
             Common.PageMain.MainFrame.Navigate(typeof(BasePage));
             _ = ((App)Application.Current).InitializeJumpList();
         }

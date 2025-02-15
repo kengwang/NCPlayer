@@ -2,13 +2,12 @@
 
 using AudioEffectComponent;
 using HyPlayer.Classes;
+using HyPlayer.NeteaseApi.ApiContracts;
 using Kawazu;
 using LyricParser.Abstraction;
 using LyricParser.Implementation;
 using Microsoft.Toolkit.Uwp.Helpers;
 using Microsoft.Toolkit.Uwp.Notifications;
-using NeteaseCloudMusicApi;
-using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -79,7 +78,7 @@ public static class HyPlayList
 
     public delegate void SongLikeStatusChanged(bool isLiked);
 
-    public delegate Task SongCoverChanged(int hashCode, IRandomAccessStream coverStream);
+    public delegate Task SongCoverChanged(int hashCode, IBuffer coverStream);
 
     public static int NowPlaying;
     private static readonly System.Timers.Timer SecTimer = new(1000); // 公用秒表
@@ -97,12 +96,12 @@ public static class HyPlayList
     private static readonly BackgroundDownloader Downloader = new();
     private static Dictionary<HyPlayItem, DownloadOperation> DownloadOperations = new();
     public static InMemoryRandomAccessStream CoverStream = new InMemoryRandomAccessStream();
-
+    public static IBuffer CoverBuffer;
     public static RandomAccessStreamReference CoverStreamReference =
         RandomAccessStreamReference.CreateFromStream(CoverStream);
 
     public static int NowPlayingHashCode = 0;
-    private static InMemoryRandomAccessStream _ncmPlayableStream;
+    private static InMemoryRandomAccessStream _ncmPlayableStream = new();
     private static string _ncmPlayableStreamMIMEType = string.Empty;
     private static MediaSource _mediaSource;
     private static Task _playerLoaderTask;
@@ -255,7 +254,6 @@ public static class HyPlayList
         Player.CurrentStateChanged += Player_CurrentStateChanged;
         //Player.VolumeChanged += Player_VolumeChanged;
         Player.PlaybackSession.PositionChanged += PlaybackSession_PositionChanged;
-        Player.PlaybackSession.SeekCompleted += PlaybackSession_SeekCompleted;
         if (Common.Setting.progressInSMTC)
         {
             MediaSystemControls.PlaybackPositionChangeRequested += MediaSystemControls_PlaybackPositionChangeRequested;
@@ -275,10 +273,6 @@ public static class HyPlayList
         if (!Common.Setting.EnableAudioGain) AudioEffectsProperties["AudioGain_Disabled"] = true;
         Player.AddAudioEffect(typeof(AudioGainEffect).FullName, true, AudioEffectsProperties);
         Common.IsInFm = false;
-    }
-
-    private static void PlaybackSession_SeekCompleted(MediaPlaybackSession sender, object args)
-    {
     }
 
     public static void Seek(TimeSpan targetTimeSpan)
@@ -333,8 +327,8 @@ public static class HyPlayList
             Common.AddToTeachingTipLists("播放失败", "无法创建媒体接收器，请检查设备是否有声音输出设备！");
             return;
         }
-        if ((uint)args.ExtendedErrorCode.HResult == 0x80004004 
-            || (uint)args.ExtendedErrorCode.HResult == 0xC00D36BB 
+        if ((uint)args.ExtendedErrorCode.HResult == 0x80004004
+            || (uint)args.ExtendedErrorCode.HResult == 0xC00D36BB
             || (uint)args.ExtendedErrorCode.HResult == 0x80004005)
         {
             if (PlaybackErrorHandling) return;
@@ -424,7 +418,7 @@ public static class HyPlayList
                                 .Size.ToString(),
                             */
                             Name = Info.musicName,
-                            Tag = file.Provider.DisplayName + " NCM"
+                            InfoTag = file.Provider.DisplayName + " NCM"
                         }
                     };
                     hyitem.PlayItem.Artist = Info.artist.Select(t => new NCArtist
@@ -616,9 +610,8 @@ public static class HyPlayList
                     break;
                 }
             case HyPlayItemType.Radio:
-                _ = Common.ncapi?.RequestAsync(CloudMusicApiProviders.ResourceLike,
-                    new Dictionary<string, object>
-                        { { "type", "4" }, { "t", "1" }, { "id", NowPlayingItem.PlayItem.Id } });
+                // TODO: 待实现电台红心
+                Common.AddToTeachingTipLists("暂不支持红心电台歌曲", "将在后续版本中支持");
                 OnSongLikeStatusChange?.Invoke(!isLiked);
                 break;
         }
@@ -1054,64 +1047,66 @@ public static class HyPlayList
             Common.Setting.songUrlLazyGet) && targetItem.PlayItem.Id != "-1")
             try
             {
-                var json = await Common.ncapi?.RequestAsync(
-                    CloudMusicApiProviders.SongUrlV1,
-                    new Dictionary<string, object>
-                    {
-                        { "id", targetItem.PlayItem.Id },
-                        { "level", Common.Setting.audioRate }
-                    });
-                if (json["data"]?[0]?["code"]?.ToString() == "200")
+                var songRequest = new SongUrlRequest { Level = Common.Setting.audioRate, Id = targetItem.PlayItem.Id };
+                var songResult = await Common.NeteaseAPI.RequestAsync(NeteaseApis.SongUrlApi, songRequest);
+                if (songResult.IsSuccess)
                 {
-                    if (json["data"]?[0]?["freeTrialInfo"]?.HasValues == true && Common.Setting.jumpVipSongPlaying)
+                    if (songResult.Value.SongUrls[0].Code == 200)
                     {
-                        throw new Exception("当前歌曲为 VIP 试听, 已自动跳过");
-                    }
-
-                    playUrl = json["data"][0]["url"]?.ToString();
-                    if (Common.Setting.UseHttpWhenGettingSongs && playUrl.Contains("https://"))
-                    {
-                        playUrl = playUrl.Replace("https://", "http://");
-                    }
-                    var tag = json["data"]?[0]?["level"]?.ToString() switch
-                    {
-                        "standard" => "标准",
-                        "higher" => "较高",
-                        "exhigh" => "极高",
-                        "lossless" => "无损",
-                        "hires" => "Hi-Res",
-                        "jyeffect" => "高清环绕声",
-                        "sky" => "沉浸环绕声",
-                        "jymaster" => "超清母带",
-                        _ => "在线"
-                    };
-                    targetItem.PlayItem.Tag = tag;
-                    AudioEffectsProperties["AudioGain_GainValue"] = float.Parse(json["data"]?[0]?["gain"].ToString());
-                    _ = Common.Invoke(() =>
-                    {
-                        Common.BarPlayBar.TbSongTag.Text = tag;
-                        if (tag.Length > 2)
+                        if (!string.IsNullOrEmpty(songResult.Value.SongUrls[0].FreeTrialInfo) && Common.Setting.jumpVipSongPlaying)
                         {
-                            var backgroundbrush = new LinearGradientBrush();
-                            backgroundbrush.StartPoint = new Windows.Foundation.Point(0, 0);
-                            backgroundbrush.EndPoint = new Windows.Foundation.Point(1, 1);
-
-                            backgroundbrush.GradientStops.Add(new GradientStop { Offset = 0, Color = Color.FromArgb(255, 251, 251, 206) });
-                            backgroundbrush.GradientStops.Add(new GradientStop { Offset = 1, Color = Color.FromArgb(255, 223, 155, 28) });
-
-                            Common.BarPlayBar.SongInfoTag.Background = backgroundbrush;
-                            Common.BarPlayBar.SongInfoTag.BorderBrush = new SolidColorBrush(Color.FromArgb(0, 0, 0, 0));
-                            Common.BarPlayBar.TbSongTag.Foreground = new SolidColorBrush(Color.FromArgb(255, 0, 0, 0));
+                            throw new Exception("当前歌曲为 VIP 试听, 已自动跳过");
                         }
-                        else
+
+                        playUrl = songResult.Value.SongUrls[0].Url;
+                        if (Common.Setting.UseHttpWhenGettingSongs && playUrl.Contains("https://"))
                         {
-                            var brush = new SolidColorBrush(Colors.Red);
-                            Common.BarPlayBar.SongInfoTag.BorderBrush = brush;
-                            Common.BarPlayBar.SongInfoTag.Background = null;
-                            Common.BarPlayBar.TbSongTag.Foreground = brush;
+                            playUrl = playUrl.Replace("https://", "http://");
                         }
-                    });
-                    json.RemoveAll();
+
+
+                        var tag = songResult.Value.SongUrls[0]?.Level
+                            switch
+                        {
+                            "standard" => "标准",
+                            "higher" => "较高",
+                            "exhigh" => "极高",
+                            "lossless" => "无损",
+                            "hires" => "Hi-Res",
+                            "jyeffect" => "高清环绕声",
+                            "sky" => "沉浸环绕声",
+                            "jymaster" => "超清母带",
+                            _ => "在线"
+                        };
+                        targetItem.PlayItem.QualityTag = tag;
+
+
+                        AudioEffectsProperties["AudioGain_GainValue"] = songResult.Value.SongUrls[0]?.Gain ?? 0f;
+                        _ = Common.Invoke(() =>
+                        {
+                            Common.BarPlayBar.TbSongTag.Text = targetItem.PlayItem.QualityTag;
+                            if (targetItem.PlayItem.QualityTag.Length > 2)
+                            {
+                                var backgroundbrush = new LinearGradientBrush();
+                                backgroundbrush.StartPoint = new Windows.Foundation.Point(0, 0);
+                                backgroundbrush.EndPoint = new Windows.Foundation.Point(1, 1);
+
+                                backgroundbrush.GradientStops.Add(new GradientStop { Offset = 0, Color = Color.FromArgb(255, 251, 251, 206) });
+                                backgroundbrush.GradientStops.Add(new GradientStop { Offset = 1, Color = Color.FromArgb(255, 223, 155, 28) });
+
+                                Common.BarPlayBar.SongInfoTag.Background = backgroundbrush;
+                                Common.BarPlayBar.SongInfoTag.BorderBrush = new SolidColorBrush(Color.FromArgb(0, 0, 0, 0));
+                                Common.BarPlayBar.TbSongTag.Foreground = new SolidColorBrush(Color.FromArgb(255, 0, 0, 0));
+                            }
+                            else
+                            {
+                                var brush = new SolidColorBrush(Colors.Red);
+                                Common.BarPlayBar.SongInfoTag.BorderBrush = brush;
+                                Common.BarPlayBar.SongInfoTag.Background = null;
+                                Common.BarPlayBar.TbSongTag.Foreground = brush;
+                            }
+                        });
+                    }
                 }
                 else
                 {
@@ -1272,7 +1267,20 @@ public static class HyPlayList
                         else
                         {
                             var playUrl = await GetNowPlayingUrl(targetItem);
-                            _mediaSource = MediaSource.CreateFromUri(new Uri(playUrl));
+                            if (Common.Setting.EnablePreLoad)
+                            {
+                                var reference = RandomAccessStreamReference.CreateFromUri(new Uri(playUrl));
+                                using var stream = await reference.OpenReadAsync();
+                                var buffer = new Buffer((uint)stream.Size);
+                                await stream.ReadAsync(buffer, (uint)stream.Size, InputStreamOptions.None);
+                                _ncmPlayableStream = new InMemoryRandomAccessStream();
+                                await _ncmPlayableStream.WriteAsync(buffer);
+                                _mediaSource = MediaSource.CreateFromStream(_ncmPlayableStream, stream.ContentType);
+                            }
+                            else
+                            {
+                                _mediaSource = MediaSource.CreateFromUri(new Uri(playUrl));
+                            }
                         }
                     }
 
@@ -1397,7 +1405,7 @@ public static class HyPlayList
                 if ((hashCodeWhenRequested == NowPlayingHashCode) && !Common.Setting.noImage)
                 {
                     CoverStream.Seek(0);
-                    OnSongCoverChanged?.Invoke(hashCodeWhenRequested, CoverStream);
+                    OnSongCoverChanged?.Invoke(hashCodeWhenRequested, CoverBuffer);
                 }
             }
 
@@ -1473,7 +1481,11 @@ public static class HyPlayList
                     throw new Exception("更新SMTC图片时发生异常");
                 }
 
-                await result.Content.WriteToStreamAsync(CoverStream);
+                var buffer = (await result.Content.ReadAsByteArrayAsync()).AsBuffer();
+                CoverBuffer = buffer;
+                CoverStream.Size = 0;
+                CoverStream.Seek(0);
+                await CoverStream.WriteAsync(buffer);
             }
         }
         catch (Exception)
@@ -1514,12 +1526,7 @@ public static class HyPlayList
                 if (properties.Size == 0)
                 {
                     using var outputStream = await storageFile.OpenAsync(FileAccessMode.ReadWrite);
-                    var buffer = new Buffer(MIMEHelper.PICTURE_FILE_HEADER_CAPACITY);
-                    coverStream.Seek(0);
-                    await coverStream.ReadAsync(buffer, MIMEHelper.PICTURE_FILE_HEADER_CAPACITY,
-                        InputStreamOptions.None);
-                    var mime = MIMEHelper.GetPictureCodecFromBuffer(buffer);
-                    BitmapDecoder decoder = await BitmapDecoder.CreateAsync(mime, coverStream);
+                    BitmapDecoder decoder = await BitmapDecoder.CreateAsync(coverStream);
                     using var softwareBitmap = await decoder.GetSoftwareBitmapAsync();
                     BitmapEncoder encoder =
                         await BitmapEncoder.CreateAsync(BitmapEncoder.JpegEncoderId, outputStream);
@@ -1843,98 +1850,66 @@ public static class HyPlayList
                 };
             try
             {
-                JObject json;
 
-                if (Common.Setting.karaokLyric)
+                var lyricRequest = new LyricRequest() { Id = ncp.PlayItem.Id };
+                var lyricResult = await Common.NeteaseAPI.RequestAsync(NeteaseApis.LyricApi, lyricRequest);
+                string lrc, romaji, karaoklrc, translrc, yrromaji, yrtranslrc;
+                if (lyricResult.IsError)
                 {
-                    json = await Common.ncapi?.RequestAsync(
-                        CloudMusicApiProviders.LyricNew,
-                        new Dictionary<string, object> { { "id", ncp.PlayItem.Id } });
-                    string lrc, romaji, karaoklrc, translrc, yrromaji, yrtranslrc;
-                    if (json["yrc"] is null)
+                    Common.AddToTeachingTipLists("获取歌词失败", lyricResult.Error.Message);
+                    return new PureLyricInfo
                     {
-                        lrc = string.Join('\n',
-                            (json["lrc"]?["lyric"]?.ToString() ?? string.Empty).Split("\n")
-                            .Where(t => !t.StartsWith("{")).ToArray());
-                        romaji = json["romalrc"]?["lyric"]?.ToString();
-                        translrc = json["tlyric"]?["lyric"]?.ToString();
-                        return new PureLyricInfo()
-                        {
-                            PureLyrics = lrc,
-                            TrLyrics = translrc,
-                            NeteaseRomaji = romaji,
-                        };
-                    }
-                    else
+                        PureLyrics = "[00:00.000] 歌词获取失败",
+                        TrLyrics = null
+                    };
+                }
+
+                if (lyricResult.Value?.Lyric is null && lyricResult.Value?.YunLyric is null)
+                {
+                    return new PureLyricInfo
                     {
-                        lrc = string.Join('\n',
-                            (json["lrc"]?["lyric"]?.ToString() ?? string.Empty).Split("\n")
-                            .Where(t => !t.StartsWith("{")).ToArray());
-                        karaoklrc = string.Join('\n',
-                            (json["yrc"]?["lyric"]?.ToString() ?? string.Empty).Split("\n")
-                            .Where(t => !t.StartsWith("{")).ToArray());
-                        yrromaji = json["yromalrc"]?["lyric"]?.ToString();
-                        yrtranslrc = json["ytlrc"]?["lyric"]?.ToString();
-                        romaji = json["romalrc"]?["lyric"]?.ToString();
-                        translrc = json["tlyric"]?["lyric"]?.ToString();
-                        return new KaraokLyricInfo()
-                        {
-                            PureLyrics = lrc,
-                            TrLyrics = translrc,
-                            YrNeteaseRomaji = yrromaji,
-                            YrTrLyrics = yrtranslrc,
-                            NeteaseRomaji = romaji,
-                            KaraokLyric = karaoklrc
-                        };
-                    }
+                        PureLyrics = "[00:00.000] 无歌词 请欣赏",
+                        TrLyrics = null
+                    };
+                }
+
+                string CleanLrc(string text)
+                {
+                    return string.Join('\n',
+                        text.Split("\n")
+                        .Where(t => !t.StartsWith("{")).ToArray());
+                }
+
+                if (lyricResult.Value?.YunLyric?.Lyric is null)
+                {
+                    lrc = CleanLrc(lyricResult.Value?.Lyric?.Lyric);
+                    romaji = lyricResult.Value?.RomajiLyric?.Lyric;
+                    translrc = lyricResult.Value?.TranslationLyric?.Lyric;
+                    return new PureLyricInfo()
+                    {
+                        PureLyrics = lrc,
+                        TrLyrics = translrc,
+                        NeteaseRomaji = romaji,
+                    };
                 }
                 else
                 {
-                    json = await Common.ncapi?.RequestAsync(
-                        CloudMusicApiProviders.Lyric,
-                        new Dictionary<string, object> { { "id", ncp.PlayItem.Id } });
-                    if (json["nolyric"]?.ToString().ToLower() == "true")
-                        return new PureLyricInfo
-                        {
-                            PureLyrics = "[00:00.000] 纯音乐 请欣赏",
-                            TrLyrics = null
-                        };
-                    if (json["uncollected"]?.ToString().ToLower() == "true")
-                        /*
-                             * 此接口失效
-                            //Ask for Cloud Pan
-                            json = await Common.ncapi?.RequestAsync(
-                                CloudMusicApiProviders.CloudLyric,
-                                new Dictionary<string, object>
-                                    { { "id", ncp.PlayItem.Id }, { "userId", Common.LoginedUser?.id } });
-                            if (json["lrc"] != null)
-                                return new PureLyricInfo
-                                {
-                                    PureLyrics = json["lrc"]?.ToString(),
-                                    TrLyrics = null
-                                };
-                            */
-                        return new PureLyricInfo
-                        {
-                            PureLyrics = "[00:00.000] 无歌词 请欣赏",
-                            TrLyrics = null
-                        };
-                    try
+                    lrc = CleanLrc(lyricResult.Value?.Lyric?.Lyric);
+                    karaoklrc = CleanLrc(lyricResult.Value?.YunLyric?.Lyric);
+                    yrromaji = lyricResult.Value?.YunRomajiLyric?.Lyric;
+                    yrtranslrc = lyricResult.Value?.YunTranslationLyric?.Lyric;
+                    romaji = lyricResult.Value?.RomajiLyric?.Lyric;
+                    translrc = lyricResult.Value?.TranslationLyric?.Lyric;
+                    return new KaraokLyricInfo()
                     {
-                        return new PureLyricInfo
-                        {
-                            PureLyrics = json["lrc"]?["lyric"]?.ToString(),
-                            TrLyrics = json["tlyric"]?["lyric"]?.ToString(),
-                            NeteaseRomaji = json["romalrc"]?["lyric"]?.ToString()
-                        };
-                    }
-                    catch (Exception)
-                    {
-                        //DEBUG
-                    }
+                        PureLyrics = lrc,
+                        TrLyrics = translrc,
+                        YrNeteaseRomaji = yrromaji,
+                        YrTrLyrics = yrtranslrc,
+                        NeteaseRomaji = romaji,
+                        KaraokLyric = karaoklrc
+                    };
                 }
-
-                json.RemoveAll();
             }
             catch (Exception ex)
             {
@@ -2003,23 +1978,7 @@ public static class HyPlayList
     {
         try
         {
-            var ncp = new PlayItem
-            {
-                Type = ncSong.Type,
-                //Bitrate = json["data"][0]["br"].ToObject<int>(),
-                Tag = "在线",
-                Album = ncSong.Album,
-                Artist = ncSong.Artist,
-                //SubExt = json["data"][0]["type"].ToString().ToLowerInvariant(),
-                Id = ncSong.sid,
-                Name = ncSong.songname,
-                TrackId = ncSong.TrackId,
-                CDName = ncSong.CDName,
-                //Url = json["data"][0]["url"].ToString(),
-                LengthInMilliseconds = ncSong.LengthInMilliseconds
-                //Size = json["data"][0]["size"].ToString(),
-                //md5 = json["data"][0]["md5"].ToString()
-            };
+            var ncp = NCSongToPlayItem(ncSong);
             return LoadNcPlayItem(ncp);
         }
         catch (Exception ex)
@@ -2030,7 +1989,7 @@ public static class HyPlayList
         return null;
     }
 
-    private static void AppendNcPlayItem(PlayItem ncp)
+    public static void AppendNcPlayItem(PlayItem ncp)
     {
         var hpi = LoadNcPlayItem(ncp);
         List.Add(hpi);
@@ -2046,6 +2005,26 @@ public static class HyPlayList
         return hpi;
     }
 
+    public static PlayItem NCSongToPlayItem(NCSong ncSong)
+    {
+        return new PlayItem
+        {
+            Type = ncSong.Type,
+            InfoTag = ncSong.alias,
+            Album = ncSong.Album,
+            Artist = ncSong.Artist,
+            //SubExt = token["type"].ToString(),
+            Id = ncSong.sid,
+            Name = ncSong.songname,
+            TrackId = ncSong.TrackId,
+            CDName = ncSong.CDName,
+            //url = token["url"].ToString(),
+            LengthInMilliseconds = ncSong.LengthInMilliseconds
+            //size = token["size"].ToString(),
+            //md5 = token["md5"].ToString()
+        };
+    }
+
     public static void AppendNcSongs(IList<NCSong> ncSongs, bool needRemoveList = true, bool resetPlaying = true,
         string currentSongId = "-1")
     {
@@ -2056,22 +2035,7 @@ public static class HyPlayList
         {
             foreach (var ncSong in ncSongs)
             {
-                var ncp = new PlayItem
-                {
-                    Type = ncSong.Type,
-                    Tag = "在线",
-                    Album = ncSong.Album,
-                    Artist = ncSong.Artist,
-                    //SubExt = token["type"].ToString(),
-                    Id = ncSong.sid,
-                    Name = ncSong.songname,
-                    TrackId = ncSong.TrackId,
-                    CDName = ncSong.CDName,
-                    //url = token["url"].ToString(),
-                    LengthInMilliseconds = ncSong.LengthInMilliseconds
-                    //size = token["size"].ToString(),
-                    //md5 = token["md5"].ToString()
-                };
+                var ncp = NCSongToPlayItem(ncSong);
                 AppendNcPlayItem(ncp);
             }
 
@@ -2102,11 +2066,25 @@ public static class HyPlayList
                     await AppendPlayList(sourceId.Substring(2, sourceId.Length - 2));
                     return true;
                 case "ns":
-                    var json = await Common.ncapi?.RequestAsync(CloudMusicApiProviders.SongDetail,
-                        new Dictionary<string, object>
-                            { { "ids", sourceId.Substring(2, sourceId.Length - 2) } });
-                    _ = AppendNcSong(NCSong.CreateFromJson(json["songs"]?[0]));
-                    json.RemoveAll();
+                    var result = await Common.NeteaseAPI?.RequestAsync(NeteaseApis.SongDetailApi,
+                        new SongDetailRequest()
+                        {
+                            Id = sourceId.Substring(2, sourceId.Length - 2)
+                        });
+                    if (result.IsError)
+                    {
+                        Common.AddToTeachingTipLists("获取歌曲信息失败", result.Error.Message);
+                        return false;
+                    }
+                    else
+                    {
+                        if (result.Value?.Songs is not { Length: > 0 })
+                        {
+                            Common.AddToTeachingTipLists("获取歌曲信息失败", "歌曲信息为空");
+                            return false;
+                        }
+                        AppendNcSong(result.Value.Songs?[0].MapToNcSong());
+                    }
                     return true;
                 case "al":
                     await AppendAlbum(sourceId.Substring(2, sourceId.Length - 2));
@@ -2135,32 +2113,19 @@ public static class HyPlayList
     {
         try
         {
-            var j1 = await Common.ncapi?.RequestAsync(CloudMusicApiProviders.ArtistTopSong,
-                new Dictionary<string, object> { { "id", id } });
-
-
-            var json = await Common.ncapi?.RequestAsync(CloudMusicApiProviders.SongDetail,
-                new Dictionary<string, object>
+            var j1 = await Common.NeteaseAPI?.RequestAsync(NeteaseApis.ArtistTopSongApi,
+                new ArtistTopSongRequest
                 {
-                    ["ids"] = string.Join(",",
-                        (j1["songs"] ?? new JArray()).ToList().Select(t => t["id"]))
-                },
-                false);
-            var idx = 0;
-            var list = new List<NCSong>();
-            if (json["songs"] != null)
-                foreach (var jToken in json["songs"])
-                {
-                    var ncSong = NCSong.CreateFromJson(jToken);
-                    ncSong.IsAvailable = json["privileges"]?[idx]?["st"]?.ToString() == "0";
-                    ncSong.Order = idx++;
-                    list.Add(ncSong);
-                }
+                    ArtistId = id
+                });
+            if (j1.IsError)
+            {
+                Common.AddToTeachingTipLists("获取歌手热门歌曲失败", j1.Error.Message);
+                return false;
+            }
 
-            list.RemoveAll(t => t == null);
+            var list = j1.Value.Songs?.Select(t => t.MapToNcSong()).ToList();
             AppendNcSongs(list, false);
-            list.Clear();
-            json.RemoveAll();
             return true;
         }
         catch (Exception ex)
@@ -2175,20 +2140,19 @@ public static class HyPlayList
     {
         try
         {
-            var json = await Common.ncapi?.RequestAsync(CloudMusicApiProviders.Album,
-                new Dictionary<string, object> { { "id", albumId } });
+            var json = await Common.NeteaseAPI?.RequestAsync(NeteaseApis.AlbumApi,
+                new AlbumRequest()
+                {
+                    Id = albumId
+                });
 
-            var list = new List<NCSong>();
-            foreach (var song in (json["songs"] ?? new JArray()).ToArray())
+
+            if (json.IsError)
             {
-                var ncSong = NCSong.CreateFromJson(song);
-                list.Add(ncSong);
+                Common.AddToTeachingTipLists("获取专辑信息失败", json.Error.Message);
+                return false;
             }
-
-            list.RemoveAll(t => t == null || !t.IsAvailable);
-            AppendNcSongs(list, false);
-            list.Clear();
-            json.RemoveAll();
+            AppendNcSongs(json.Value.Songs?.Select(t => t.MapToNcSong()).ToList(), false);
             return true;
         }
         catch (Exception ex)
@@ -2208,20 +2172,25 @@ public static class HyPlayList
             while (hasMore is true)
                 try
                 {
-                    var json = await Common.ncapi?.RequestAsync(CloudMusicApiProviders.DjProgram,
-                        new Dictionary<string, object>
+                    var json = await Common.NeteaseAPI?.RequestAsync(NeteaseApis.DjChannelProgramsApi,
+                        new DjChannelProgramsRequest()
                         {
-                            { "rid", radioId },
-                            { "offset", page++ * 100 },
-                            { "limit", 100 },
-                            { "asc", asc }
+                            RadioId = radioId,
+                            Offset = page * 100,
+                            Limit = 100,
+                            Asc = asc
                         });
-                    hasMore = json["more"]?.ToObject<bool>();
-                    if (json["programs"] != null)
+                    if (json.IsError)
+                    {
+                        Common.AddToTeachingTipLists("获取电台节目失败", json.Error.Message);
+                        return false;
+                    }
+
+                    hasMore = json.Value is { More: true };
+                    if (json.Value?.Programs is { Length: > 0 })
                         AppendNcSongs(
-                            json["programs"].Select(t => (NCSong)NCFmItem.CreateFromJson(t)).ToList(),
+                            json.Value.Programs.Select(t => (NCSong)t.MapToNCFmItem()).ToList(),
                             false);
-                    json.RemoveAll();
                 }
                 catch (Exception ex)
                 {
@@ -2243,32 +2212,41 @@ public static class HyPlayList
     {
         try
         {
-            var json = await Common.ncapi?.RequestAsync(CloudMusicApiProviders.PlaylistDetail,
-                new Dictionary<string, object> { { "id", playlistId } });
+            var detailResponse = await Common.NeteaseAPI.RequestAsync(NeteaseApis.PlaylistTracksGetApi,
+                new PlaylistTracksGetRequest() { Id = playlistId });
 
             var nowIndex = 0;
-            var trackIds = (json["playlist"]?["trackIds"] ?? new JArray()).Select(t => (string)t["id"])
-                .ToList();
+            if (detailResponse.IsError)
+            {
+                Common.AddToTeachingTipLists("获取歌单失败", detailResponse.Error.Message);
+                return false;
+            }
+            var trackIds = detailResponse.Value.Playlist?.TrackIds?.Select(t => t.Id).ToList() ?? [];
             while (nowIndex * 500 < trackIds.Count)
             {
                 var nowIds = trackIds.GetRange(nowIndex * 500,
                     Math.Min(500, trackIds.Count - nowIndex * 500));
                 try
                 {
-                    json = await Common.ncapi?.RequestAsync(CloudMusicApiProviders.SongDetail,
-                        new Dictionary<string, object> { ["ids"] = string.Join(",", nowIds) });
-                    nowIndex++;
-                    var i = 0;
-                    var ncSongs = (json["songs"] ?? new JArray()).Select(t =>
+                    var songResponse = await Common.NeteaseAPI.RequestAsync(NeteaseApis.SongDetailApi,
+                         new SongDetailRequest() { IdList = nowIds });
+                    if (songResponse.IsError)
                     {
-                        if (json["privileges"] == null) return null;
-                        if (json["privileges"].ToList()[i++]["st"]?.ToString() == "0")
-                            return NCSong.CreateFromJson(t);
-
-                        return null;
-                    }).ToList();
-                    ncSongs.RemoveAll(t => t == null);
-                    AppendNcSongs(ncSongs, false);
+                        Common.AddToTeachingTipLists("获取歌曲失败", songResponse.Error.Message);
+                    }
+                    nowIndex++;
+                    var privileges = songResponse.Value?.Privileges ?? [];
+                    var songs = songResponse.Value?.Songs ?? [];
+                    var result = new List<NCSong>();
+                    if (privileges is null) return false;
+                    for (var i = 0; i < privileges.Length; i++)
+                    {
+                        if (privileges[i].St == 0)
+                        {
+                            result.Add(songs[i].MapToNcSong());
+                        }
+                    }
+                    AppendNcSongs(result, false);
                 }
                 catch (Exception ex)
                 {
@@ -2276,8 +2254,6 @@ public static class HyPlayList
                         (ex.InnerException ?? new Exception()).Message);
                 }
             }
-
-            json.RemoveAll();
             return true;
         }
         catch (Exception ex)
@@ -2316,7 +2292,7 @@ public static class HyPlayList
                     IsLocalFile = true,
                     LocalFileTag = tagFile.Tag,
                     Bitrate = tagFile.Properties.AudioBitrate,
-                    Tag = sf.Provider.DisplayName,
+                    InfoTag = sf.Provider.DisplayName,
                     Id = null,
                     Name = tagFile.Tag.Title,
                     Type = HyPlayItemType.Local,
@@ -2363,7 +2339,7 @@ public static class HyPlayList
             Name = mi.musicName,
             TrackId = (int)tagFile.Tag.Track,
             CDName = "01",
-            Tag = sf.Provider.DisplayName
+            InfoTag = sf.Provider.DisplayName
         };
         hpi.Artist = mi.artist
             .Select(t => new NCArtist { name = t[0].ToString(), id = t[1].ToString() })

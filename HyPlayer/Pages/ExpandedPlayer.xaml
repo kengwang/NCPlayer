@@ -212,22 +212,23 @@
             Grid.Row="0"
             Grid.Column="0"
             Background="Transparent" />
-        <Grid
+        <ContentControl
             x:Name="ShaderLuminousBackgroundContainer"
             Grid.Row="0"
             Grid.RowSpan="3"
             Grid.Column="0"
-            x:Load="{x:Bind hyplayer:Common.Setting.expandedPlayerBackgroundType, Converter={StaticResource ShaderConverter}}"
+            HorizontalContentAlignment="Stretch"
+            VerticalContentAlignment="Stretch"
             Canvas.ZIndex="-1"
-            Unloaded="LuminousBackground_OnUnloaded">
+            Unloaded="LuminousBackground_OnUnloaded"
+            Visibility="{x:Bind hyplayer:Common.Setting.expandedPlayerBackgroundType, Converter={StaticResource ShaderConverter}}">
             <win2d:CanvasAnimatedControl
                 x:Name="LuminousBackground"
                 CreateResources="LuminousBackground_CreateResources"
                 Draw="LuminousBackground_Draw"
-                Paused="True"
                 SizeChanged="LuminousBackground_SizeChanged"
                 Update="LuminousBackground_Update" />
-        </Grid>
+        </ContentControl>
         <Grid
             x:Name="LuminousBackgroundContainer"
             Grid.Row="0"

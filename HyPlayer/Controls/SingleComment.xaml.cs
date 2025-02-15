@@ -1,13 +1,11 @@
 ﻿#region
 
 using HyPlayer.Classes;
+using HyPlayer.NeteaseApi.ApiContracts;
 using HyPlayer.Pages;
-using NeteaseCloudMusicApi;
 using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using Windows.ApplicationModel.Core;
@@ -43,7 +41,7 @@ public sealed partial class SingleComment : UserControl, INotifyPropertyChanged
 
     private ObservableCollection<Comment> floorComments = new ObservableCollection<Comment>();
     public UserDisplay CommentUserDisplay;
-    private string time;
+    private string time = "0";
 
     public SingleComment()
     {
@@ -77,24 +75,30 @@ public sealed partial class SingleComment : UserControl, INotifyPropertyChanged
         try
         {
             if (!IsLoadMoreComments) floorComments.Clear();
-            var json = await Common.ncapi?.RequestAsync(CloudMusicApiProviders.CommentFloor,
-                new Dictionary<string, object>
+            var result = await Common.NeteaseAPI.RequestAsync(NeteaseApis.CommentFloorApi,
+                new CommentFloorRequest()
                 {
-                    { "parentCommentId", MainComment.cid }, { "id", MainComment.resourceId },
-                    { "type", MainComment.resourceType },
-                    { "time", IsLoadMoreComments? 0 : time }
-                });
-            foreach (var floorcomment in json["data"]["comments"].ToArray())
+                    ParentCommentId = MainComment.cid,
+                    ResourceId = MainComment.resourceId,
+                    ResourceType = MainComment.resourceType,
+                    Time = !IsLoadMoreComments ? 0 : long.Parse(time ?? "0")
+                }
+                );
+            if (result.IsError)
             {
-                var floorComment = Comment.CreateFromJson(floorcomment, MainComment.resourceId, MainComment.resourceType);
+                Common.AddToTeachingTipLists("加载楼层评论错误", result.Error?.Message ?? "未知错误");
+                return;
+            }
+            foreach (var floorcomment in result.Value?.Data?.Comments ?? [])
+            {
+                var floorComment = floorcomment.MapToComment();
+                floorComment.resourceId = MainComment.resourceId;
+                floorComment.resourceType = MainComment.resourceType;
                 floorComment.IsMainComment = false;
                 floorComments.Add(floorComment);
             }
-            time = json["data"]["time"].ToString();
-            if (json["data"]["hasMore"].ToString() == "True")
-                LoadMore.Visibility = Visibility.Visible;
-            else LoadMore.Visibility = Visibility.Collapsed;
-            json.RemoveAll();
+            time = result.Value?.Data?.Time.ToString();
+            LoadMore.Visibility = result.Value?.Data?.HasMore is true ? Visibility.Visible : Visibility.Collapsed;
         }
         catch (Exception ex)
         {
@@ -104,26 +108,27 @@ public sealed partial class SingleComment : UserControl, INotifyPropertyChanged
 
     private async void Like_Click(object sender, RoutedEventArgs e)
     {
-        await Common.ncapi?.RequestAsync(CloudMusicApiProviders.CommentLike,
-            new Dictionary<string, object>
+        var result = await Common.NeteaseAPI.RequestAsync(NeteaseApis.CommentLikeApi,
+            new CommentLikeRequest()
             {
-                { "id", MainComment.resourceId }, { "cid", MainComment.cid }, { "type", MainComment.resourceType },
-                { "t", MainComment.HasLiked ? "0" : "1" }
+                CommentId = MainComment.cid,
+                ResourceType = MainComment.resourceType,
+                IsLike = !MainComment.HasLiked
             });
+        if (result.IsError)
+        {
+            Common.AddToTeachingTipLists("点赞失败", result.Error?.Message ?? "未知错误");
+            return;
+        }
         MainComment.likedCount += MainComment.HasLiked ? -1 : 1;
         MainComment.HasLiked = !MainComment.HasLiked;
         LikeCountTB.Text = MainComment.likedCount.ToString();
     }
 
-    private async void Delete_Click(object sender, RoutedEventArgs e)
+    private void Delete_Click(object sender, RoutedEventArgs e)
     {
-        await Common.ncapi?.RequestAsync(CloudMusicApiProviders.Comment,
-            new Dictionary<string, object>
-            {
-                { "id", MainComment.resourceId }, { "t", "0" }, { "type", MainComment.resourceType },
-                { "commentId", MainComment.cid }
-            });
-        (Parent as StackPanel).Children.Remove(this);
+        throw new NotImplementedException();
+        // TODO: 删除评论
     }
 
     private void NavToUser_Click(object sender, RoutedEventArgs e)
@@ -137,17 +142,11 @@ public sealed partial class SingleComment : UserControl, INotifyPropertyChanged
         {
             try
             {
-                var json = await Common.ncapi?.RequestAsync(CloudMusicApiProviders.Comment,
-                    new Dictionary<string, object>
-                    {
-                        { "id", MainComment.resourceId }, { "commentId", MainComment.cid },
-                        { "type", MainComment.resourceType },
-                        { "t", "2" }, { "content", ReplyText.Text }
-                    });
+                // TODO: 发送评论
                 ReplyText.Text = string.Empty;
                 await Task.Delay(1000);
                 _ = LoadFloorComments(false);
-                json.RemoveAll();
+
             }
             catch (Exception ex)
             {

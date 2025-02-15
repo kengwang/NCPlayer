@@ -7,7 +7,6 @@ using Microsoft.Graphics.Canvas.Effects;
 using Microsoft.Graphics.Canvas.Geometry;
 using System;
 using Windows.Foundation;
-using Windows.UI;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Media.Animation;
 
@@ -76,7 +75,7 @@ public class ProgressBarRenderingLyricLine : RenderingLyricLine
 
         var cl = new CanvasCommandList(session);
         var focusingColor = context.PreferTypography.FocusingColor!.Value;
-        focusingColor.A = (byte)(100 + 60*progress);
+        focusingColor.A = (byte)(100 + 60 * progress);
         using (var clds = cl.CreateDrawingSession())
         {
             clds.FillGeometry(geometryFill, actualX, offset.Y + Height, focusingColor);

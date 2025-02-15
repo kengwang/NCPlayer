@@ -95,7 +95,7 @@
                                             <TextBlock
                                                 Name="TextBlockAlia"
                                                 Grid.Row="1"
-                                                Margin="5,10,0,-18"
+                                                Margin="5,0,0,-18"
                                                 FontSize="12"
                                                 Foreground="{ThemeResource TextFillColorTertiaryBrush}"
                                                 MaxLines="1"

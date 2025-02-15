@@ -1,11 +1,10 @@
 ﻿#region
 
 using HyPlayer.Classes;
-using NeteaseCloudMusicApi;
+using HyPlayer.NeteaseApi.ApiContracts;
+using HyPlayer.NeteaseApi.Bases;
 using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Windows.UI.Xaml.Controls;
@@ -98,14 +97,18 @@ public sealed partial class History : Page, IDisposable
         _cancellationToken.ThrowIfCancellationRequested();
         try
         {
-            var ret3 = await Common.ncapi?.RequestAsync(CloudMusicApiProviders.UserRecord,
-                new Dictionary<string, object> { { "uid", Common.LoginedUser.id }, { "type", "0" } });
-
-            var weekData = ret3["allData"].ToArray();
+            var ret3 = await Common.NeteaseAPI.RequestAsync<UserRecordAllResponse, UserRecordRequest, UserRecordResponse, ErrorResultBase, UserRecordActualRequest>(NeteaseApis.UserRecordApi,
+                new UserRecordRequest() { UserId = Common.LoginedUser.id, RecordType = UserRecordType.All });
+            if (ret3.IsError)
+            {
+                Common.AddToTeachingTipLists("获取播放记录失败", ret3.Error.Message);
+                return;
+            }
+            var weekData = ret3.Value?.AllData;
             for (var i = 0; i < weekData.Length; i++)
             {
                 _cancellationToken.ThrowIfCancellationRequested();
-                var song = NCSong.CreateFromJson(weekData[i]["song"]);
+                var song = weekData[i].Song.MapNcSong();
                 song.Order = i;
                 Songs.Add(song);
             }
@@ -124,15 +127,18 @@ public sealed partial class History : Page, IDisposable
         _cancellationToken.ThrowIfCancellationRequested();
         try
         {
-            var ret2 = await Common.ncapi?.RequestAsync(CloudMusicApiProviders.UserRecord,
-                new Dictionary<string, object> { { "uid", Common.LoginedUser.id }, { "type", "1" } });
-
-            var weekData = ret2["weekData"].ToArray();
-
+            var ret2 = await Common.NeteaseAPI.RequestAsync<UserRecordWeekResponse, UserRecordRequest, UserRecordResponse, ErrorResultBase, UserRecordActualRequest>(NeteaseApis.UserRecordApi,
+                new UserRecordRequest() { UserId = Common.LoginedUser.id, RecordType = UserRecordType.WeekData });
+            if (ret2.IsError)
+            {
+                Common.AddToTeachingTipLists("获取播放记录失败", ret2.Error.Message);
+                return;
+            }
+            var weekData = ret2.Value?.WeekData;
             for (var i = 0; i < weekData.Length; i++)
             {
                 _cancellationToken.ThrowIfCancellationRequested();
-                var song = NCSong.CreateFromJson(weekData[i]["song"]);
+                var song = weekData[i].Song.MapNcSong();
                 song.Order = i;
                 Songs.Add(song);
             }

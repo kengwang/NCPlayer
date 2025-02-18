@@ -1,16 +1,14 @@
 ﻿#region
 
 using HyPlayer.Classes;
-using NeteaseCloudMusicApi;
+using HyPlayer.NeteaseApi.ApiContracts;
+using HyPlayer.NeteaseApi.Models;
 using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Windows.System.Threading;
 using Windows.UI.Core;
-using Windows.UI.Popups;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Media.Animation;
@@ -31,7 +29,7 @@ public sealed partial class Comments : Page, IDisposable
     private string cursor;
     private int page = 1;
     private string resourceid;
-    private int resourcetype;
+    private NeteaseResourceType resourcetype;
     private int sortType = 1;
     private bool IsShiftingPage = false;
     private ScrollViewer MainScroll, HotCommentsScroll;
@@ -58,22 +56,22 @@ public sealed partial class Comments : Page, IDisposable
             switch (resstr.Substring(0, 2))
             {
                 case "sg":
-                    resourcetype = 0;
+                    resourcetype = NeteaseResourceType.Song;
                     break;
                 case "mv":
-                    resourcetype = 1;
+                    resourcetype = NeteaseResourceType.MV;
                     break;
                 case "fm":
-                    resourcetype = 4;
+                    resourcetype = NeteaseResourceType.RadioProgram;
                     break;
                 case "mb":
-                    resourcetype = 7;
+                    resourcetype = NeteaseResourceType.MLog;
                     break;
                 case "al":
-                    resourcetype = 3;
+                    resourcetype = NeteaseResourceType.Album;
                     break;
                 case "pl":
-                    resourcetype = 2;
+                    resourcetype = NeteaseResourceType.Playlist;
                     break;
             }
         }
@@ -118,55 +116,58 @@ public sealed partial class Comments : Page, IDisposable
 
     private async Task LoadComments(int type)
     {
-        // type 1:按推荐排序,2:按热度排序,3:按时间排序
         if (string.IsNullOrEmpty(resourceid)) return;
         if (IsShiftingPage) return;
         _cancellationToken.ThrowIfCancellationRequested();
         var isHotCommentsPage = HotCommentsContainer.Visibility == Visibility.Visible;
-        try
+        var result = await Common.NeteaseAPI.RequestAsync(NeteaseApis.CommentsApi, new CommentsRequest
         {
-            var json = await Common.ncapi?.RequestAsync(CloudMusicApiProviders.CommentNew,
-                new Dictionary<string, object>
-                {
-                    { "cursor", page != 1 && type == 3 ? cursor : null },
-                    { "id", resourceid },
-                    { "type", resourcetype },
-                    { "pageNo", page },
-                    { "pageSize", 20 },
-                    { "sortType", type }
-                });
-            if (type == 2 && isHotCommentsPage)
-                hotComments.Clear();
-            else normalComments.Clear();
-            foreach (var comment in json["data"]["comments"].ToArray())
+            ResourceType = resourcetype,
+            ResourceId = resourceid,
+            CommentSortType = type switch
             {
-                _cancellationToken.ThrowIfCancellationRequested();
-                Comment LoadedComment = Comment.CreateFromJson(comment, resourceid, resourcetype);
-                if (type == 2 && isHotCommentsPage)
-                    hotComments.Add(LoadedComment);
-                else normalComments.Add(LoadedComment);
-            }
-            if (type == 3)
-                cursor = json["data"]["cursor"].ToString();
-            if (json["data"]["hasMore"].ToString() == "True")
-                NextPage.IsEnabled = true;
-            else
-                NextPage.IsEnabled = false;
+                2 => CommentSortType.Hot,
+                3 => CommentSortType.Time,
+                _ => CommentSortType.Recommend
+            },
+            PageSize = 20,
+            PageNo = page,
+            Cursor = page != 1 && type == 3 ? cursor : null
+        }, _cancellationToken);
 
-            if (page > 1)
-                PrevPage.IsEnabled = true;
-            else
-                PrevPage.IsEnabled = false;
-
-            PageIndicator.Text =
-                $"第 {page} 页 / 共 {Math.Ceiling((decimal)json["data"]["totalCount"].ToObject<long>() / 20).ToString()} 页";
-            json.RemoveAll();
-        }
-        catch (Exception ex)
+        if (result.IsError)
         {
-            if (ex.GetType() != typeof(TaskCanceledException) && ex.GetType() != typeof(OperationCanceledException))
-                Common.AddToTeachingTipLists(ex.Message, (ex.InnerException ?? new Exception()).Message);
+            Common.AddToTeachingTipLists("加载评论时出错", result.Error.Message);
+            return;
         }
+
+        if (type == 2 && isHotCommentsPage)
+            hotComments.Clear();
+        else normalComments.Clear();
+
+        foreach (var comment in result.Value?.Data?.Comments ?? [])
+        {
+            _cancellationToken.ThrowIfCancellationRequested();
+            var cmt = comment.MapToComment();
+            cmt.resourceType = resourcetype;
+            cmt.resourceId = resourceid;
+            if (type == 2 && isHotCommentsPage)
+                hotComments.Add(cmt);
+            else normalComments.Add(cmt);
+        }
+
+        if (type == 3)
+            cursor = result.Value?.Data?.Cursor;
+
+        if (result.Value?.Data?.HasMore == true)
+            NextPage.IsEnabled = true;
+        else
+            NextPage.IsEnabled = false;
+
+        if (page > 1)
+            PrevPage.IsEnabled = true;
+        else
+            PrevPage.IsEnabled = false;
     }
 
 
@@ -184,8 +185,11 @@ public sealed partial class Comments : Page, IDisposable
         ScrollTop();
     }
 
-    private async void SendComment_Click(object sender, RoutedEventArgs e)
+    private void SendComment_Click(object sender, RoutedEventArgs e)
     {
+        // TODO: 评论功能风控
+        Common.AddToTeachingTipLists("评论功能暂时关闭", "由于网易云音乐风控策略，评论功能暂时关闭");
+        /*
         if (!string.IsNullOrWhiteSpace(CommentEdit.Text) && Common.Logined)
         {
             try
@@ -230,6 +234,7 @@ public sealed partial class Comments : Page, IDisposable
             var dlg = new MessageDialog("请先登录");
             await dlg.ShowAsync();
         }
+        */
     }
 
     private void ComboBoxSortType_OnSelectionChanged(object sender, SelectionChangedEventArgs e)

@@ -155,7 +155,7 @@ public sealed partial class LocalMusicPage : Page, INotifyPropertyChanged, IDisp
                         Size = null,
                         SubExt = storageFile.FileType,
                         TrackId = 0,
-                        Tag = "本地歌曲",
+                        InfoTag = "本地歌曲",
                         Type = HyPlayItemType.LocalProgressive,
                         Url = storageFile.Path
                     }

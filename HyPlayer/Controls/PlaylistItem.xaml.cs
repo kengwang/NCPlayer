@@ -2,10 +2,9 @@
 
 using HyPlayer.Classes;
 using HyPlayer.HyPlayControl;
+using HyPlayer.NeteaseApi.ApiContracts;
 using HyPlayer.Pages;
-using NeteaseCloudMusicApi;
 using System;
-using System.Collections.Generic;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Input;
@@ -60,44 +59,39 @@ public sealed partial class PlaylistItem : UserControl, IDisposable
 
     private async void ItemPublicPlayList_Click(object sender, RoutedEventArgs e)
     {
-        try
+        var result = await Common.NeteaseAPI.RequestAsync(NeteaseApis.PlaylistPrivacyApi,
+            new PlaylistPrivacyRequest()
+            {
+                Id = playList.plid
+            });
+        if (result.IsError)
         {
-            var json = await Common.ncapi?.RequestAsync(CloudMusicApiProviders.PlaylistPrivacy,
-                new Dictionary<string, object>
-                {
-                    { "id", playList.plid }
-                });
-            json.RemoveAll();
+            Common.AddToTeachingTipLists("公开歌单失败", result.Error?.Message ?? "未知错误");
         }
-        catch (Exception ex)
+        else
         {
-            Common.AddToTeachingTipLists("公开歌单失败", ex.Message);
-            return;
+            Common.AddToTeachingTipLists("成功公开歌单");
+            _ = Common.PageBase?.LoadSongList();
         }
-
-        Common.AddToTeachingTipLists("成功公开歌单");
-        _ = Common.PageBase.LoadSongList();
     }
 
     private async void ItemDelPlayList_Click(object sender, RoutedEventArgs e)
     {
-        try
+        var result = await Common.NeteaseAPI.RequestAsync(NeteaseApis.PlaylistDeleteApi,
+            new PlaylistDeleteRequest()
+            {
+                Id = playList.plid
+            });
+        if (result.IsError)
         {
-            await Common.ncapi?.RequestAsync(CloudMusicApiProviders.PlaylistDelete,
-                new Dictionary<string, object>
-                {
-                    { "ids", playList.plid }
-                });
+            Common.AddToTeachingTipLists("删除歌单失败", result.Error?.Message ?? "未知错误");
+        }
+        else
+        {
             Common.AddToTeachingTipLists("成功删除");
+            _ = Common.PageBase?.LoadSongList();
+            Common.NavigateRefresh();
         }
-        catch (Exception ex)
-        {
-            Common.AddToTeachingTipLists(ex.Message, (ex.InnerException ?? new Exception()).Message);
-        }
-
-
-        _ = Common.PageBase.LoadSongList();
-        Common.NavigateRefresh();
     }
 
     private void UserControl_Loaded(object sender, RoutedEventArgs e)
@@ -105,10 +99,13 @@ public sealed partial class PlaylistItem : UserControl, IDisposable
         if (Common.Setting.noImage) ImageContainer.Source = null;
         else
         {
-            ImageContainerSource.UriSource = new Uri(playList.cover + "?param=" + StaticSource.PICSIZE_PLAYLIST_ITEM_COVER);
+            if (playList.cover is not null)
+                ImageContainerSource.UriSource =
+                new Uri(playList.cover + "?param=" + StaticSource.PICSIZE_PLAYLIST_ITEM_COVER);
         }
+
         TextBlockPLName.Text = playList.name;
-        TextBlockPLAuthor.Text = playList.creater.name;
+        TextBlockPLAuthor.Text = playList.creater.name ?? "网易云音乐";
         StoryboardIn.Begin();
     }
 
@@ -125,6 +122,7 @@ public sealed partial class PlaylistItem : UserControl, IDisposable
             disposedValue = true;
         }
     }
+
     ~PlaylistItem()
     {
         Dispose(disposing: false);

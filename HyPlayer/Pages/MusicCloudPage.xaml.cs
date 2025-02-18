@@ -2,7 +2,7 @@
 
 using HyPlayer.Classes;
 using HyPlayer.HyPlayControl;
-using NeteaseCloudMusicApi;
+using HyPlayer.NeteaseApi.ApiContracts;
 using System;
 using System.Collections.ObjectModel;
 using System.Linq;
@@ -41,37 +41,38 @@ public sealed partial class MusicCloudPage : Page, IDisposable
     public async Task LoadMusicCloudItem()
     {
         if (disposedValue) throw new ObjectDisposedException(nameof(MusicCloudPage));
-        _cancellationToken.ThrowIfCancellationRequested();
         try
         {
-            var json = await Common.ncapi?.RequestAsync(CloudMusicApiProviders.UserCloud,
-                new()
+            _cancellationToken.ThrowIfCancellationRequested();
+            var json = await Common.NeteaseAPI.RequestAsync(NeteaseApis.UserCloudApi,
+                new UserCloudRequest()
                 {
-                    { "limit", 200 },
-                    { "offset", page * 200 }
-                })!;
-            if (json["code"]?.ToString() == "405")
+                    Limit = 200,
+                    Offset = page * 200
+                });
+
+            if (json.IsError && json.Error.ErrorCode == 405)
             {
                 treashold = ++cooldownTime * 10;
                 page--;
-                throw new Exception($"渐进加载速度过于快, 将在 {cooldownTime * 10} 秒后尝试继续加载, 正在清洗请求");
+                Common.AddToTeachingTipLists("贪婪加载被风控", $"渐进加载速度过于快, 将在 {cooldownTime * 10} 秒后尝试继续加载, 正在清洗请求");
             }
 
             var idx = page * 200;
-            foreach (var jToken in json["data"]!)
+            foreach (var jToken in json.Value.Songs ?? [])
             {
                 _cancellationToken.ThrowIfCancellationRequested();
                 try
                 {
-                    var ret = NCSong.CreateFromJson(jToken["simpleSong"]);
+                    var ret = jToken.SongInfo.MapNcSong();
                     if (ret.Artist[0].id == "0")
                     {
                         //不是标准歌曲
-                        ret.Album.name = jToken["album"]?.ToString();
+                        ret.Album.name = jToken.AlbumName;
                         ret.Artist.Clear();
                         ret.Artist.Add(new NCArtist
                         {
-                            name = jToken["artist"]?.ToString()
+                            name = jToken.ArtistName
                         });
                     }
 
@@ -84,10 +85,8 @@ public sealed partial class MusicCloudPage : Page, IDisposable
                     //ignore
                 }
 
-                NextPage.Visibility = json["hasMore"]!.ToObject<bool>() ? Visibility.Visible : Visibility.Collapsed;
+                NextPage.Visibility = json.Value.HasMore ? Visibility.Visible : Visibility.Collapsed;
             }
-
-            json.RemoveAll();
         }
         catch (Exception ex)
         {

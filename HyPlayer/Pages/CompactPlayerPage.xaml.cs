@@ -83,11 +83,14 @@ public sealed partial class CompactPlayerPage : Page, IDisposable
 
 
 
-    private async Task HyPlayList_OnSongCoverChanged(int hashCode, IRandomAccessStream coverStream)
+    private async Task HyPlayList_OnSongCoverChanged(int hashCode, IBuffer coverStream)
     {
+        if (HyPlayList.CoverStream.Size == 0) return;
         await Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, async () =>
         {
-            using var stream = coverStream.CloneStream();
+            using var stream = new InMemoryRandomAccessStream();
+            await stream.WriteAsync(coverStream);
+            stream.Seek(0);
             if (!Common.Setting.noImage && stream.Size != 0)
             {
                 try
@@ -329,8 +332,7 @@ public sealed partial class CompactPlayerPage : Page, IDisposable
     {
         base.OnNavigatedTo(e);
         OnChangePlayItem(HyPlayList.NowPlayingItem);
-        using var coverStream = HyPlayList.CoverStream.CloneStream();
-        await HyPlayList_OnSongCoverChanged(HyPlayList.NowPlayingHashCode, coverStream);
+        await HyPlayList_OnSongCoverChanged(HyPlayList.NowPlayingHashCode, HyPlayList.CoverBuffer);
         PlayStateIcon.Glyph = HyPlayList.IsPlaying ? "\uEDB4" : "\uEDB5";
         //Common.BarPlayBar.Visibility = Visibility.Collapsed;
         (e.Parameter as AppWindow).TitleBar.ExtendsContentIntoTitleBar = true;

@@ -436,14 +436,18 @@ namespace HyPlayer.LyricRenderer
         private void LyricView_OnPointerMoved(object sender, PointerRoutedEventArgs e)
         {
             // 指针事件
-            // 获取在指针范围的行
+            // 获取在指针范围的行（二分法查找）
             if (e.Pointer.PointerDeviceType == Windows.Devices.Input.PointerDeviceType.Mouse)
             {
                 var focusingLine = -1;
-                foreach (var renderOffsetsKey in Context.RenderOffsets.Keys)
+                int firstPosition = 0;
+                int lastPosition = Context.RenderOffsets.Count - 1;
+                int maximumAttempts = (int)Math.Ceiling(Math.Log(lastPosition + 1)) + 3;
+                int attemptCount = 1;
+                while (attemptCount <= maximumAttempts)
                 {
-                    if (Context.LyricLines[renderOffsetsKey].Hidden)
-                        continue;
+                    attemptCount += 1;
+                    int renderOffsetsKey = (firstPosition + lastPosition) / 2;
                     if (Context.RenderOffsets[renderOffsetsKey].Y <= e.GetCurrentPoint(this).Position.Y &&
                         Context.RenderOffsets[renderOffsetsKey].Y + Context.LyricLines[renderOffsetsKey].RenderingHeight >=
                         e.GetCurrentPoint(this).Position.Y)
@@ -452,6 +456,27 @@ namespace HyPlayer.LyricRenderer
                         Context.LyricLines[renderOffsetsKey].GoToReactionState(ReactionState.Enter, Context);
                         focusingLine = renderOffsetsKey;
                         break;
+                    }
+                    else if (lastPosition - firstPosition == 1)//结束时刻前面是下取整，两个都不是那就是没移到上面
+                    {
+                        if (Context.RenderOffsets[renderOffsetsKey + 1].Y <= e.GetCurrentPoint(this).Position.Y &&
+                            Context.RenderOffsets[renderOffsetsKey + 1].Y + Context.LyricLines[renderOffsetsKey + 1].RenderingHeight >=
+                            e.GetCurrentPoint(this).Position.Y)
+                        {
+                            if (Context.PointerFocusingIndex == renderOffsetsKey + 1) return;
+                            Context.LyricLines[renderOffsetsKey + 1].GoToReactionState(ReactionState.Enter, Context);
+                            focusingLine = renderOffsetsKey + 1;
+
+                        }
+                        break;
+                    }
+                    else
+                    {
+                        if (Context.RenderOffsets[renderOffsetsKey].Y <= e.GetCurrentPoint(this).Position.Y)
+                        {
+                            firstPosition = renderOffsetsKey;
+                        }
+                        else lastPosition = renderOffsetsKey;
                     }
                 }
 

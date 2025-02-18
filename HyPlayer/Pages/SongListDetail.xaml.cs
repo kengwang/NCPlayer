@@ -2,13 +2,12 @@
 
 using HyPlayer.Classes;
 using HyPlayer.HyPlayControl;
-using NeteaseCloudMusicApi;
-using Newtonsoft.Json.Linq;
+using HyPlayer.NeteaseApi.ApiContracts;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.IO;
 using System.Linq;
-using System.Runtime.InteropServices.WindowsRuntime;
 using System.Threading;
 using System.Threading.Tasks;
 using Windows.ApplicationModel.DataTransfer;
@@ -73,10 +72,10 @@ public sealed partial class SongListDetail : Page, IDisposable
         using var result = await Common.HttpClient.GetAsync(new Uri(playList.cover + "?param=" + StaticSource.PICSIZE_SONGLIST_DETAIL_COVER));
         if (result.IsSuccessStatusCode)
         {
-            using var stream = new InMemoryRandomAccessStream();
-            await result.Content.WriteToStreamAsync(stream);
+            using var stream = await result.Content.ReadAsStreamAsync();
+            using var inputStream = stream.AsRandomAccessStream();
             _cancellationToken.ThrowIfCancellationRequested();
-            Color imageMainColor = await ColorExtractor.ExtractColorFromStream(stream);
+            Color imageMainColor = await ColorExtractor.ExtractColorFromStream(inputStream);
             if (AlbumColor != null)
             {
                 _ = Common.Invoke(() => AlbumColor.Color = imageMainColor);
@@ -128,6 +127,7 @@ public sealed partial class SongListDetail : Page, IDisposable
         if (playList.plid != "-666")
         {
             await LoadPlayListItems();
+            await LoadPage();
         }
         else
         {
@@ -145,8 +145,13 @@ public sealed partial class SongListDetail : Page, IDisposable
         try
         {
             _cancellationToken.ThrowIfCancellationRequested();
-            var json = await Common.ncapi?.RequestAsync(CloudMusicApiProviders.RecommendSongs);
-            if (json["data"]["dailySongs"][0]["alg"].ToString() == "birthDaySong")
+            var json = await Common.NeteaseAPI?.RequestAsync(NeteaseApis.RecommendSongsApi, _cancellationToken);
+            if (json.IsError)
+            {
+                Common.AddToTeachingTipLists("加载日推出错", json.Error.Message);
+                return;
+            }
+            if (json.Value.Data?.DailySongs?.FirstOrDefault()?.RecommendReason == "birthDaySong")
             {
                 // 诶呀,没想到还过生了,吼吼
                 DescriptionTextBlock.Text = "生日快乐~ 今天也要开心哦!";
@@ -155,15 +160,14 @@ public sealed partial class SongListDetail : Page, IDisposable
             }
 
             var idx = 0;
-            foreach (var song in json["data"]["dailySongs"])
+            foreach (var song in json.Value?.Data?.DailySongs ?? [])
             {
                 _cancellationToken.ThrowIfCancellationRequested();
-                var ncSong = NCSong.CreateFromJson(song);
+                var ncSong = song.MapNcSong();
                 ncSong.IsAvailable = true;
                 ncSong.Order = idx++;
                 Songs.Add(ncSong);
             }
-            json.RemoveAll();
         }
         catch (Exception ex)
         {
@@ -172,59 +176,80 @@ public sealed partial class SongListDetail : Page, IDisposable
         }
     }
 
+    private List<string> _songListIds = [];
+
     private async Task LoadPlayListItems()
     {
         if (disposedValue) throw new ObjectDisposedException(nameof(SongListDetail));
         try
         {
             _cancellationToken.ThrowIfCancellationRequested();
-            var json = await Common.ncapi?.RequestAsync(CloudMusicApiProviders.PlaylistDetail,
-                new Dictionary<string, object> { { "id", playList.plid } });
-            if (json["code"].ToString() == "405")
+            var json = await Common.NeteaseAPI.RequestAsync(NeteaseApis.PlaylistTracksGetApi,
+                new PlaylistTracksGetRequest()
+                {
+                    Id = playList.plid
+                }, _cancellationToken);
+
+            if (json.IsError)
             {
-                treashold = ++cooldownTime * 10;
-                page--;
-                throw new Exception($"渐进加载速度过于快, 将在 {cooldownTime * 10} 秒后尝试继续加载, 正在清洗请求");
+                Common.AddToTeachingTipLists("加载歌单出错", json.Error?.Message ?? "未知错误");
+                return;
             }
-            if (!json["playlist"]["trackIds"].HasValues) return;
-            var trackIds = json["playlist"]["trackIds"].Select(t => (string)t["id"]).Skip(page * 500)
-                .Take(500)
-                .ToArray();
 
-            NextPage.Visibility = trackIds.Length >= 500 ? Visibility.Visible : Visibility.Collapsed;
-
-
-            if (json["playlist"]["specialType"].ToString() == "5" &&
-                json["playlist"]["userId"].ToString() == Common.LoginedUser?.id)
+            var playlistDetail = json.Value?.Playlist?.TrackIds;
+            if (playlistDetail is null)
+            {
+                Common.AddToTeachingTipLists("加载歌单出错", "未找到歌单信息");
+                return;
+            }
+            if (json.Value.Playlist.SpecialType == 5 &&
+                json.Value.Playlist.Creator?.UserId == Common.LoginedUser?.id)
             {
                 ButtonIntel.Visibility = Visibility.Visible;
                 SongsList.IsMySongList = true;
             }
+            _songListIds = playlistDetail.Select(x => x.Id).ToList();
+        }
+        catch (Exception ex)
+        {
+            if (ex.GetType() != typeof(TaskCanceledException) && ex.GetType() != typeof(OperationCanceledException))
+                Common.AddToTeachingTipLists(ex.Message, (ex.InnerException ?? new Exception()).Message);
+        }
+    }
 
-            try
-            {
-                json = await Common.ncapi?.RequestAsync(CloudMusicApiProviders.SongDetail,
-                    new Dictionary<string, object> { ["ids"] = string.Join(",", trackIds) });
-                var idx = page * 500;
-                var i = 0;
-                foreach (var jToken in json["songs"])
+    private async Task LoadPage()
+    {
+
+        var trackIds = _songListIds.Skip(page * 500).Take(500).ToList();
+
+        try
+        {
+            var json = await Common.NeteaseAPI!.RequestAsync(NeteaseApis.SongDetailApi,
+                new SongDetailRequest()
                 {
-                    _cancellationToken.ThrowIfCancellationRequested();
-                    var song = (JObject)jToken;
-
-                    var ncSong = NCSong.CreateFromJson(song);
-                    ncSong.IsAvailable =
-                        json["privileges"].ToList()[i++]["st"].ToString() == "0";
-                    ncSong.Order = idx++;
-                    Songs.Add(ncSong);
-                }
-                json.RemoveAll();
-            }
-
-            catch (Exception ex)
+                    IdList = trackIds
+                }, _cancellationToken);
+            if (json is { IsError: true, Error.ErrorCode: 405 })
             {
-                if (ex.GetType() != typeof(TaskCanceledException) && ex.GetType() != typeof(OperationCanceledException))
-                    Common.AddToTeachingTipLists(ex.Message, (ex.InnerException ?? new Exception()).Message);
+                treashold = ++cooldownTime * 10;
+                page--;
+                Common.AddToTeachingTipLists("贪婪加载被风控", $"渐进加载速度过于快, 将在 {cooldownTime * 10} 秒后尝试继续加载, 正在清洗请求");
+                return;
+            }
+            var privileges = json.Value?.Privileges;
+            var idx = page * 500;
+            var i = 0;
+            foreach (var jToken in json.Value?.Songs ?? [])
+            {
+                _cancellationToken.ThrowIfCancellationRequested();
+                var ncSong = jToken.MapToNcSong();
+                ncSong.IsAvailable = privileges?[i++].St is 0;
+                ncSong.Order = idx++;
+                Songs.Add(ncSong);
+            }
+            if (_songListIds.Count <= Songs.Count)
+            {
+                NextPage.Visibility = Visibility.Collapsed;
             }
         }
         catch (Exception ex)
@@ -278,13 +303,17 @@ public sealed partial class SongListDetail : Page, IDisposable
 
                 try
                 {
-                    var json = await Common.ncapi?.RequestAsync(
-                        CloudMusicApiProviders.PlaylistDetail,
-                        new Dictionary<string, object> { { "id", pid } });
-                    if (json["code"].ToString() != "200")
-                        throw new Exception(json["message"]?.ToString());
-                    playList = NCPlayList.CreateFromJson(json["playlist"]);
-                    json.RemoveAll();
+                    var json = await Common.NeteaseAPI?.RequestAsync(NeteaseApis.PlaylistDetailApi,
+                       new PlaylistDetailRequest()
+                       {
+                           Id = pid
+                       }, _cancellationToken);
+                    if (json.IsError)
+                    {
+                        Common.AddToTeachingTipLists("加载歌单出错", json.Error?.Message ?? "未知错误");
+                        return;
+                    }
+                    playList = json.Value?.Playlists?.FirstOrDefault().MapToNCPlayList();
                 }
                 catch (Exception ex)
                 {
@@ -350,7 +379,7 @@ public sealed partial class SongListDetail : Page, IDisposable
     {
         if (disposedValue) throw new ObjectDisposedException(nameof(SongListDetail));
         page++;
-        _songListLoaderTask = LoadSongListItem();
+        _songListLoaderTask = LoadPage();
     }
 
     private void ButtonComment_OnClick(object sender, RoutedEventArgs e)
@@ -359,51 +388,10 @@ public sealed partial class SongListDetail : Page, IDisposable
         Common.NavigatePage(typeof(Comments), "pl" + playList.plid);
     }
 
-    private async void ButtonHeartBeat_OnClick(object sender, RoutedEventArgs e)
+    private void ButtonHeartBeat_OnClick(object sender, RoutedEventArgs e)
     {
         if (disposedValue) throw new ObjectDisposedException(nameof(SongListDetail));
-        HyPlayList.RemoveAllSong();
-        try
-        {
-            var jsona = await Common.ncapi?.RequestAsync(
-                CloudMusicApiProviders.PlaymodeIntelligenceList,
-                new Dictionary<string, object>
-                    { { "pid", playList.plid }, { "id", Songs[0].sid } /*, { "sid", Songs[0].sid }*/ });
-            var IntSongs = new List<NCSong>
-            {
-                Songs[new Random().Next(0, Songs.Count)]
-            };
-            foreach (var token in jsona["data"])
-                try
-                {
-                    if (token["songInfo"] != null)
-                    {
-                        var ncSong = NCSong.CreateFromJson(token["songInfo"]);
-                        IntSongs.Add(ncSong);
-                    }
-                }
-                catch
-                {
-                    //ignore
-                }
-
-            try
-            {
-                HyPlayList.AppendNcSongs(IntSongs);
-                HyPlayList.PlaySourceId = playList.plid;
-                HyPlayList.SongMoveTo(0);
-            }
-            catch (Exception ex)
-            {
-                Common.AddToTeachingTipLists(ex.Message, (ex.InnerException ?? new Exception()).Message);
-            }
-            jsona.RemoveAll();
-            IntSongs.Clear();
-        }
-        catch (Exception ex)
-        {
-            Common.AddToTeachingTipLists(ex.Message, (ex.InnerException ?? new Exception()).Message);
-        }
+        _ = Api.EnterIntelligencePlay(_cancellationToken);
     }
 
     private void ButtonDownloadAll_OnClick(object sender, RoutedEventArgs e)
@@ -412,11 +400,20 @@ public sealed partial class SongListDetail : Page, IDisposable
         DownloadManager.AddDownload(Songs.ToList());
     }
 
-    private void LikeBtnClick(object sender, RoutedEventArgs e)
+    private async void LikeBtnClick(object sender, RoutedEventArgs e)
     {
         if (disposedValue) throw new ObjectDisposedException(nameof(SongListDetail));
-        _ = Common.ncapi?.RequestAsync(CloudMusicApiProviders.PlaylistSubscribe,
-            new Dictionary<string, object> { { "id", playList.plid }, { "t", playList.subscribed ? "0" : "1" } });
+        var result = await Common.NeteaseAPI?.RequestAsync(NeteaseApis.PlaylistSubscribeApi,
+            new PlaylistSubscribeRequest()
+            {
+                PlaylistId = playList.plid,
+                IsSubscribe = !playList.subscribed
+            }, _cancellationToken);
+        if (result.IsError)
+        {
+            Common.AddToTeachingTipLists("操作失败", result.Error.Message);
+            return;
+        }
         playList.subscribed = !playList.subscribed;
         ButtonLike.Tag = playList.subscribed;
         UpdateLikeBtnStyle();

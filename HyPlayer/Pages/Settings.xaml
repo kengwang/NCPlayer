@@ -752,7 +752,13 @@
                                             <ComboBoxItem Content="流光溢彩 (实验, Isolation)" />
                                         </ComboBox>
                                     </controls3:SettingsCard>
-                                    <controls3:SettingsCard Description="关闭则为RGB空间" Header="Impressionist (背景取色) 使用LAB空间">
+                                    <controls3:SettingsCard Header="背景取色设置">
+                                        <ComboBox HorizontalAlignment="Right" SelectedIndex="{x:Bind hyplayer:Common.Setting.ColorGeneratorType, Mode=TwoWay}">
+                                            <ComboBoxItem Content="KMeans" />
+                                            <ComboBoxItem Content="OctTree" />
+                                        </ComboBox>
+                                    </controls3:SettingsCard>
+                                    <controls3:SettingsCard Description="关闭则为RGB空间，仅在KMeans模式下生效" Header="Impressionist (背景取色) 使用LAB空间">
                                         <ToggleSwitch
                                             MinWidth="10"
                                             HorizontalAlignment="Right"
@@ -764,7 +770,7 @@
                                             HorizontalAlignment="Right"
                                             IsOn="{x:Bind hyplayer:Common.Setting.ImpressionistIgnoreWhite, Mode=TwoWay}" />
                                     </controls3:SettingsCard>
-                                    <controls3:SettingsCard Description="关闭则随机颜色进行初始化" Header="Impressionist (背景取色) 使用KMeans++算法初始化颜色">
+                                    <controls3:SettingsCard Description="关闭则随机颜色进行初始化，仅在KMeans模式下生效" Header="Impressionist (背景取色) 使用KMeans++算法初始化颜色">
                                         <ToggleSwitch
                                             MinWidth="10"
                                             HorizontalAlignment="Right"
@@ -1328,6 +1334,9 @@
                             <controls3:SettingsCard Description="可能造成无法播放, 请勿轻易开启" Header="开启播放缓存">
                                 <CheckBox Margin="0,0,-100,0" IsChecked="{x:Bind hyplayer:Common.Setting.enableCache, Mode=TwoWay}" />
                             </controls3:SettingsCard>
+                            <controls3:SettingsCard Description="提前将曲目加载至内存, 在网络环境较差情况下可能需要较长时间加载" Header="开启播放预加载">
+                                <CheckBox Margin="0,0,-100,0" IsChecked="{x:Bind hyplayer:Common.Setting.EnablePreLoad, Mode=TwoWay}" />
+                            </controls3:SettingsCard>
                             <controls3:SettingsCard Header="本地文件扫描渐进式加载 (Progressive Loading)">
                                 <CheckBox Margin="0,0,-100,0" IsChecked="{x:Bind hyplayer:Common.Setting.localProgressiveLoad, Mode=TwoWay}" />
                             </controls3:SettingsCard>
@@ -1361,8 +1370,8 @@
                             <controls3:SettingsCard Description="可能会提高内存占用" Header="启用安全本地文件访问">
                                 <CheckBox Margin="0,0,-100,0" IsChecked="{x:Bind hyplayer:Common.Setting.safeFileAccess, Mode=TwoWay}" />
                             </controls3:SettingsCard>
-                            <controls3:SettingsCard Description="将会把听歌数据上传网易云音乐同步" Header="进行听歌打卡">
-                                <CheckBox Margin="0,0,-100,0" IsChecked="{x:Bind hyplayer:Common.Setting.doScrobble, Mode=TwoWay}" />
+                            <controls3:SettingsCard Header="启用歌单创建">
+                                <CheckBox Margin="0,0,-100,0" IsChecked="{x:Bind hyplayer:Common.Setting.EnableSonglistCreate, Mode=TwoWay}" />
                             </controls3:SettingsCard>
                             <controls3:SettingsCard Description="使用「热词」时需开启" Header="SMTC 更新进度条">
                                 <CheckBox Margin="0,0,-100,0" IsChecked="{x:Bind hyplayer:Common.Setting.progressInSMTC, Mode=TwoWay}" />

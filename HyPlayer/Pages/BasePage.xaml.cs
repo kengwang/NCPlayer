@@ -3,15 +3,12 @@
 using HyPlayer.Classes;
 using HyPlayer.Controls;
 using HyPlayer.HyPlayControl;
-using Microsoft.AppCenter.Crashes;
+using HyPlayer.NeteaseApi.ApiContracts;
 using Microsoft.UI.Xaml.Controls;
-using NeteaseCloudMusicApi;
-using Newtonsoft.Json.Linq;
 using QRCoder;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Windows.ApplicationModel.Core;
@@ -83,7 +80,7 @@ public sealed partial class BasePage : Page
         // Window.Current.CoreWindow.Dispatcher.AcceleratorKeyActivated += Dispatcher_AcceleratorKeyActivated;
     }
 
-    private async Task HyPlayList_OnSongCoverChanged(int hashCode, IRandomAccessStream coverStream)
+    private async Task HyPlayList_OnSongCoverChanged(int hashCode, IBuffer coverStream)
     {
         await RefreshNavItemCover(hashCode, coverStream);
     }
@@ -194,11 +191,11 @@ public sealed partial class BasePage : Page
     {
         try
         {
-            if (Common.Setting.LoadCookies())
+            if (Common.Setting.LoadCookies() || Common.NeteaseAPI?.Option.AdditionalParameters.Cookies.Count is > 0)
             {
                 try
                 {
-                    await Common.ncapi?.RequestAsync(CloudMusicApiProviders.LoginStatus);
+                    await Common.NeteaseAPI.RequestAsync(NeteaseApis.LoginStatusApi);
                     await LoginDone();
                 }
                 catch
@@ -237,39 +234,56 @@ public sealed partial class BasePage : Page
 
         DialogLogin.IsPrimaryButtonEnabled = false;
         DialogLogin.PrimaryButtonText = "登录中......";
-        JObject json;
         try
         {
             var queries = new Dictionary<string, object>();
             var account = TextBoxAccount.Text;
             var isPhone = Regex.Match(account, "^[0-9]+$").Success;
+            var contryCode = string.Empty;
             if (account.StartsWith('+'))
             {
                 isPhone = true;
                 // get the string between '+' and ' '
-                queries["countrycode"] = account.Substring(1, account.IndexOf(' ') - 1);
+                contryCode = account.Substring(1, account.IndexOf(' ') - 1);
                 account = account.Substring(account.IndexOf(' ') + 1);
             }
-
-            queries[isPhone ? "phone" : "email"] = account;
-            queries["password"] = TextBoxPassword.Password;
-            json = await Common.ncapi?.RequestAsync(
-                isPhone ? CloudMusicApiProviders.LoginCellphone : CloudMusicApiProviders.Login, queries);
-            if (json?["code"]?.ToString() != "200")
+            if (isPhone)
             {
-                InfoBarLoginHint.IsOpen = true;
-                InfoBarLoginHint.Title = "登录失败";
-                DialogLogin.PrimaryButtonText = "登录";
-                DialogLogin.IsPrimaryButtonEnabled = true;
-                InfoBarLoginHint.Severity = InfoBarSeverity.Warning;
-                InfoBarLoginHint.Message = "登录失败 " + json["msg"] + json["message"];
+
+                var response = await Common.NeteaseAPI.RequestAsync(NeteaseApis.LoginCellphoneApi,
+                    new LoginCellphoneRequest() { Cellphone = account, CountryCode = string.IsNullOrEmpty(contryCode) ? null : contryCode, Password = TextBoxPassword.Password });
+                if (response.IsError)
+                {
+                    InfoBarLoginHint.IsOpen = true;
+                    InfoBarLoginHint.Title = "登录失败";
+                    DialogLogin.PrimaryButtonText = "登录";
+                    DialogLogin.IsPrimaryButtonEnabled = true;
+                    InfoBarLoginHint.Severity = InfoBarSeverity.Warning;
+                    InfoBarLoginHint.Message = "登录失败 " + response.Error.Message;
+                }
+                else
+                {
+                    await LoginDone();
+                }
             }
             else
             {
-                await LoginDone();
+                var response = await Common.NeteaseAPI.RequestAsync(NeteaseApis.LoginEmailApi,
+                    new LoginEmailRequest() { Email = account, Password = TextBoxPassword.Password });
+                if (response.IsError)
+                {
+                    InfoBarLoginHint.IsOpen = true;
+                    InfoBarLoginHint.Title = "登录失败";
+                    DialogLogin.PrimaryButtonText = "登录";
+                    DialogLogin.IsPrimaryButtonEnabled = true;
+                    InfoBarLoginHint.Severity = InfoBarSeverity.Warning;
+                    InfoBarLoginHint.Message = "登录失败 " + response.Error.Message;
+                }
+                else
+                {
+                    await LoginDone();
+                }
             }
-
-            json.RemoveAll();
         }
         catch (Exception ex)
         {
@@ -277,7 +291,6 @@ public sealed partial class BasePage : Page
             InfoBarLoginHint.IsOpen = true;
             InfoBarLoginHint.Severity = InfoBarSeverity.Error;
             InfoBarLoginHint.Message = "登录失败 " + ex;
-            Crashes.TrackError(ex);
         }
     }
 
@@ -294,10 +307,16 @@ public sealed partial class BasePage : Page
 
     public async Task<bool> LoginDone()
     {
-        JObject LoginStatus;
+        LoginStatusResponse LoginStatus;
         try
         {
-            LoginStatus = await Common.ncapi?.RequestAsync(CloudMusicApiProviders.LoginStatus);
+            var result = await Common.NeteaseAPI.RequestAsync(NeteaseApis.LoginStatusApi);
+            if (result.IsError)
+            {
+                Common.AddToTeachingTipLists("登录失败", result.Error.Message);
+                return false;
+            }
+            LoginStatus = result.Value;
         }
         catch (Exception e)
         {
@@ -305,19 +324,19 @@ public sealed partial class BasePage : Page
             return false;
         }
 
-        if (!LoginStatus["account"].HasValues) return false;
+        if (LoginStatus.Account == null) return false;
         InfoBarLoginHint.IsOpen = true;
         InfoBarLoginHint.Title = "登录成功";
         //存储Cookie
         Common.Setting.SaveCookies();
-        if (LoginStatus?["profile"].HasValues ?? false)
-            Common.LoginedUser = NCUser.CreateFromJson(LoginStatus["profile"]);
+        if (LoginStatus.Profile != null)
+            Common.LoginedUser = LoginStatus.Profile.MapToNcUser();
         else
             Common.LoginedUser = new NCUser
             {
                 avatar = "ms-appx:///Assets/icon.png",
-                id = LoginStatus["account"]["id"].ToString(),
-                name = LoginStatus["account"]["userName"].ToString(),
+                id = LoginStatus.Account.Id,
+                name = LoginStatus.Account.UserName,
                 signature = "此账号未进行手机号验证, 请使用网易云音乐客户端登录后再继续操作"
             };
 
@@ -344,30 +363,14 @@ public sealed partial class BasePage : Page
 
         HyPlayList.LoginDoneCall();
         _ = ((App)Application.Current).InitializeJumpList();
-        if (!Common.Setting.forceMemoryGarbage)
-            NavMain.SelectedItem = NavItemLogin;
-        Common.NavigatePage(typeof(Me));
+        NavMain.SelectedItem = NavItemLogin;
         return true;
     }
 
     public async void Scrobble(HyPlayItem item)
     {
         // 播放数据记录
-        if (item.ItemType != HyPlayItemType.Netease && Common.Setting.doScrobble /* || Common.IsInFm ||
-            string.IsNullOrEmpty(HyPlayList.PlaySourceId)*/) return;
-        var json = await Common.ncapi?.RequestAsync(CloudMusicApiProviders.Scrobble, new Dictionary<string, object>
-                                                        {
-                                                            { "id", item.PlayItem.Id },
-                                                            { "sourceId", HyPlayList.PlaySourceId ?? "-1" },
-                                                            {
-                                                                "time",
-                                                                TimeSpan.FromMilliseconds(
-                                                                            item.PlayItem.LengthInMilliseconds)
-                                                                        .TotalSeconds
-                                                                        .ToString("f0")
-                                                            }
-                                                        });
-        json.RemoveAll();
+        if (item.ItemType != HyPlayItemType.Netease) return;
         try
         {
             await LastFMManager.ScrobbleAsync(item);
@@ -378,21 +381,17 @@ public sealed partial class BasePage : Page
         }
     }
 
-    private static void DoDailySign()
-    {
-        _ = Common.ncapi?.RequestAsync(CloudMusicApiProviders.DailySignin);
-        _ = Common.ncapi?.RequestAsync(CloudMusicApiProviders.DailySignin,
-                                       new Dictionary<string, object> { { "type", 1 } });
-    }
-
     private static async Task LoadMyLikelist()
     {
         try
         {
-            var js = await Common.ncapi?.RequestAsync(CloudMusicApiProviders.Likelist,
-                                                      new Dictionary<string, object>
-                                                      { { "uid", Common.LoginedUser.id } });
-            Common.LikedSongs = js["ids"].ToObject<List<string>>();
+            var js = await Common.NeteaseAPI.RequestAsync(NeteaseApis.LikelistApi, new LikelistRequest() { Uid = Common.LoginedUser.id });
+            if (js.IsError)
+            {
+                Common.AddToTeachingTipLists("获取喜欢列表失败", js.Error.Message);
+                return;
+            }
+            Common.LikedSongs = js.Value.TrackIds.ToList();
         }
         catch (Exception ex)
         {
@@ -406,9 +405,13 @@ public sealed partial class BasePage : Page
         var nowitem = NavItemsMyList;
         try
         {
-            var json = await Common.ncapi?.RequestAsync(CloudMusicApiProviders.UserPlaylist,
-                                                        new Dictionary<string, object>
-                                                        { { "uid", Common.LoginedUser.id } });
+            var json = await Common.NeteaseAPI.RequestAsync(NeteaseApis.UserPlaylistApi,
+                                                        new UserPlaylistRequest() { Uid = Common.LoginedUser.id });
+            if (json.IsError)
+            {
+                Common.AddToTeachingTipLists("获取歌单列表失败", json.Error.Message);
+                return;
+            }
 
             NavItemsLikeList.MenuItems.Clear();
             NavItemsMyList.MenuItems.Clear();
@@ -418,13 +421,13 @@ public sealed partial class BasePage : Page
             NavItemsMyLovedPlaylist.Visibility = Visibility.Visible;
             Common.MySongLists.Clear();
             var isliked = false;
-            foreach (var jToken in json["playlist"])
-                if (jToken["subscribed"].ToString() == "True")
+            foreach (var jToken in json.Value.Playlists)
+                if (jToken.Subscribed)
                 {
                     var item = new NavigationViewItem
                     {
-                        Content = jToken["name"].ToString(),
-                        Tag = "Playlist" + jToken["id"],
+                        Content = jToken.Name,
+                        Tag = "Playlist" + jToken.Id,
                         IsRightTapEnabled = true,
                         Icon = new FontIcon
                         {
@@ -433,7 +436,7 @@ public sealed partial class BasePage : Page
                     };
                     item.RightTapped += (_, __) =>
                     {
-                        nowplid = jToken["id"].ToString();
+                        nowplid = jToken.Id;
                         ItemPublicPlayList.Visibility = Visibility.Collapsed;
                         PlaylistFlyout.ShowAt((FrameworkElement)_);
                     };
@@ -441,7 +444,7 @@ public sealed partial class BasePage : Page
                 }
                 else
                 {
-                    Common.MySongLists.Add(NCPlayList.CreateFromJson(jToken));
+                    Common.MySongLists.Add(jToken.MapToNCPlayList());
                     if (!isliked)
                     {
                         isliked = true;
@@ -452,19 +455,19 @@ public sealed partial class BasePage : Page
                     {
                         Icon = new FontIcon
                         {
-                            Glyph = jToken["privacy"].ToString() == "0" ? "\uE142" : "\uE72E"
+                            Glyph = jToken.Privacy == 0 ? "\uE142" : "\uE72E"
                         },
-                        Content = jToken["name"].ToString(),
-                        Tag = "Playlist" + jToken["id"],
+                        Content = jToken.Name,
+                        Tag = "Playlist" + jToken.Id,
                         IsRightTapEnabled = true
                     };
-                    if (jToken["privacy"].ToString() != "0")
+                    if (jToken.Privacy == 0)
                         item.Icon.Foreground = new SolidColorBrush(Color.FromArgb(255, 211, 39, 100));
 
                     item.RightTapped += (_, __) =>
                     {
-                        nowplid = jToken["id"].ToString();
-                        ItemPublicPlayList.Visibility = jToken["privacy"].ToString() == "0"
+                        nowplid = jToken.Id.ToString();
+                        ItemPublicPlayList.Visibility = jToken.Privacy == 0
                             ? Visibility.Collapsed
                             : Visibility.Visible;
                         PlaylistFlyout.ShowAt((FrameworkElement)_);
@@ -472,7 +475,6 @@ public sealed partial class BasePage : Page
                     NavItemsMyList.MenuItems.Add(item);
                 }
 
-            json.RemoveAll();
         }
         catch (Exception ex)
         {
@@ -491,7 +493,7 @@ public sealed partial class BasePage : Page
 
         if (nowitem.Tag.ToString() == "PageMe" && !Common.Logined)
         {
-            foreach (Cookie ncapiCookie in Common.ncapi?.Cookies) ncapiCookie.Expired = true; //清一遍Cookie防止出错
+            Common.NeteaseAPI.Option.Cookies.Clear();//清一遍Cookie防止出错
             await DialogLogin.ShowAsync();
             return;
         }
@@ -564,8 +566,10 @@ public sealed partial class BasePage : Page
         {
             case "SonglistCreate":
                 {
-                    await new CreateSonglistDialog().ShowAsync();
-                    _ = LoadSongList();
+                    if (Common.Setting.EnableSonglistCreate)
+                        await new CreateSonglistDialog().ShowAsync();
+                    else
+                        Common.AddToTeachingTipLists("歌单创建功能被禁用", "由于网易云音乐风控升级, 默认禁用歌单创建功能, 如需启用请至\"设置-实验室\"启用歌单创建功能");
                     break;
                 }
             case "PersonalFM":
@@ -581,45 +585,7 @@ public sealed partial class BasePage : Page
 
     private async Task LoadHeartBeat()
     {
-        HyPlayList.RemoveAllSong();
-        try
-        {
-            var jsoon = await Common.ncapi?.RequestAsync(CloudMusicApiProviders.PlaylistDetail,
-                                                         new Dictionary<string, object>
-                                                         { { "id", Common.MySongLists[0].plid } });
-            var jsona = await Common.ncapi?.RequestAsync(
-                CloudMusicApiProviders.PlaymodeIntelligenceList,
-                new Dictionary<string, object>
-                {
-                    { "pid", Common.MySongLists[0].plid },
-                    { "id", jsoon["playlist"]["trackIds"][0]["id"].ToString() }
-                });
-
-            var Songs = new List<NCSong>();
-            foreach (var token in jsona["data"])
-            {
-                var ncSong = NCSong.CreateFromJson(token["songInfo"]);
-                Songs.Add(ncSong);
-            }
-
-            try
-            {
-                HyPlayList.AppendNcSongs(Songs);
-                HyPlayList.SongMoveTo(0);
-            }
-            catch (Exception ex)
-            {
-                Common.AddToTeachingTipLists(ex.Message, (ex.InnerException ?? new Exception()).Message);
-            }
-
-            jsoon.RemoveAll();
-            jsona.RemoveAll();
-            Songs.Clear();
-        }
-        catch (Exception ex)
-        {
-            Common.AddToTeachingTipLists(ex.Message, (ex.InnerException ?? new Exception()).Message);
-        }
+        await Api.EnterIntelligencePlay();
     }
 
     private void OnNavigateBack(NavigationView sender, NavigationViewBackRequestedEventArgs args)
@@ -656,42 +622,36 @@ public sealed partial class BasePage : Page
     {
         try
         {
-            var key = await Common.ncapi?.RequestAsync(CloudMusicApiProviders.LoginQrKey,
-                                                       new Dictionary<string, object>
-                                                       {
-                                                           {
-                                                               "timestamp",
-                                                               (DateTime.Now - Common.UnixEpoch).TotalMilliseconds
-                                                           }
-                                                       });
-
-            _ = ReFreshQr(key);
-            nowqrkey = key["unikey"].ToString();
-            while (!Common.Logined && nowqrkey == key["unikey"].ToString())
+            var key = await Common.NeteaseAPI.RequestAsync(NeteaseApis.LoginQrCodeUnikeyApi, new LoginQrCodeUnikeyRequest());
+            if (key.IsError)
             {
-                var res = await Common.ncapi?.RequestAsync(CloudMusicApiProviders.LoginQrCheck,
-                                                           new Dictionary<string, object>
-                                                           { { "key", key["unikey"].ToString() } });
-                if (res["code"].ToString() == "800")
+                Common.AddToTeachingTipLists("获取UniKey失败", key.Error.Message);
+                return;
+            }
+            _ = ReFreshQr(key.Value.Unikey);
+            nowqrkey = key.Value.Unikey;
+            while (!Common.Logined && nowqrkey == key.Value.Unikey)
+            {
+                var res = await Common.NeteaseAPI.RequestAsync(NeteaseApis.LoginQrCodeCheckApi,
+                                                           new LoginQrCodeCheckRequest() { Unikey = key.Value.Unikey });
+                if (res.Value.Code == 800)
                 {
-                    key = await Common.ncapi?.RequestAsync(CloudMusicApiProviders.LoginQrKey,
-                                                           new Dictionary<string, object>
-                                                           {
-                                                               {
-                                                                   "timestamp",
-                                                                   (DateTime.Now - Common.UnixEpoch).TotalMilliseconds
-                                                               }
-                                                           });
+                    key = await Common.NeteaseAPI.RequestAsync(NeteaseApis.LoginQrCodeUnikeyApi, new LoginQrCodeUnikeyRequest());
+                    if (key.IsError)
+                    {
+                        Common.AddToTeachingTipLists("获取UniKey失败", key.Error.Message);
+                        return;
+                    }
                     try
                     {
-                        _ = ReFreshQr(key);
+                        _ = ReFreshQr(key.Value.Unikey);
                     }
                     catch (Exception ex)
                     {
                         Common.AddToTeachingTipLists(ex.Message, (ex.InnerException ?? new Exception()).Message);
                     }
                 }
-                else if (res["code"].ToString() == "801")
+                else if (res.Value.Code == 801)
                 {
                     if (!InfoBarLoginHint.IsOpen)
                     {
@@ -700,7 +660,7 @@ public sealed partial class BasePage : Page
 
                     InfoBarLoginHint.Title = "请扫描上方二维码登录";
                 }
-                else if (res["code"].ToString() == "803")
+                else if (res.Value.Code == 803)
                 {
                     if (!InfoBarLoginHint.IsOpen)
                     {
@@ -712,7 +672,7 @@ public sealed partial class BasePage : Page
                     await LoginDone();
                     break;
                 }
-                else if (res["code"].ToString() == "802")
+                else if (res.Value.Code == 802)
                 {
                     if (!InfoBarLoginHint.IsOpen)
                     {
@@ -731,9 +691,9 @@ public sealed partial class BasePage : Page
         }
     }
 
-    private async Task ReFreshQr(JObject key)
+    private async Task ReFreshQr(string key)
     {
-        var QrUri = new Uri("https://music.163.com/login?codekey=" + key["unikey"]);
+        var QrUri = new Uri("https://music.163.com/login?codekey=" + key);
         var img = new BitmapImage();
 
         var qrGenerator = new QRCodeGenerator();
@@ -810,11 +770,14 @@ public sealed partial class BasePage : Page
     {
         try
         {
-            await Common.ncapi?.RequestAsync(CloudMusicApiProviders.PlaylistPrivacy,
-                                             new Dictionary<string, object>
-                                             {
-                                                 { "id", nowplid }
-                                             });
+            var result = await Common.NeteaseAPI.RequestAsync(NeteaseApis.PlaylistPrivacyApi,
+                                             new PlaylistPrivacyRequest() { Id = nowplid });
+            if (result.IsError)
+            {
+                Common.AddToTeachingTipLists("公开歌单失败", result.Error.Message);
+                return;
+            }
+
             Common.AddToTeachingTipLists("成功公开歌单");
             _ = LoadSongList();
         }
@@ -828,11 +791,13 @@ public sealed partial class BasePage : Page
     {
         try
         {
-            await Common.ncapi?.RequestAsync(CloudMusicApiProviders.PlaylistDelete,
-                                             new Dictionary<string, object>
-                                             {
-                                                 { "ids", nowplid }
-                                             });
+            var json = await Common.NeteaseAPI.RequestAsync(NeteaseApis.PlaylistDeleteApi,
+                                             new PlaylistDeleteRequest() { Id = nowplid });
+            if (json.IsError)
+            {
+                Common.AddToTeachingTipLists("删除失败", json.Error.Message);
+                return;
+            }
             Common.AddToTeachingTipLists("成功删除");
             _ = LoadSongList();
         }
@@ -865,16 +830,14 @@ public sealed partial class BasePage : Page
 
         try
         {
-            var json = await Common.ncapi?.RequestAsync(CloudMusicApiProviders.SearchSuggest,
-                                                        new Dictionary<string, object>
-                                                        { { "keywords", sender.Text }, { "type", "mobile" } });
-
-            if (json["result"] != null && json["result"]["allMatch"] != null &&
-                json["result"]["allMatch"].HasValues)
-                sender.ItemsSource = json["result"]["allMatch"].ToArray().ToList()
-                                                               .Select(t => t["keyword"].ToString())
-                                                               .ToList();
-            json.RemoveAll();
+            var json = await Common.NeteaseAPI.RequestAsync(NeteaseApis.SearchSuggestionApi,
+                                                        new SearchSuggestionRequest() { Keyword = sender.Text });
+            if (json.IsError)
+            {
+                Common.AddToTeachingTipLists("获取推荐词失败", json.Error.Message);
+                return;
+            }
+            sender.ItemsSource = json.Value.Result.AllMatch.Select(t => t.Keyword).ToList();
         }
         catch (Exception ex)
         {
@@ -899,11 +862,14 @@ public sealed partial class BasePage : Page
         });
     }
 
-    public async Task RefreshNavItemCover(int hashCode, IRandomAccessStream coverStream)
+    public async Task RefreshNavItemCover(int hashCode, IBuffer coverStream)
     {
+        if (HyPlayList.CoverStream.Size == 0) return;
         await Dispatcher.RunAsync(CoreDispatcherPriority.Normal, async () =>
         {
-            using var stream = coverStream.CloneStream();
+            using var stream = new InMemoryRandomAccessStream();
+            await stream.WriteAsync(coverStream);
+            stream.Seek(0);
             if (NavItemBlank.Opacity != 0 && !Common.isExpanded && !Common.Setting.noImage && stream.Size != 0)
             {
                 try

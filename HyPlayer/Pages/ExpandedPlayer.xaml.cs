@@ -10,9 +10,9 @@ using HyPlayer.Controls;
 using HyPlayer.HyPlayControl;
 using HyPlayer.LyricRenderer.RollingCalculators;
 using Impressionist.Abstractions;
+using Impressionist.Implementations;
 using LyricParser.Abstraction;
 using Microsoft.Graphics.Canvas.Effects;
-using NeteaseCloudMusicApi;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -89,6 +89,7 @@ public sealed partial class ExpandedPlayer : Page, IDisposable
     public System.Diagnostics.Stopwatch time = new System.Diagnostics.Stopwatch();
     private PixelShaderEffect? _shaderEffect;
     private float _randomValue = -1;
+    private bool _backgroundIsReady = false;
 
 
     public ExpandedPlayer()
@@ -475,8 +476,7 @@ public sealed partial class ExpandedPlayer : Page, IDisposable
         try
         {
             OnSongChange(HyPlayList.List[HyPlayList.NowPlaying]);
-            using var coverStream = HyPlayList.CoverStream.CloneStream();
-            await RefreshAlbumCover(HyPlayList.NowPlayingHashCode, coverStream);
+            await RefreshAlbumCover(HyPlayList.NowPlayingHashCode, HyPlayList.CoverBuffer);
             ChangeWindowMode();
             needRedesign++;
         }
@@ -537,18 +537,16 @@ public sealed partial class ExpandedPlayer : Page, IDisposable
 
 
     private Storyboard bpmAniStoryboard = new Storyboard();
-    public async void InitializeBPM()
+    public void InitializeBPM()
     {
-        bpmAniStoryboard.Stop();
-        if (Common.ncapi is null || HyPlayList.NowPlayingItem.ItemType != HyPlayItemType.Netease ||
+        // TODO: 完成 BPM API
+        /*
+        bpmAniStoryboard.Stop();    
+        if (HyPlayList.NowPlayingItem.ItemType != HyPlayItemType.Netease ||
             string.IsNullOrEmpty(HyPlayList.NowPlayingItem.PlayItem.Id))
             return;
-        var json = await Common.ncapi.RequestAsync(CloudMusicApiProviders.SongWikiSummary,
-            new()
-            {
-                { "id", HyPlayList.NowPlayingItem.PlayItem.Id }
-            });
-        if (json["code"]?.ToString() != "200") return;
+        var json = await Common.NeteaseAPI.RequestAsync(NeteaseApis.SongWikiSummaryApi, new SongWikiSummaryRequest() { SongId = HyPlayList.NowPlayingItem.PlayItem.Id });
+        if (json.IsError) return;
         // 寻找 BPM 的 Node
         var blocks = json["data"]?["blocks"]?.ToArray();
         if (blocks is null) return;
@@ -568,6 +566,7 @@ public sealed partial class ExpandedPlayer : Page, IDisposable
                 }
             }
         }
+        */
     }
 
     public void LoadLyricsBox()
@@ -641,8 +640,7 @@ public sealed partial class ExpandedPlayer : Page, IDisposable
     public async Task OnEnteringForeground()
     {
         OnSongChange(HyPlayList.NowPlayingItem);
-        using var coverStream = HyPlayList.CoverStream.CloneStream();
-        await RefreshAlbumCover(HyPlayList.NowPlayingHashCode, coverStream);
+        await RefreshAlbumCover(HyPlayList.NowPlayingHashCode, HyPlayList.CoverBuffer);
         if (!_lyricHasBeenLoaded) HyPlayList_OnLyricLoaded();
     }
 
@@ -845,7 +843,7 @@ public sealed partial class ExpandedPlayer : Page, IDisposable
                     await Common.HttpClient!.GetAsync(new Uri(HyPlayList.NowPlayingItem.PlayItem.Album.cover));
                 if (coverResult.IsSuccessStatusCode)
                 {
-                    var cover = await coverResult.Content.ReadAsBufferAsync();
+                    var cover = (await coverResult.Content.ReadAsByteArrayAsync()).AsBuffer();
                     await FileIO.WriteBufferAsync(file, cover);
                 }
                 else
@@ -961,8 +959,8 @@ public sealed partial class ExpandedPlayer : Page, IDisposable
         using var stream = coverStream.CloneStream();
         var finalResult = false; //在不手动指定背景类型为2至5时需要执行颜色采样
         var resultGenerated = false; //标志返回颜色已经生成
-        if (Common.Setting.lyricColor != 0 && Common.Setting.lyricColor != 3) 
-        { 
+        if (Common.Setting.lyricColor != 0 && Common.Setting.lyricColor != 3)
+        {
             finalResult = Common.Setting.lyricColor == 2;
             resultGenerated = true;
         }
@@ -979,31 +977,41 @@ public sealed partial class ExpandedPlayer : Page, IDisposable
             }
 
         if (HyPlayList.NowPlayingItem.PlayItem == null) return false;
-
-        if (lastSongForBrush == HyPlayList.NowPlayingItem.PlayItem) return Common.BrushManagement.AccentBrush.Color.R == 0;
         lastSongForBrush = HyPlayList.NowPlayingItem.PlayItem;
         try
         {
-            Buffer buffer = new Buffer(MIMEHelper.PICTURE_FILE_HEADER_CAPACITY);
-            stream.Seek(0);
-            await stream.ReadAsync(buffer, MIMEHelper.PICTURE_FILE_HEADER_CAPACITY, InputStreamOptions.None);
-            var mime = MIMEHelper.GetPictureCodecFromBuffer(buffer);
-            BitmapDecoder decoder = await BitmapDecoder.CreateAsync(mime, stream);
+            BitmapDecoder decoder = await BitmapDecoder.CreateAsync(stream);
             var colors = await ImageDecoder.GetPixelColor(decoder);
             ThemeColorResult themeColor;
             PaletteResult palette;
             if (Common.Setting.expandedPlayerBackgroundType != 6 && Common.Setting.expandedPlayerBackgroundType != 7)
             {
-                themeColor = await Common.PaletteGenerator.CreateThemeColor(colors, Common.Setting.ImpressionistIgnoreWhite, Common.Setting.ImpressionistLABSpace);
+                if (Common.Setting.ColorGeneratorType is 0)
+                {
+                    themeColor = await PaletteGenerators.KMeansPaletteGenerator.CreateThemeColor(colors, Common.Setting.ImpressionistIgnoreWhite, Common.Setting.ImpressionistLABSpace);
+                }
+                else
+                {
+                    themeColor = await PaletteGenerators.OctTreePaletteGenerator.CreateThemeColor(colors, Common.Setting.ImpressionistIgnoreWhite);
+                }
                 albumMainColor = Windows.UI.Color.FromArgb(255, (byte)themeColor.Color.X, (byte)themeColor.Color.Y, (byte)themeColor.Color.Z);
             }
             else
             {
-                palette = await Common.PaletteGenerator.CreatePalette(colors,
-                    Common.Setting.expandedPlayerBackgroundType is 6 ? 9 : 4,
-                    Common.Setting.ImpressionistIgnoreWhite,
-                    Common.Setting.ImpressionistLABSpace,
-                    Common.Setting.ImpressionistUseKMeansPP);
+                if (Common.Setting.ColorGeneratorType is 0)
+                {
+                    palette = await PaletteGenerators.KMeansPaletteGenerator.CreatePalette(colors,
+                                                                                           Common.Setting.expandedPlayerBackgroundType is 6 ? 9 : 4,
+                                                                                           Common.Setting.ImpressionistIgnoreWhite,
+                                                                                           Common.Setting.ImpressionistLABSpace,
+                                                                                           Common.Setting.ImpressionistUseKMeansPP);
+                }
+                else
+                {
+                    palette = await PaletteGenerators.OctTreePaletteGenerator.CreatePalette(colors,
+                                                                                           Common.Setting.expandedPlayerBackgroundType is 6 ? 9 : 4,
+                                                                                           Common.Setting.ImpressionistIgnoreWhite);
+                }
                 themeColor = palette.ThemeColor;
                 albumColors = palette.Palette.Select(quantizedColor => Windows.UI.Color.FromArgb(255, (byte)quantizedColor.X, (byte)quantizedColor.Y, (byte)quantizedColor.Z))
                     .ToList();
@@ -1187,10 +1195,12 @@ public sealed partial class ExpandedPlayer : Page, IDisposable
         {
             luminousColorsRotateStoryBoard.Resume();
         }
-        if (HyPlayList.IsPlaying && LuminousBackground != null)
+        if (LuminousBackground != null)
         {
-            LuminousBackground.Paused = false;
+            LuminousBackground.Paused = false;//先初始化
+
         }
+
         LoadLyricsBox();
     }
 
@@ -1303,11 +1313,14 @@ public sealed partial class ExpandedPlayer : Page, IDisposable
     }
 
 
-    public async Task RefreshAlbumCover(int hashCode, IRandomAccessStream coverStream)
+    public async Task RefreshAlbumCover(int hashCode, IBuffer coverStream)
     {
+        if (HyPlayList.CoverStream.Size == 0) return;
         await Dispatcher.RunAsync(CoreDispatcherPriority.Normal, async () =>
         {
-            using var stream = coverStream.CloneStream();
+            using var stream = new InMemoryRandomAccessStream();
+            await stream.WriteAsync(coverStream);
+            stream.Seek(0);
             if (!Common.Setting.noImage)
             {
                 try
@@ -1432,6 +1445,7 @@ public sealed partial class ExpandedPlayer : Page, IDisposable
                             _shaderEffect.Properties["RandomValue2"] = (float)random.Next(-50, +50);
                             _shaderEffect.Properties["RandomValue3"] = (float)random.Next(-50, +50);
                         }
+                        if (!HyPlayList.IsPlaying) LuminousBackground.Paused = true;
                     }
                 }
                 catch
@@ -1481,7 +1495,7 @@ public sealed partial class ExpandedPlayer : Page, IDisposable
 
     private void LuminousBackground_OnUnloaded(object sender, RoutedEventArgs e)
     {
-        LuminousBackground?.RemoveFromVisualTree();
+        if (Common.Setting.expandedPlayerBackgroundType == 7) LuminousBackground.RemoveFromVisualTree();
         LuminousBackground = null;
     }
 
@@ -1688,6 +1702,7 @@ public sealed partial class ExpandedPlayer : Page, IDisposable
             LuminousBackground.IsFixedTimeStep = true;
             LuminousBackground.TargetElapsedTime = TimeSpan.FromMilliseconds(16.6 * (60d / Common.Setting.IsolationFPS));
         }
+        _backgroundIsReady = true;
     }
 
     private void LuminousBackground_Update(Microsoft.Graphics.Canvas.UI.Xaml.ICanvasAnimatedControl sender, Microsoft.Graphics.Canvas.UI.Xaml.CanvasAnimatedUpdateEventArgs args)
@@ -1706,6 +1721,7 @@ public sealed partial class ExpandedPlayer : Page, IDisposable
             if (_shaderEffect != null)
             {
                 session.DrawImage(_shaderEffect);
+                if (!HyPlayList.IsPlaying || !_backgroundIsReady) sender.Paused = true;
             }
         }
     }

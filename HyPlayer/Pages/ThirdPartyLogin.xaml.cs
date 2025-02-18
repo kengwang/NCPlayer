@@ -3,7 +3,6 @@
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.Web.WebView2.Core;
 using System;
-using System.Net;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Navigation;
@@ -74,15 +73,7 @@ public sealed partial class ThirdPartyLogin : Page, IDisposable
             var cookiestring = string.Empty;
             foreach (var cookie in cookies)
             {
-                var rescookie = new Cookie();
-                rescookie.Name = cookie.Name;
-                rescookie.Value = cookie.Value;
-                rescookie.HttpOnly = cookie.IsHttpOnly;
-                rescookie.Domain = cookie.Domain;
-                rescookie.Secure = cookie.IsSecure;
-                rescookie.Expires = Common.UnixEpoch.AddSeconds(cookie.Expires);
-                rescookie.Path = cookie.Path;
-                Common.ncapi?.Cookies.Add(rescookie);
+                Common.NeteaseAPI.Option.Cookies.Add(cookie.Name, cookie.Value);
             }
             await Common.PageBase.LoginDone();
         }

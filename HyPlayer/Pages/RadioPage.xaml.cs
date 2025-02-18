@@ -2,11 +2,10 @@
 
 using HyPlayer.Classes;
 using HyPlayer.HyPlayControl;
-using NeteaseCloudMusicApi;
+using HyPlayer.NeteaseApi.ApiContracts;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Windows.UI.Xaml;
@@ -62,31 +61,29 @@ public sealed partial class RadioPage : Page, IDisposable
         _cancellationToken.ThrowIfCancellationRequested();
         try
         {
-            var json = await Common.ncapi?.RequestAsync(CloudMusicApiProviders.DjProgram,
-                new Dictionary<string, object>
+            var json = await Common.NeteaseAPI?.RequestAsync(NeteaseApis.DjChannelProgramsApi,
+                new DjChannelProgramsRequest()
                 {
-                    { "rid", Radio.id },
-                    {   "limit" , 100 },
-                    { "offset", page * 100 },
-                    { "asc", asc }
-                }, true);
-            if (json["code"].ToString() == "405")
+                    RadioId = Radio.id,
+                    Limit = 100,
+                    Offset = page * 100,
+                    Asc = asc
+                });
+            if (json.IsError && json.Error.ErrorCode == 405)
             {
                 treashold = ++cooldownTime * 10;
                 page--;
                 throw new Exception($"渐进加载速度过于快, 将在 {cooldownTime * 10} 秒后尝试继续加载, 正在清洗请求");
             }
-            NextPage.Visibility = json["more"].ToObject<bool>() ? Visibility.Visible : Visibility.Collapsed;
-            foreach (var jToken in json["programs"])
+            NextPage.Visibility = json.Value.More ? Visibility.Visible : Visibility.Collapsed;
+            foreach (var jToken in json.Value.Programs ?? [])
             {
                 _cancellationToken.ThrowIfCancellationRequested();
-                var song = NCFmItem.CreateFromJson(jToken);
-                song.Type = HyPlayItemType.Radio;
+                var song = jToken.MapToNCFmItem();
                 song.Order = i++;
                 song.TrackId = i;
                 Songs.Add(song);
             }
-            json.RemoveAll();
         }
         catch (Exception ex)
         {
@@ -101,10 +98,17 @@ public sealed partial class RadioPage : Page, IDisposable
         if (e.Parameter is string rid)
             try
             {
-                var json1 = await Common.ncapi?.RequestAsync(CloudMusicApiProviders.DjDetail,
-                    new Dictionary<string, object> { { "rid", rid } });
-                Radio = NCRadio.CreateFromJson(json1["djRadio"]);
-                json1.RemoveAll();
+                var json1 = await Common.NeteaseAPI?.RequestAsync(NeteaseApis.DjChannelDetailApi,
+                    new DjChannelDetailRequest()
+                    {
+                        Id = rid
+                    });
+                if (json1.IsError)
+                {
+                    Common.AddToTeachingTipLists("加载电台信息错误", json1.Error.Message);
+                    return;
+                }
+                Radio = json1.Value.RadioData.MapToNCRadio();
             }
             catch (Exception ex)
             {
@@ -212,18 +216,24 @@ public sealed partial class RadioPage : Page, IDisposable
             while (hasMore is true)
                 try
                 {
-                    var json = await Common.ncapi?.RequestAsync(CloudMusicApiProviders.DjProgram,
-                        new Dictionary<string, object>
+                    var json = await Common.NeteaseAPI?.RequestAsync(NeteaseApis.DjChannelProgramsApi,
+                        new DjChannelProgramsRequest()
                         {
-                            { "rid", Radio.id },
-                            { "offset", page++ * 100 },
-                            { "limit", 100 },
-                            { "asc", asc }
+                            RadioId = Radio.id,
+                            Limit = 100,
+                            Offset = page * 100,
+                            Asc = asc
                         });
-                    hasMore = json["more"]?.ToObject<bool>();
-                    if (json["programs"] is not null)
-                        result.AddRange(json["programs"].Select(t => (NCSong)NCFmItem.CreateFromJson(t)).ToList());
-                    json.RemoveAll();
+                    hasMore = json.Value?.More is true;
+                    foreach (var jToken in json.Value?.Programs ?? [])
+                    {
+                        _cancellationToken.ThrowIfCancellationRequested();
+                        var song = jToken.MapToNCFmItem();
+                        song.Order = i++;
+                        song.TrackId = i;
+                        result.Add(song);
+                    }
+                    page++;
                 }
                 catch (Exception ex)
                 {

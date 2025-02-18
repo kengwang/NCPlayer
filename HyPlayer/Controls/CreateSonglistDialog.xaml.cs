@@ -1,8 +1,7 @@
 ﻿#region
 
-using NeteaseCloudMusicApi;
+using HyPlayer.NeteaseApi.ApiContracts;
 using System;
-using System.Collections.Generic;
 using Windows.UI.Xaml.Controls;
 
 #endregion
@@ -21,18 +20,22 @@ public sealed partial class CreateSonglistDialog : ContentDialog
     private async void ContentDialog_PrimaryButtonClick(ContentDialog sender,
         ContentDialogButtonClickEventArgs args)
     {
-        string realIpBackup = Common.ncapi?.RealIP;
+        string realIpBackup = Common.NeteaseAPI.Option.XRealIP;
         // This request would return with a 250 error without RealIP set
-        if (Common.ncapi != null)
-        {
-            Common.ncapi.RealIP = "118.88.88.88";
-        }
+        Common.NeteaseAPI.Option.XRealIP = "118.88.88.88";
 
         try
         {
-            await Common.ncapi?.RequestAsync(CloudMusicApiProviders.PlaylistCreate,
-                new Dictionary<string, object>
-                    { { "name", SonglistTitle.Text }, { "privacy", (bool)PrivateCheckBox.IsChecked ? 10 : 0 } });
+            var result = await Common.NeteaseAPI.RequestAsync(NeteaseApis.PlaylistCreateApi,
+                new PlaylistCreateRequest()
+                {
+                    Name = SonglistTitle.Text,
+                    Privacy = (bool)PrivateCheckBox.IsChecked ? 10 : 0
+                });
+            if (result.IsError)
+            {
+                Common.AddToTeachingTipLists("创建失败", result.Error.Message);
+            }
         }
         catch (Exception e)
         {
@@ -42,10 +45,7 @@ public sealed partial class CreateSonglistDialog : ContentDialog
 
         Common.AddToTeachingTipLists("创建成功");
         _ = Common.PageBase.LoadSongList();
-        if (Common.ncapi != null)
-        {
-            Common.ncapi.RealIP = realIpBackup;
-        }// Restore user setting
+        Common.NeteaseAPI.Option.XRealIP = realIpBackup;// Restore user setting
     }
 
     private void ContentDialog_SecondaryButtonClick(ContentDialog sender, ContentDialogButtonClickEventArgs args)

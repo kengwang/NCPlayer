@@ -99,6 +99,7 @@
     <Compile Include="Classes\ImageDecoder.cs" />
     <Compile Include="Classes\LastFMManager.cs" />
     <Compile Include="Classes\LyricRenderComposer.cs" />
+    <Compile Include="Classes\Mapper.cs" />
     <Compile Include="Classes\MIMEHelper.cs" />
     <Compile Include="Classes\NCMFile.cs" />
     <Compile Include="Classes\NCSong.cs" />
@@ -603,14 +604,11 @@
     <PackageReference Include="CommunityToolkit.Uwp.Media">
       <Version>8.1.240916</Version>
     </PackageReference>
+    <PackageReference Include="HyPlayer.PlayCore.Abstraction">
+      <Version>0.1.4</Version>
+    </PackageReference>
     <PackageReference Include="Inflatable.Lastfm">
       <Version>1.2.0</Version>
-    </PackageReference>
-    <PackageReference Include="Microsoft.AppCenter.Analytics">
-      <Version>5.0.6</Version>
-    </PackageReference>
-    <PackageReference Include="Microsoft.AppCenter.Crashes">
-      <Version>5.0.6</Version>
     </PackageReference>
     <PackageReference Include="Microsoft.Gaming.XboxGameBar">
       <Version>7.2.241028002</Version>
@@ -622,7 +620,7 @@
       <Version>7.1.3</Version>
     </PackageReference>
     <PackageReference Include="Microsoft.UI.Xaml">
-      <Version>2.8.6</Version>
+      <Version>2.8.7</Version>
     </PackageReference>
     <PackageReference Include="QRCoder">
       <Version>1.6.0</Version>
@@ -649,6 +647,10 @@
       <Project>{8db15c94-9cca-4b40-91f4-5919bbc67abb}</Project>
       <Name>HyPlayer.Frieren</Name>
     </ProjectReference>
+    <ProjectReference Include="..\HyPlayer.NeteaseProvider\HyPlayer.NeteaseApi\HyPlayer.NeteaseApi.csproj">
+      <Project>{a9fac26e-7651-4ec5-9ca6-8b3cef6412e9}</Project>
+      <Name>HyPlayer.NeteaseApi</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Impressionist\Impressionist\Impressionist.csproj">
       <Project>{0f920821-8006-4512-abcd-1396d1916fed}</Project>
       <Name>Impressionist</Name>
@@ -660,10 +662,6 @@
     <ProjectReference Include="..\LyricParser\LyricParser\LyricParser.csproj">
       <Project>{8cb63bd0-1a5e-4ca0-aaad-4249d37e3a47}</Project>
       <Name>LyricParser</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\NeteaseCloudMusicApi\NeteaseCloudMusicApi\NeteaseCloudMusicApi.csproj">
-      <Project>{c20d7ea5-6db8-42b3-855d-75470cbe667f}</Project>
-      <Name>NeteaseCloudMusicApi</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup />

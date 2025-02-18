@@ -33,10 +33,10 @@ public sealed partial class MainPage
     public MainPage()
     {
         Common.PageMain = this;
-        if (Common.ncapi != null)
+        if (Common.NeteaseAPI != null)
         {
-            Common.ncapi.RealIP = Setting.GetSettings<string>("xRealIp", null);
-            Common.ncapi.UseHttp = Setting.GetSettings("UseHttp", false);
+            Common.NeteaseAPI.Option.XRealIP = Setting.GetSettings<string>("xRealIp", null);
+            Common.NeteaseAPI.Option.DegradeHttp = Setting.GetSettings("UseHttp", false);
         }
         StaticSource.PICSIZE_AUDIO_PLAYER_COVER = Common.Setting.highQualityCoverInSMTC ? "1024y1024" : "640y640";
         if (Common.Setting.uiSound)
@@ -123,8 +123,7 @@ public sealed partial class MainPage
             //lyricstoryboard.Begin();
 
             PointerInAni.Begin();
-            using var coverStream = HyPlayList.CoverStream.CloneStream();
-            await Common.BarPlayBar.RefreshPlayBarCover(HyPlayList.NowPlayingHashCode, coverStream);
+            await Common.BarPlayBar.RefreshPlayBarCover(HyPlayList.NowPlayingHashCode, HyPlayList.CoverBuffer);
             var BlankAni = new DoubleAnimation
             {
                 To = 0,

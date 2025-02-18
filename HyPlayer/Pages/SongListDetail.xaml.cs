@@ -224,7 +224,7 @@ public sealed partial class SongListDetail : Page, IDisposable
 
         try
         {
-            var json = await Common.NeteaseAPI?.RequestAsync(NeteaseApis.SongDetailApi,
+            var json = await Common.NeteaseAPI!.RequestAsync(NeteaseApis.SongDetailApi,
                 new SongDetailRequest()
                 {
                     IdList = trackIds
@@ -246,6 +246,10 @@ public sealed partial class SongListDetail : Page, IDisposable
                 ncSong.IsAvailable = privileges?[i++].St is 0;
                 ncSong.Order = idx++;
                 Songs.Add(ncSong);
+            }
+            if (_songListIds.Count <= Songs.Count)
+            {
+                NextPage.Visibility = Visibility.Collapsed;
             }
         }
         catch (Exception ex)

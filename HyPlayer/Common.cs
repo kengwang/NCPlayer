@@ -356,7 +356,7 @@ namespace HyPlayer
 
         public int lyricPaddingTopRatio
         {
-            get => GetSettings(nameof(lyricPaddingTopRatio), 10);
+            get => GetSettings(nameof(lyricPaddingTopRatio), 30);
             set
             {
                 ApplicationData.Current.LocalSettings.Values[nameof(lyricPaddingTopRatio)] = value;
@@ -858,6 +858,16 @@ namespace HyPlayer
             }
         }
 
+        public int lyricRenderWidthRatio
+        {
+            get => GetSettings(nameof(lyricRenderWidthRatio), 80);
+            set
+            {
+                ApplicationData.Current.LocalSettings.Values[nameof(lyricRenderWidthRatio)] = value;
+                OnPropertyChanged();
+            }
+        }
+        
         public bool lyricRenderTransliterationScanning
         {
             get => GetSettings(nameof(lyricRenderTransliterationScanning), true);

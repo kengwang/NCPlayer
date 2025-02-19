@@ -108,7 +108,7 @@ public sealed partial class ExpandedPlayer : Page, IDisposable
         LyricBox.Context.LineRollingEaseCalculator = new ElasticEaseRollingCalculator();
         LyricBox.OnBeforeRender += LyricBox_OnBeforeRender;
         LyricBox.OnRequestSeek += LyricBoxOnOnRequestSeek;
-        LyricBox.Context.LyricWidthRatio = 1;
+        LyricBox.Context.LyricWidthRatio = Common.Setting.lyricRenderWidthRatio / 100f;
         LyricBox.Context.LyricPaddingTopRatio = Common.Setting.lyricPaddingTopRatio / 100f;
         LyricBox.Context.CurrentLyricTime = 0;
         LyricBox.Context.Debug = Common.Setting.LyricRendererDebugMode;
@@ -316,16 +316,7 @@ public sealed partial class ExpandedPlayer : Page, IDisposable
                 break;
         }
 
-        if (WindowMode == ExpandedWindowMode.LyricOnly)
-            LyricWidth = nowwidth - 30;
-        else
-        {
-            if (nowwidth > 800 || WindowMode == ExpandedWindowMode.Both)
-                LyricWidth = nowwidth * 0.4;
-            else
-                LyricWidth = nowwidth - 30;
-        }
-
+        LyricWidth = nowwidth - 30;
         needRedesign++;
         realclick = true;
     }

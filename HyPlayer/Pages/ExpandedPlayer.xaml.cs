@@ -23,6 +23,7 @@ using System.Threading.Tasks;
 using Windows.ApplicationModel.DataTransfer;
 using Windows.Devices.Input;
 using Windows.Graphics.Imaging;
+using Windows.Media.Playback;
 using Windows.Storage;
 using Windows.Storage.FileProperties;
 using Windows.Storage.Pickers;
@@ -126,10 +127,10 @@ public sealed partial class ExpandedPlayer : Page, IDisposable
         LyricBox.Context.Effects.SimpleLineScanning = Common.Setting.lyricRenderSimpleLineScanning;
         LyricBox.Context.PreferTypography.Font = Common.Setting.lyricFontFamily;
         LyricBox.Context.LineSpacing = Common.Setting.lyricLineSpacing;
-        HyPlayList.Player.SeekCompleted += Player_SeekCompleted;
+        HyPlayList.Player.PlaybackSession.SeekCompleted += Player_SeekCompleted;
     }
 
-    private void Player_SeekCompleted(Windows.Media.Playback.MediaPlayer sender, object args)
+    private void Player_SeekCompleted(MediaPlaybackSession mediaPlaybackSession, object args)
     {
         _positionChangedBySeeking = true;
     }
@@ -257,8 +258,8 @@ public sealed partial class ExpandedPlayer : Page, IDisposable
         if (lastwidth != nowwidth)
         {
             //这段不要放出去了
-            if (nowwidth > 800 || WindowMode == ExpandedWindowMode.Both)
-                LyricWidth = nowwidth * 0.4;
+            if (WindowMode == ExpandedWindowMode.Both)
+                LyricWidth = nowwidth * 0.5;
             else
                 LyricWidth = nowwidth - 15;
             LyricWidth = Math.Max(LyricWidth, 0);
@@ -279,6 +280,13 @@ public sealed partial class ExpandedPlayer : Page, IDisposable
     private void ChangeWindowMode()
     {
         realclick = false;
+        
+        if (WindowMode == ExpandedWindowMode.Both)
+            LyricWidth = nowwidth * 0.5;
+        else
+            LyricWidth = nowwidth - 30;
+        LyricWidth = Math.Max(LyricWidth, 0);
+        
         switch (WindowMode)
         {
             case ExpandedWindowMode.Both:
@@ -315,8 +323,7 @@ public sealed partial class ExpandedPlayer : Page, IDisposable
                 LyricBox.Margin = new Thickness(15);
                 break;
         }
-
-        LyricWidth = nowwidth - 30;
+        
         needRedesign++;
         realclick = true;
     }
@@ -1469,7 +1476,7 @@ public sealed partial class ExpandedPlayer : Page, IDisposable
             Common.OnEnterForegroundFromBackground -= OnEnteringForeground;
             HyPlayList.OnSongCoverChanged -= RefreshAlbumCover;
             Common.OnPlaybarVisibilityChanged -= OnPlaybarVisibilityChanged;
-            HyPlayList.Player.SeekCompleted -= Player_SeekCompleted;
+            HyPlayList.Player.PlaybackSession.SeekCompleted -= Player_SeekCompleted;
             if (Window.Current != null)
                 Window.Current.SizeChanged -= Current_SizeChanged;
             if (Common.Setting.albumRotate)

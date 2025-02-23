@@ -150,11 +150,12 @@ namespace HyPlayer.LyricRenderer
 
             foreach (var renderingLyricLine in Context.LyricLines)
             {
-                Context.RenderOffsets[renderingLyricLine.Id] = new LineRenderOffset
+                var offset = new LineRenderOffset
                 {
                     X = 4,
                     Y = topleftPosition
                 };
+                Context.RenderOffsets[renderingLyricLine.Id] = offset;
                 Context.SnapshotRenderOffsets[renderingLyricLine.Id] = new LineRenderOffset();
                 topleftPosition += renderingLyricLine.RenderingHeight + Context.LineSpacing;
                 // 获取 Keyframe
@@ -179,6 +180,7 @@ namespace HyPlayer.LyricRenderer
                 }
             }
 
+            _isTypographyChanged = true;
             _initializing = false;
         }
 
@@ -187,9 +189,19 @@ namespace HyPlayer.LyricRenderer
             try
             {
                 Context.ItemWidth = Context.ViewWidth * Context.LyricWidthRatio;
+                
                 foreach (var renderingLyricLine in Context.LyricLines)
                 {
                     renderingLyricLine.OnRenderSizeChanged(session, Context);
+                    if (Context.PreferTypography?.Alignment is TextAlignment.Right)
+                    {
+                        Context.RenderOffsets[renderingLyricLine.Id].X = Context.ViewWidth - renderingLyricLine.RenderingWidth;
+                    }
+
+                    if (Context.PreferTypography?.Alignment is TextAlignment.Center)
+                    {
+                        Context.RenderOffsets[renderingLyricLine.Id].X = (Context.ViewWidth - renderingLyricLine.RenderingWidth) / 2;
+                    }
                 }
             }
             catch
@@ -337,6 +349,15 @@ namespace HyPlayer.LyricRenderer
                     foreach (var renderingLyricLine in Context.LyricLines)
                     {
                         renderingLyricLine.OnTypographyChanged(args.DrawingSession, Context);
+                        if (Context.PreferTypography?.Alignment is TextAlignment.Right)
+                        {
+                            Context.RenderOffsets[renderingLyricLine.Id].X = Context.ViewWidth - renderingLyricLine.RenderingWidth;
+                        }
+
+                        if (Context.PreferTypography?.Alignment is TextAlignment.Center)
+                        {
+                            Context.RenderOffsets[renderingLyricLine.Id].X = (Context.ViewWidth - renderingLyricLine.RenderingWidth) / 2;
+                        }
                     }
                 }
                 catch
@@ -369,7 +390,6 @@ namespace HyPlayer.LyricRenderer
                 }
 
                 _needRecalculate = true;
-                _needRecalculateSize = true;
             }
 
             if (_needRecalculateSize)

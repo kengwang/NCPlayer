@@ -111,6 +111,7 @@ public sealed partial class TestPage : Page
             }
             Common.Setting.ApiAdditionalParameters = result;
             Common.NeteaseAPI!.Option.AdditionalParameters = result;
+            HyPlayList.LoginDoneCall();
             Common.AddToTeachingTipLists("成功设置API附加参数", "请重启应用以使更改生效");
         }
         catch (Exception ex)
